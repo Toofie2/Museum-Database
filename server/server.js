@@ -11,6 +11,8 @@ app.use(express.urlencoded({ extended: true }));
 const employeesRouter = require('./routes/employees');
 app.use('/employees', employeesRouter);
 
+const ticketRouter = require('./routes/ticket');
+app.use('/ticket', ticketRouter);
 
 app.get("/", (req, res) => {
     res.json("Hello, this is the backend!");
