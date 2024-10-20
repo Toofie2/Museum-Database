@@ -14,6 +14,8 @@ app.use('/employees', employeesRouter);
 const ticketRouter = require('./routes/ticket');
 app.use('/ticket', ticketRouter);
 
+
+
 app.get("/", (req, res) => {
     res.json("Hello, this is the backend!");
 });
