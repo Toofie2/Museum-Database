@@ -30,7 +30,7 @@ router.get('/:id', (req, res) => {
 
 // POST a new employee, check if SSN exists first to avoid mySQL auto incrementing even if error occurs
 router.post('/', (req, res) => {
-    const { department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, work_email, password, hire_date, start_date, salary, ssn } = req.body;
+    const { department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, hire_date, start_date, salary, ssn } = req.body;
     const checkSSNQuery = 'SELECT employee_id FROM Employee WHERE ssn = ?';
     db.query(checkSSNQuery, [ssn], (err, results) => {
         if (err) {
@@ -39,8 +39,8 @@ router.post('/', (req, res) => {
         if (results.length > 0) {
             return res.status(400).json({ error: "An employee with this SSN already exists." });
         }
-        const insertQuery = 'INSERT INTO Employee (department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, work_email, password, hire_date, start_date, salary, ssn) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        db.query(insertQuery, [department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, work_email, password, hire_date, start_date, salary, ssn], (err, result) => {
+        const insertQuery = 'INSERT INTO Employee (department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, hire_date, start_date, salary, ssn) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        db.query(insertQuery, [department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, hire_date, start_date, salary, ssn], (err, result) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
@@ -65,9 +65,9 @@ router.put('/:id', (req, res) => {
         const currentEmployee = fetchResult[0];
         // Merge the updates with the current data
         const updatedEmployee = { ...currentEmployee, ...updates };
-        const { department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, work_email, password, hire_date, start_date, salary, ssn } = updatedEmployee;
-        const updateQuery = 'UPDATE Employee SET department_id = ?, first_name = ?, middle_initial = ?, last_name = ?, date_of_birth = ?, sex = ?, address = ?, role = ?, work_email = ?, password = ?, hire_date = ?, start_date = ?, salary = ?, ssn = ? WHERE employee_id = ?';
-        db.query(updateQuery, [department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, work_email, password, hire_date, start_date, salary, ssn, employeeId], (updateErr, updateResult) => {
+        const { department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, hire_date, start_date, salary, ssn } = updatedEmployee;
+        const updateQuery = 'UPDATE Employee SET department_id = ?, first_name = ?, middle_initial = ?, last_name = ?, date_of_birth = ?, sex = ?, address = ?, role = ?, hire_date = ?, start_date = ?, salary = ?, ssn = ? WHERE employee_id = ?';
+        db.query(updateQuery, [department_id, first_name, middle_initial, last_name, date_of_birth, sex, address, role, hire_date, start_date, salary, ssn, employeeId], (updateErr, updateResult) => {
             if (updateErr) {
                 if (updateErr.code === 'ER_NO_REFERENCED_ROW_2') {
                     return res.status(400).json({ error: "Invalid department ID." });
