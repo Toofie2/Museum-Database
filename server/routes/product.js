@@ -31,7 +31,8 @@ router.get('/:id', (req, res) => {
 // POST a new product
 router.post('/', (req, res) => {
     const { name, description, price, image_path, } = req.body;
-    const insertQuery = 'INSERT INTO Product (name, description, price, image_path) VALUES (?, ?, ?, ?)';
+    //Include timestamp for date_added in query
+    const insertQuery = `INSERT INTO Product (name, description, price, image_path, date_added) VALUES (?, ?, ?, ?, ${new Date().toISOString().slice(0, 19).replace('T', ' ')})`;
     db.query(insertQuery, [name, description, price, image_path], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -44,7 +45,7 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
     const productId = req.params.id;
     const updates = req.body;
-    // Fetch employee data
+    // Fetch product data
     const fetchQuery = 'SELECT * FROM Product WHERE product_id = ?';
     db.query(fetchQuery, [productId], (fetchErr, fetchResult) => {
         if (fetchErr) {
@@ -56,7 +57,7 @@ router.put('/:id', (req, res) => {
         const currentProduct = fetchResult[0];
         // Merge the updates with the current data
         const updatedProduct = { ...currentProduct, ...updates };
-        const { name, description, price, image_path } = updatedEmployee;
+        const { name, description, price, image_path } = updatedProduct;
         const updateQuery = 'UPDATE Product SET name = ?, description = ?, price = ?, image_path = ?';
         db.query(updateQuery, [name, description, price, image_path], (updateErr, updateResult) => {
             if (updateErr) {
@@ -65,38 +66,38 @@ router.put('/:id', (req, res) => {
             if (updateResult.affectedRows === 0) {
                 return res.status(404).json({ message: 'Product not found' });
             }
-            res.json({ id: productId, ...updatedProduct });
+            res.json({ id: productId, ...updatedProduct});
         });
     });
 });
 
-// Soft DELETE an employee (set is_active to FALSE)
+// Soft DELETE a product (change date_deleted from NULL to the current time)
 router.delete('/:id', (req, res) => {
-    db.query('UPDATE Employee SET is_active = FALSE WHERE employee_id = ? AND is_active = TRUE', [req.params.id], (err, result) => {
+    db.query(`UPDATE Product SET date_deleted = ${new Date().toISOString().slice(0, 19).replace('T', ' ')} WHERE product_id = ? AND date_deleted = NULL`, [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
         if (result.affectedRows === 0) {
-            res.status(404).json({ message: 'Employee not found or already inactive' });
+            res.status(404).json({ message: 'Product not found or already deleted' });
             return;
         }
-        res.json({ message: 'Employee successfully deactivated' });
+        res.json({ message: 'Product successfully deleted' });
     });
 });
 
-// Optional: Reactivate an employee
+// Optional: Reactivate a product
 router.patch('/:id/reactivate', (req, res) => {
-    db.query('UPDATE Employee SET is_active = TRUE WHERE employee_id = ?', [req.params.id], (err, result) => {
+    db.query('UPDATE Product SET date_deleted = NULL WHERE product_id = ?', [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
         if (result.affectedRows === 0) {
-            res.status(404).json({ message: 'Employee not found' });
+            res.status(404).json({ message: 'Product not found' });
             return;
         }
-        res.json({ message: 'Employee successfully reactivated' });
+        res.json({ message: 'Product successfully reactivated' });
     });
 });
 
