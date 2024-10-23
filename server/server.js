@@ -11,6 +11,12 @@ app.use(express.urlencoded({ extended: true }));
 const employeeRouter = require('./routes/employee');
 app.use('/employee', employeeRouter);
 
+const customerRouter = require('./routes/customer');
+app.use('/customer', customerRouter);
+
+const authenticationRouter = require('./routes/authentication');
+app.use('/authentication', authenticationRouter);
+
 const customer_exhibitionRouter = require('./routes/customer_exhibition');
 app.use('/customer_exhibition', customer_exhibitionRouter);
 
@@ -19,6 +25,9 @@ app.use('/room', roomRouter);
 
 const exhibitionRouter = require('./routes/exhibition');
 app.use('/exhibition', exhibitionRouter);
+
+const reviewRouter = Require('.routes/review');
+app.use('/review', reviewRouter);
 
 app.get("/", (req, res) => {
     res.json("Hello, this is the backend!");
