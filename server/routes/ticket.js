@@ -4,7 +4,7 @@ const db = require('../db');
 
 // GET all tickets
 router.get('/', (req, res) => {
-    db.query('SELECT * FROM Ticket', (err, results) => {
+    db.query('SELECT * FROM Ticket WHERE is_deleted = FALSE', (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 // GET ticket by ID
 router.get('/:id', (req, res) => {
-    db.query('SELECT * FROM Ticket WHERE ticket_id = ?', [req.params.id], (err, results) => {
+    db.query('SELECT * FROM Ticket WHERE ticket_id = ? AND is_deleted = FALSE', [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -45,7 +45,7 @@ router.put('/:id', (req, res) => {
     const ticketId = req.params.id;
     const updates = req.body;
     // Fetch ticket data
-    const fetchQuery = 'SELECT * FROM Ticket WHERE ticket_id = ?';
+    const fetchQuery = 'SELECT * FROM Ticket WHERE ticket_id = ? AND is_deleted = FALSE';
     db.query(fetchQuery, [ticketId], (fetchErr, fetchResult) => {
         if (fetchErr) {
             return res.status(500).json({ error: fetchErr.message });
@@ -65,14 +65,14 @@ router.put('/:id', (req, res) => {
             if (updateResult.affectedRows === 0) {
                 return res.status(404).json({ message: 'Ticket not found' });
             }
-            res.json({ id: ticketID, ...updatedTicket});
+            res.json({ id: ticketId, ...updatedTicket});
         });
     });
 });
 
-// Soft DELETE a ticket (change date_deleted from NULL to the current time)
+// Soft DELETE a ticket (change is_deleted to TRUE)
 router.delete('/:id', (req, res) => {
-    db.query(`UPDATE Ticket SET date_deleted = ${new Date().toISOString().slice(0, 19).replace('T', ' ')} WHERE ticket_id = ? AND date_deleted = NULL`, [req.params.id], (err, result) => {
+    db.query(`UPDATE Ticket SET is_deleted = TRUE WHERE ticket_id = ? AND is_deleted = FALSE`, [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -87,7 +87,7 @@ router.delete('/:id', (req, res) => {
 
 // Optional: Reactivate a ticket
 router.patch('/:id/reactivate', (req, res) => {
-    db.query('UPDATE Ticket SET date_deleted = NULL WHERE ticket_id = ?', [req.params.id], (err, result) => {
+    db.query('UPDATE Ticket SET is_deleted = FALSE WHERE ticket_id = ?', [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
