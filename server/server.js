@@ -28,7 +28,7 @@ app.use('/room', roomRouter);
 const exhibitionRouter = require('./routes/exhibition');
 app.use('/exhibition', exhibitionRouter);
 
-const reviewRouter = Require('.routes/review');
+const reviewRouter = require('./routes/review');
 app.use('/review', reviewRouter);
 
 const artRouter = require('./routes/art');
