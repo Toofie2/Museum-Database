@@ -4,7 +4,7 @@ const db = require('../db');
 
 // GET all products
 router.get('/', (req, res) => {
-    db.query('SELECT * FROM Product', (err, results) => {
+    db.query('SELECT * FROM Product WHERE is_deleted = FALSE', (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 // GET product by ID
 router.get('/:id', (req, res) => {
-    db.query('SELECT * FROM Product WHERE product_id = ?', [req.params.id], (err, results) => {
+    db.query('SELECT * FROM Product WHERE product_id = ? AND is_deleted = FALSE', [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -31,8 +31,7 @@ router.get('/:id', (req, res) => {
 // POST a new product
 router.post('/', (req, res) => {
     const { name, description, price, image_path, } = req.body;
-    //Include timestamp for date_added in query
-    const insertQuery = `INSERT INTO Product (name, description, price, image_path, date_added) VALUES (?, ?, ?, ?, ${new Date().toISOString().slice(0, 19).replace('T', ' ')})`;
+    const insertQuery = 'INSERT INTO Product (name, description, price, image_path) VALUES (?, ?, ?, ?)';
     db.query(insertQuery, [name, description, price, image_path], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -46,7 +45,7 @@ router.put('/:id', (req, res) => {
     const productId = req.params.id;
     const updates = req.body;
     // Fetch product data
-    const fetchQuery = 'SELECT * FROM Product WHERE product_id = ?';
+    const fetchQuery = 'SELECT * FROM Product WHERE product_id = ? AND is_deleted = FALSE';
     db.query(fetchQuery, [productId], (fetchErr, fetchResult) => {
         if (fetchErr) {
             return res.status(500).json({ error: fetchErr.message });
@@ -71,9 +70,9 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// Soft DELETE a product (change date_deleted from NULL to the current time)
+// Soft DELETE a product (change is_deleted to TRUE)
 router.delete('/:id', (req, res) => {
-    db.query(`UPDATE Product SET date_deleted = ${new Date().toISOString().slice(0, 19).replace('T', ' ')} WHERE product_id = ? AND date_deleted = NULL`, [req.params.id], (err, result) => {
+    db.query('UPDATE Product SET is_deleted = TRUE WHERE product_id = ? AND is_deleted= FALSE', [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -88,7 +87,7 @@ router.delete('/:id', (req, res) => {
 
 // Optional: Reactivate a product
 router.patch('/:id/reactivate', (req, res) => {
-    db.query('UPDATE Product SET date_deleted = NULL WHERE product_id = ?', [req.params.id], (err, result) => {
+    db.query('UPDATE Product SET is_deleted = FALSE WHERE product_id = ?', [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
