@@ -70,5 +70,19 @@ router.put('/:id', (req, res) => {
     });
 });
 
+// DELETE a customer ticket
+router.delete('/:id', (req, res) => {
+    db.query('DELETE FROM Customer_Ticket WHERE customer_ticket_id = ?', [req.params.id], (err, result) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (result.affectedRows === 0) {
+            res.status(404).json({ message: 'Customer Ticket not found or already deleted' });
+            return;
+        }
+        res.json({ message: 'Customer Ticket successfully deleted' });
+    });
+});
 
 module.exports = router;
