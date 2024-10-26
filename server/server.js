@@ -1,7 +1,10 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
+//import cors from 'cors'
 
 const app = express();
+app.use(cors());
 const port = process.env.PORT;
 
 app.use(express.json());
@@ -19,6 +22,12 @@ app.use('/room', roomRouter);
 
 const exhibitionRouter = require('./routes/exhibition');
 app.use('/exhibition', exhibitionRouter);
+
+const ticketRouter = require('./routes/ticket');
+app.use('/ticket', ticketRouter);
+
+const productRouter = require('./routes/product');
+app.use('/product', productRouter);
 
 app.get("/", (req, res) => {
     res.json("Hello, this is the backend!");
