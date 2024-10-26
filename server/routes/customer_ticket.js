@@ -21,18 +21,18 @@ router.get('/:id', (req, res) => {
             return;
         }
         if (results.length == 0) {
-            res.status(404).json({ message: 'Ticket not found' });
+            res.status(404).json({ message: 'Customer Ticket not found' });
             return;
         }
         res.json(results[0]);
     });
 });
 
-// POST a new ticket
+// POST a new customer_ticket
 router.post('/', (req, res) => {
-    const { type, price } = req.body;
-    const insertQuery = "INSERT INTO Customer_Ticket (customer_id, ticket_id, amount_spent, valid_start, valid_end) VALUES (?, ?)";
-    db.query(insertQuery, [type, price], (err, result) => {
+    const { customer_id, ticket_id, amount_spent, valid_start, valid_end } = req.body;
+    const insertQuery = "INSERT INTO Customer_Ticket (customer_id, ticket_id, amount_spent, valid_start, valid_end) VALUES (?, ?, ?, ?, ?)";
+    db.query(insertQuery, [customer_id, ticket_id, amount_spent, valid_start, valid_end], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -40,64 +40,35 @@ router.post('/', (req, res) => {
     });
 });
 
-// PUT (update) a ticket
+// PUT (update) a customer ticket
 router.put('/:id', (req, res) => {
-    const ticketId = req.params.id;
+    const customerTicketId = req.params.id;
     const updates = req.body;
-    // Fetch ticket data
-    const fetchQuery = 'SELECT * FROM Ticket WHERE ticket_id = ? AND is_deleted = FALSE';
-    db.query(fetchQuery, [ticketId], (fetchErr, fetchResult) => {
+    // Fetch customer ticket data
+    const fetchQuery = 'SELECT * FROM Customer_Ticket WHERE customer_ticket_id = ?';
+    db.query(fetchQuery, [customerTicketId], (fetchErr, fetchResult) => {
         if (fetchErr) {
             return res.status(500).json({ error: fetchErr.message });
         }
         if (fetchResult.length === 0) {
-            return res.status(404).json({ message: 'Ticket not found' });
+            return res.status(404).json({ message: 'Customer Ticket not found' });
         }
-        const currentTicket = fetchResult[0];
+        const currentCustomerTicket = fetchResult[0];
         // Merge the updates with the current data
-        const updatedTicket = { ...currentTicket, ...updates };
-        const { type, price } = updatedTicket;
-        const updateQuery = 'UPDATE Ticket SET type = ?, price = ?';
-        db.query(updateQuery, [type, price], (updateErr, updateResult) => {
+        const updatedCustomerTicket = { ...currentCustomerTicket, ...updates };
+        const { customer_id, ticket_id, amount_spent, valid_start, valid_end } = updatedCustomerTicket;
+        const updateQuery = 'UPDATE Customer_Ticket SET customer_id = ?, ticket_id = ?, amount_spent = ?, valid_start = ?, valid_end = ?';
+        db.query(updateQuery, [customer_id, ticket_id, amount_spent, valid_start, valid_end], (updateErr, updateResult) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
             if (updateResult.affectedRows === 0) {
-                return res.status(404).json({ message: 'Ticket not found' });
+                return res.status(404).json({ message: 'Customer Ticket not found' });
             }
-            res.json({ id: ticketId, ...updatedTicket});
+            res.json({ id: customerTicketId, ...updatedCustomerTicket});
         });
     });
 });
 
-// Soft DELETE a ticket (change is_deleted to TRUE)
-router.delete('/:id', (req, res) => {
-    db.query(`UPDATE Ticket SET is_deleted = TRUE WHERE ticket_id = ? AND is_deleted = FALSE`, [req.params.id], (err, result) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        if (result.affectedRows === 0) {
-            res.status(404).json({ message: 'Ticket not found or already deleted' });
-            return;
-        }
-        res.json({ message: 'Ticket successfully deleted' });
-    });
-});
-
-// Optional: Reactivate a ticket
-router.patch('/:id/reactivate', (req, res) => {
-    db.query('UPDATE Ticket SET is_deleted = FALSE WHERE ticket_id = ?', [req.params.id], (err, result) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        if (result.affectedRows === 0) {
-            res.status(404).json({ message: 'Ticket not found' });
-            return;
-        }
-        res.json({ message: 'Ticket successfully reactivated' });
-    });
-});
 
 module.exports = router;
