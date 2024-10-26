@@ -1,12 +1,10 @@
 const express = require('express');
-const cors = require('cors');
 const router = express.Router();
-router.use(cors());
 const db = require('../db');
 
-// GET all tickets
+// GET all customer tickets
 router.get('/', (req, res) => {
-    db.query('SELECT * FROM Ticket WHERE is_deleted = FALSE', (err, results) => {
+    db.query('SELECT * FROM Customer_Ticket', (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -15,9 +13,9 @@ router.get('/', (req, res) => {
     });
 });
 
-// GET ticket by ID
+// GET customer ticket by ID
 router.get('/:id', (req, res) => {
-    db.query('SELECT * FROM Ticket WHERE ticket_id = ? AND is_deleted = FALSE', [req.params.id], (err, results) => {
+    db.query('SELECT * FROM Customer_Ticket WHERE customer_ticket_id = ?', [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -33,7 +31,7 @@ router.get('/:id', (req, res) => {
 // POST a new ticket
 router.post('/', (req, res) => {
     const { type, price } = req.body;
-    const insertQuery = "INSERT INTO Ticket (type, price) VALUES (?, ?)";
+    const insertQuery = "INSERT INTO Customer_Ticket (customer_id, ticket_id, amount_spent, valid_start, valid_end) VALUES (?, ?)";
     db.query(insertQuery, [type, price], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
