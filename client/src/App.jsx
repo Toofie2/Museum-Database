@@ -1,12 +1,16 @@
-import { Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage.jsx";
+import {BrowserRouter, Routes, Route} from "react-router-dom"
+import HomePage from "./pages/HomePage.jsx"
+import TicketPage from "./pages/TicketPage.jsx"
+
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-    </Routes>
-  );
-};
+    <BrowserRouter>
+      <Routes>
+        <Route path="/tickets" element={<TicketPage />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
 
-export default App;
+export default App
