@@ -70,5 +70,19 @@ router.put('/:id', (req, res) => {
     });
 });
 
+// DELETE a customer product
+router.delete('/:id', (req, res) => {
+    db.query('DELETE FROM Customer_Product WHERE customer_product_id = ?', [req.params.id], (err, result) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (result.affectedRows === 0) {
+            res.status(404).json({ message: 'Customer Product not found or already deleted' });
+            return;
+        }
+        res.json({ message: 'Customer Product successfully deleted' });
+    });
+});
 
 module.exports = router;
