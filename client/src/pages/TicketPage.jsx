@@ -92,9 +92,11 @@ const TicketPage = () => {
     })
     return (
         <div className="ticketForm">
+            <h1 class="text-2xl font-medium">Purchase</h1>
+            <p>Please select an available date for your visit and the amount of tickets you’ll be purchasing.</p>
             <form>
                 <label>
-                    Adult Admission (19+) ${ticketPrices.at(0)} &emsp;&emsp;
+                    <span class="font-medium">Adult Admission (19+)</span> ${ticketPrices.at(0)} &emsp;&emsp;
                     <input 
                         type="number"
                         name="adult"
@@ -104,7 +106,7 @@ const TicketPage = () => {
                 </label>
                 <br></br>
                 <label>
-                    Senior Admission (65+) ${ticketPrices.at(1)} &emsp;&emsp;
+                    <span class="font-medium">Senior Admission (65+)</span>  ${ticketPrices.at(1)} &emsp;&emsp;
                     <input 
                         type="number"
                         name="senior"
@@ -114,7 +116,7 @@ const TicketPage = () => {
                 </label>
                 <br></br>
                 <label>
-                Youth Admission (13-18) ${ticketPrices.at(2)} &emsp;&emsp;
+                <span class="font-medium">Youth Admission (13-18)</span>  ${ticketPrices.at(2)} &emsp;&emsp;
                     <input 
                         type="number"
                         name="youth"
@@ -124,7 +126,7 @@ const TicketPage = () => {
                 </label>
                 <br></br>
                 <label>
-                Child Admission (12 & Under) ${ticketPrices.at(3)} &emsp;&emsp;
+                <span class="font-medium">Child Admission (12 & Under)</span>  ${ticketPrices.at(3)} &emsp;&emsp;
                     <input 
                         type="number"
                         name="child"
@@ -134,7 +136,7 @@ const TicketPage = () => {
                 </label>
                 <br></br>
                 <label>
-                Student Admission (with valid ID) ${ticketPrices.at(4)} &emsp;&emsp;
+                <span class="font-medium">Student Admission (with valid ID)</span>  ${ticketPrices.at(4)} &emsp;&emsp;
                     <input 
                         type="number"
                         name="student"
@@ -143,10 +145,11 @@ const TicketPage = () => {
                     />
                 </label>
                 <div>
-                    <span>Subtotal</span>
-                    <span>${subtotal}</span>
+                    <span class="text-default-gray">Subtotal${subtotal}</span>
                 </div>
-                <button onClick={handleSubmit}>Checkout</button>   
+                <button class="bg-black text-white py-2 px-52 border-black rounded" onClick={handleSubmit}>
+                    Checkout
+                </button>   
             </form>
         </div>
     );
