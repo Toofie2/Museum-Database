@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
+import DatePickerComponent from "./DatePickerComponent"
 
 const TicketForm = () => {
     const[tickets, setTickets] = useState([]);
@@ -101,6 +102,9 @@ const TicketForm = () => {
         <div className="ticketForm">
             <h1 class="text-3xl font-medium">Purchase</h1>
             <p class="mt-3 leading-loose">Please select an available date for your visit and the amount of tickets you’ll be purchasing.</p>
+            <div class="mt-5">
+                <DatePickerComponent></DatePickerComponent>
+            </div>
             <form class="mt-6">
                 <span >
                 <label class="flex justify-between">
