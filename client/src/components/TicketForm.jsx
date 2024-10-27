@@ -9,7 +9,8 @@ const TicketForm = () => {
         senior: 0,
         youth: 0,
         child: 0,
-        student: 0
+        student: 0,
+        veteran: 0
     }); 
     const purchasedTicket = {
         customer_id: 1,
@@ -92,8 +93,8 @@ const TicketForm = () => {
     })
     return (
         <div className="ticketForm">
-            <h1 class="text-2xl font-medium">Purchase</h1>
-            <p>Please select an available date for your visit and the amount of tickets you’ll be purchasing.</p>
+            <h1 class="text-3xl font-medium">Purchase</h1>
+            <p class="mt-3 leading-loose">Please select an available date for your visit and the amount of tickets you’ll be purchasing.</p>
             <form>
                 <label>
                     <span class="font-medium">Adult Admission (19+)</span> ${ticketPrices.at(0)} &emsp;&emsp;
@@ -141,6 +142,16 @@ const TicketForm = () => {
                         type="number"
                         name="student"
                         value={formData.student}
+                        onChange={handleChange} 
+                    />
+                </label>
+                <br></br>
+                <label>
+                <span class="font-medium">Veteran Admission (with valid ID)</span>  ${ticketPrices.at(5)} &emsp;&emsp;
+                    <input 
+                        type="number"
+                        name="veteran"
+                        value={formData.veteran}
                         onChange={handleChange} 
                     />
                 </label>
