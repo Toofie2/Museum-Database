@@ -57,7 +57,7 @@ router.put('/:id', (req, res) => {
         // Merge the updates with the current data
         const updatedReview = { ...currentReview, ...updates };
         const { customer_id, title, feedback, rating, date_posted } = updatedCustomer;
-        const updateQuery = 'UPDATE Customer SET customer_id = ?, title, feedback, rating, date_posted';
+        const updateQuery = 'UPDATE Customer SET customer_id = ?, title, feedback, rating, date_posted WHERE review_id = ?';
         db.query(updateQuery, [customer_id, title, feedback, rating, date_posted], (updateErr, updateResult) => {
             if (updateResult.affectedRows === 0) {
                 return res.status(404).json({ message: 'Review not found' });
