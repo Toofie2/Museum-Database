@@ -57,7 +57,7 @@ router.put('/:id', (req, res) => {
         // Merge the updates with the current data
         const updatedCustomer = { ...currentCustomer, ...updates };
         const { first_name, middle_initial, last_name, is_member, membership_start_date } = updatedCustomer;
-        const updateQuery = 'UPDATE Customer SET first_name = ?, middle_initial = ?, last_name = ?, is_member = ?, membership_start_date = ?';
+        const updateQuery = 'UPDATE Customer SET first_name = ?, middle_initial = ?, last_name = ?, is_member = ?, membership_start_date = ? WHERE customer_id = ?';
         db.query(updateQuery, [first_name, middle_initial, last_name, is_member, membership_start_date, customerId], (updateErr, updateResult) => {
             if (updateResult.affectedRows === 0) {
                 return res.status(404).json({ message: 'Customer not found' });
