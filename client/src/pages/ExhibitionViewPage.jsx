@@ -27,10 +27,10 @@ const ExhibitionViewPage = () => {
   if (!exhibition) return <div className="text-center mt-20">Loading...</div>;
 
   return (
-    <div className="container mx-auto pb-12">
+    <div className="mx-auto pb-12">
       <Navbar />
       {/* Banner Section */}
-      <div className="relative flex items-center h-[800px] w-full">
+      <div className="relative flex items-center h-[800px] w-screen">
         <img
           src={`${exhibition.image_path}`}
           alt="Exhibition Banner"
