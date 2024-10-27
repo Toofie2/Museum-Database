@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// GET all users authentication credentials (idk why I added this lol)
+// GET all users authentication credentials
 router.get('/', (req, res) => {
     db.query('SELECT * FROM Authentication', (err, results) => {
         if (err) {
