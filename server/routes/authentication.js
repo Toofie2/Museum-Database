@@ -72,7 +72,7 @@ router.put('/:id', (req, res) => {
         // Merge the updates with the current data
         const updatedUser = { ...currentUser, ...updates };
         const { customer_id, employee_id, email, password } = updatedUser;
-        const updateQuery = 'UPDATE Authentication SET customer_id = ?, employee_id = ?, email = ?, password = ?';
+        const updateQuery = 'UPDATE Authentication SET customer_id = ?, employee_id = ?, email = ?, password = ? WHERE email = ?';
         db.query(updateQuery, [customer_id, employee_id, email, password], (updateErr, updateResult) => {
             if (updateErr) {
                 if (updateErr.code === 'ER_NO_REFERENCED_ROW_2') {
