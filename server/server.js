@@ -28,6 +28,15 @@ app.use('/room', roomRouter);
 const exhibitionRouter = require('./routes/exhibition');
 app.use('/exhibition', exhibitionRouter);
 
+const artRouter = require('./routes/art');
+app.use('/art', artRouter);
+
+const artistRouter = require('./routes/artist');
+app.use('/artist', artistRouter);
+
+const collectionRouter = require('./routes/collection');
+app.use('/collection', collectionRouter);
+
 const reviewRouter = require('./routes/review');
 app.use('/review', reviewRouter);
 

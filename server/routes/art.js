@@ -1,21 +1,19 @@
-/* app.get('/Art', (req, res) => {
-  db.query('SELECT * FROM Art', (err, results) => {
-    if (err) return res.status(500).send(err);
-    res.json(results);
-  });
-});
-app.post('/Art', (req, res) => {
-  const { title, artistId, collectionId } = req.body;
-  db.query('INSERT INTO Art (title, artistId, collectionId) VALUES (?, ?, ?)', [title, artistId, collectionId], (err, results) => {
-    if (err) return res.status(500).send(err);
-    res.status(201).json({ id: results.insertId, title, artistId, collectionId });
-  });
-});
-
-*/
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+
+/*
+// GET all active Artworks
+router.get('/', (req, res) => {
+    db.query('SELECT * FROM Art WHERE is_active = TRUE', (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
+*/
 
 // GET all Art
 router.get('/', (req, res) => {
@@ -26,15 +24,30 @@ router.get('/', (req, res) => {
         res.json(results);
     });
 });
-
+/*
+// GET Artwork by ID
+router.get('/:id', (req, res) => {
+    db.query('SELECT * FROM Art WHERE art_id = ? AND is_active = TRUE', [req.params.id], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (results.length === 0) 
+            return res.status(404).json({ message: 'Artwork not found or inactive' });
+        }
+        res.json(results[0]);
+    });
+});
+ */
 // GET Art by ID
 router.get('/:id', (req, res) => {
     db.query('SELECT * FROM Art WHERE art_id = ?', [req.params.id], (err, results) => {
         if (err) {
-            return res.status(500).json({ error: err.message });
+            res.status(500).json({ error: err.message });
+            return;
         }
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Art not found' });
+            res.status(404).json({ message: 'Art not found' });
+            return;
         }
         res.json(results[0]);
     });
@@ -49,16 +62,22 @@ router.post('/', (req, res) => {
         return res.status(400).json({ message: 'Invalid dates: date_created should be before or equal to date_received' });
     }
 
-    const insertQuery = `INSERT INTO Art (artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const insertQuery = `
+        INSERT INTO Art (artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     db.query(insertQuery, [artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received], (err, result) => {
         if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({ message: 'Art ID already exists' });
+            }
             return res.status(500).json({ error: err.message });
         }
         res.status(201).json({ id: result.insertId, ...req.body });
     });
 });
+
 
 // PUT (update) Art by ID
 router.put('/:id', (req, res) => {
