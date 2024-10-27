@@ -17,6 +17,18 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+// GET Art pieces by Exhibit ID
+router.get('/exhibit/:exhibit_id', (req, res) => {
+    const { exhibit_id } = req.params;
+
+    db.query('SELECT * FROM Art WHERE exhibit_id = ?', [exhibit_id], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
 // GET all Art
 router.get('/', (req, res) => {
     db.query('SELECT * FROM Art', (err, results) => {
@@ -87,7 +99,7 @@ router.put('/:id', (req, res) => {
             SET artist_id = ?, collection_id = ?, room_id = ?, title = ?, description = ?, image_path = ?, medium = ?, date_created = ?, date_received = ?
             WHERE art_id = ?
         `;
-        db.query(updateQuery, [artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received, artIdrtId], (err) => {
+        db.query(updateQuery, [artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received, artId], (err) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
