@@ -9,10 +9,17 @@ const port = process.env.PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // Backend routes for each table
 const employeeRouter = require('./routes/employee');
 app.use('/employee', employeeRouter);
+
+const customerRouter = require('./routes/customer');
+app.use('/customer', customerRouter);
+
+const authenticationRouter = require('./routes/authentication');
+app.use('/authentication', authenticationRouter);
 
 const customer_exhibitionRouter = require('./routes/customer_exhibition');
 app.use('/customer_exhibition', customer_exhibitionRouter);
@@ -34,6 +41,9 @@ app.use('/product', productRouter);
 
 const customerProductRouter = require('./routes/customer_product');
 app.use('/customer_product', customerProductRouter);
+
+const reviewRouter = require('./routes/review');
+app.use('/review', reviewRouter);
 
 app.get("/", (req, res) => {
     res.json("Hello, this is the backend!");
