@@ -45,37 +45,32 @@ const TicketForm = () => {
             purchasedTicket.amount_spent = ticketPrices.at(0);
             purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.adult; j++){
-                promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(1);
             purchasedTicket.amount_spent = ticketPrices.at(1);
-            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.senior; j++){
-                promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(2);
             purchasedTicket.amount_spent = ticketPrices.at(2);
-            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.youth; j++){
-                promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(3);
             purchasedTicket.amount_spent = ticketPrices.at(3);
-            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.child; j++){
-                promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(4);
             purchasedTicket.amount_spent = ticketPrices.at(4);
-            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.student; j++){
-                promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(5);
             purchasedTicket.amount_spent = ticketPrices.at(5);
-            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.veteran; j++){
-                promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             let allPromises = Promise.all(promises).then(() => console.log('tickets submitted in database'));
         }catch(err){
