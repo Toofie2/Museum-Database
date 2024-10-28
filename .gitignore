@@ -1,4 +1,9 @@
+vscode
+.vscode
+settings.json
 node_modules
 .DS_Store
 .env
 .env.local
+.vscode/*
+!.vscode/extensions.json
