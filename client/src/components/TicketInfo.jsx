@@ -12,7 +12,7 @@ const TicketInfo = () => {
                 Must verify student or veteran status at entry with a valid ID <br></br>
                 All tickets give access to same-day entry to museum for the date on your ticket.
             </p>
-            <div class="text-white box-border h-auto w-fit px-5 py-4 border-4 border-gray-brown rounded bg-gray-brown mt-6">
+            <div class="text-white box-border h-auto w-full px-5 py-4 border-4 border-gray-brown rounded bg-gray-brown mt-6">
                 <h2 class="text-xl font-medium">
                     Become a Member
                 </h2>
