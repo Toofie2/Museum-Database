@@ -59,8 +59,8 @@ router.put('/:id', (req, res) => {
         // Merge the updates with the current data
         const updatedTicket = { ...currentTicket, ...updates };
         const { type, price } = updatedTicket;
-        const updateQuery = 'UPDATE Ticket SET type = ?, price = ?';
-        db.query(updateQuery, [type, price], (updateErr, updateResult) => {
+        const updateQuery = 'UPDATE Ticket SET type = ?, price = ? WHERE ticket_id = ?';
+        db.query(updateQuery, [type, price, ticketId], (updateErr, updateResult) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
