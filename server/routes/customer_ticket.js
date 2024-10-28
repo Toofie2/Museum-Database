@@ -30,9 +30,9 @@ router.get('/:id', (req, res) => {
 
 // POST a new customer_ticket
 router.post('/', (req, res) => {
-    const { customer_id, ticket_id, amount_spent, valid_start, valid_end } = req.body;
-    const insertQuery = "INSERT INTO Customer_Ticket (customer_id, ticket_id, amount_spent, valid_start, valid_end) VALUES (?, ?, ?, ?, ?)";
-    db.query(insertQuery, [customer_id, ticket_id, amount_spent, valid_start, valid_end], (err, result) => {
+    const { customer_id, ticket_id, amount_spent, valid_day} = req.body;
+    const insertQuery = "INSERT INTO Customer_Ticket (customer_id, ticket_id, amount_spent, valid_day) VALUES (?, ?, ?, ?)";
+    db.query(insertQuery, [customer_id, ticket_id, amount_spent, valid_day], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -56,9 +56,9 @@ router.put('/:id', (req, res) => {
         const currentCustomerTicket = fetchResult[0];
         // Merge the updates with the current data
         const updatedCustomerTicket = { ...currentCustomerTicket, ...updates };
-        const { customer_id, ticket_id, amount_spent, valid_start, valid_end } = updatedCustomerTicket;
-        const updateQuery = 'UPDATE Customer_Ticket SET customer_id = ?, ticket_id = ?, amount_spent = ?, valid_start = ?, valid_end = ? WHERE customer_ticket_id = ?';
-        db.query(updateQuery, [customer_id, ticket_id, amount_spent, valid_start, valid_end, customerTicketId], (updateErr, updateResult) => {
+        const { customer_id, ticket_id, amount_spent, valid_day} = updatedCustomerTicket;
+        const updateQuery = 'UPDATE Customer_Ticket SET customer_id = ?, ticket_id = ?, amount_spent = ?, valid_day = ? WHERE customer_ticket_id = ?';
+        db.query(updateQuery, [customer_id, ticket_id, amount_spent, valid_day, customerTicketId], (updateErr, updateResult) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
