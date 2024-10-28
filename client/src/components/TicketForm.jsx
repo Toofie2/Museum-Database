@@ -17,10 +17,10 @@ const TicketForm = () => {
         customer_id: 1,
         ticket_id: 0,
         amount_spent: 0,
-        valid_start: "2024-12-01 01:00:00",
-        valid_end: "2024-12-01 08:00:00"
+        valid_day:""
     };
 
+    const{render, selectedDate} = DatePickerComponent();
 
     
     const handleChange = (e)=>{
@@ -38,40 +38,46 @@ const TicketForm = () => {
     }
 
     const handleSubmit = async e=>{
-        //e.preventDefault()
         try{
             let promises = [];
+            const convertedDate = selectedDate.toISOString().split("T")[0];
             purchasedTicket.ticket_id = ticketIDs.at(0);
             purchasedTicket.amount_spent = ticketPrices.at(0);
+            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.adult; j++){
                 promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(1);
             purchasedTicket.amount_spent = ticketPrices.at(1);
+            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.senior; j++){
                 promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(2);
             purchasedTicket.amount_spent = ticketPrices.at(2);
+            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.youth; j++){
                 promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(3);
             purchasedTicket.amount_spent = ticketPrices.at(3);
+            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.child; j++){
                 promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(4);
             purchasedTicket.amount_spent = ticketPrices.at(4);
+            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.student; j++){
                 promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
             purchasedTicket.ticket_id = ticketIDs.at(5);
             purchasedTicket.amount_spent = ticketPrices.at(5);
+            purchasedTicket.valid_day = convertedDate;
             for(let j = 0; j < formData.veteran; j++){
                 promises.push(axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
             }
-            let allPromises = Promise.all(promises).then(() => console.log('all done'));
+            let allPromises = Promise.all(promises).then(() => console.log('tickets submitted in database'));
         }catch(err){
             console.log(err)
         }
@@ -103,7 +109,7 @@ const TicketForm = () => {
             <h1 class="text-3xl font-medium">Purchase</h1>
             <p class="mt-3 leading-loose">Please select an available date for your visit and the amount of tickets you’ll be purchasing.</p>
             <div class="w-64 mt-5 py-2 px-5 border-2 border-black rounded">
-                <DatePickerComponent></DatePickerComponent>
+                {render}
             </div>
             <form class="mt-6">
                 <span >
@@ -115,7 +121,8 @@ const TicketForm = () => {
                         type="number"
                         name="adult"
                         min="0"
-                        max="20"
+                        max="50"
+                        placeholder="0"
                         value={formData.adult}
                         onChange={handleChange} 
                         class="w-12"
@@ -130,7 +137,8 @@ const TicketForm = () => {
                         type="number"
                         name="senior"
                         min="0"
-                        max="20"
+                        max="50"
+                        placeholder="0"
                         value={formData.senior}
                         onChange={handleChange} 
                         class="w-12"
@@ -145,7 +153,8 @@ const TicketForm = () => {
                         type="number"
                         name="youth"
                         min="0"
-                        max="20"
+                        max="50"
+                        placeholder="0"
                         value={formData.youth}
                         onChange={handleChange}
                         class="w-12" 
@@ -160,7 +169,8 @@ const TicketForm = () => {
                         type="number"
                         name="child"
                         min="0"
-                        max="20"
+                        max="50"
+                        placeholder="0"
                         value={formData.child}
                         onChange={handleChange}
                         class="w-12" 
@@ -175,7 +185,8 @@ const TicketForm = () => {
                         type="number"
                         name="student"
                         min="0"
-                        max="20"
+                        max="50"
+                        placeholder="0"
                         value={formData.student}
                         onChange={handleChange}
                         class="w-12" 
@@ -190,7 +201,8 @@ const TicketForm = () => {
                         type="number"
                         name="veteran"
                         min="0"
-                        max="20"
+                        max="50"
+                        placeholder="0"
                         value={formData.veteran}
                         onChange={handleChange}
                         class="w-12" 
