@@ -102,7 +102,7 @@ const TicketForm = () => {
         <div className="ticketForm">
             <h1 class="text-3xl font-medium">Purchase</h1>
             <p class="mt-3 leading-loose">Please select an available date for your visit and the amount of tickets you’ll be purchasing.</p>
-            <div class="mt-5">
+            <div class="w-64 mt-5 py-2 px-5 border-2 border-black rounded">
                 <DatePickerComponent></DatePickerComponent>
             </div>
             <form class="mt-6">
