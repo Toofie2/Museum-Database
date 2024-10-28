@@ -1,7 +1,25 @@
 import { Link } from "react-router-dom";
 import { TheFAMLogo } from "../constants/components.jsx";
+import { useState, useEffect } from 'react';
 
 const NavBar = () => {
+
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 0) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
     const leftnavigation = [
         {
             name: "Tickets",
@@ -39,8 +57,8 @@ const NavBar = () => {
         }
     ];
     return (
-        <nav className="fixed z-10 w-full text-white">
-            <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
+        <nav className={`fixed z-10 w-full transition-all duration-300 ${isScrolled ? 'bg-white [&_svg]:text-black shadow-md' : 'text-white'}`}>
+            <div className="flex justify-between items-center max-w-full mx-auto px-16 py-4">
                 <div className="w-1/2">
                     <ul className="flex justify-start gap-8">
                         {leftnavigation.map((item) => (
@@ -54,7 +72,7 @@ const NavBar = () => {
                 </div>
                 <div className="flex justify-center">
                     <Link>
-                        <TheFAMLogo className="text-white" />
+                        <TheFAMLogo />
                     </Link>
                 </div>
                 <div className="flex justify-end w-1/2">
