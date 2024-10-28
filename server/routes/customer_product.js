@@ -4,7 +4,7 @@ const db = require('../db');
 
 // GET all customer products
 router.get('/', (req, res) => {
-    db.query('SELECT * FROM Customer_Product', (err, results) => {
+    db.query('SELECT * FROM Customer_Product WHERE is_deleted = FALSE', (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 // GET customer product by ID
 router.get('/:id', (req, res) => {
-    db.query('SELECT * FROM Customer_Product WHERE customer_product_id = ?', [req.params.id], (err, results) => {
+    db.query('SELECT * FROM Customer_Product WHERE customer_product_id = ? AND is_deleted = FALSE', [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -57,8 +57,8 @@ router.put('/:id', (req, res) => {
         // Merge the updates with the current data
         const updatedCustomerProduct = { ...currentCustomerProduct, ...updates };
         const { customer_id, product_id, amount_spent, quantity } = updatedCustomerProduct;
-        const updateQuery = 'UPDATE Customer_Product SET customer_id = ?, product_id = ?, amount_spent = ?, quantity = ?';
-        db.query(updateQuery, [customer_id, product_id, amount_spent, quantity], (updateErr, updateResult) => {
+        const updateQuery = 'UPDATE Customer_Product SET customer_id = ?, product_id = ?, amount_spent = ?, quantity = ? WHERE customer_product_id = ?';
+        db.query(updateQuery, [customer_id, product_id, amount_spent, quantity, customerProductId], (updateErr, updateResult) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
@@ -70,9 +70,9 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// DELETE a customer product
+// Soft DELETE a customer product (change is_deleted to TRUE)
 router.delete('/:id', (req, res) => {
-    db.query('DELETE FROM Customer_Product WHERE customer_product_id = ?', [req.params.id], (err, result) => {
+    db.query(`UPDATE Customer_Product SET is_deleted = TRUE WHERE customer_product_id = ? AND is_deleted = FALSE`, [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -82,6 +82,21 @@ router.delete('/:id', (req, res) => {
             return;
         }
         res.json({ message: 'Customer Product successfully deleted' });
+    });
+});
+
+// Optional: Reactivate a customer product
+router.patch('/:id/reactivate', (req, res) => {
+    db.query('UPDATE Customer_Product SET is_deleted = FALSE WHERE customer_product_id = ?', [req.params.id], (err, result) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (result.affectedRows === 0) {
+            res.status(404).json({ message: 'Customer Product not found' });
+            return;
+        }
+        res.json({ message: 'Customer Product successfully reactivated' });
     });
 });
 
