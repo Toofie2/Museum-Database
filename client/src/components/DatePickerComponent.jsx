@@ -16,7 +16,7 @@ const DatePickerComponent = () =>{
             <DatePicker 
             selected={selectedDate}
             onChange={handleDateChange}
-            dateFormat="MM/dd/YYYY"
+            dateFormat="MMMM dd, YYYY"
             />
         </div>
 
