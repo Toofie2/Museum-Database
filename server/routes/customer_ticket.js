@@ -4,7 +4,7 @@ const db = require('../db');
 
 // GET all customer tickets
 router.get('/', (req, res) => {
-    db.query('SELECT * FROM Customer_Ticket', (err, results) => {
+    db.query('SELECT * FROM Customer_Ticket WHERE is_deleted = FALSE', (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 // GET customer ticket by ID
 router.get('/:id', (req, res) => {
-    db.query('SELECT * FROM Customer_Ticket WHERE customer_ticket_id = ?', [req.params.id], (err, results) => {
+    db.query('SELECT * FROM Customer_Ticket WHERE customer_ticket_id = ? AND is_deleted = FALSE', [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -57,8 +57,8 @@ router.put('/:id', (req, res) => {
         // Merge the updates with the current data
         const updatedCustomerTicket = { ...currentCustomerTicket, ...updates };
         const { customer_id, ticket_id, amount_spent, valid_start, valid_end } = updatedCustomerTicket;
-        const updateQuery = 'UPDATE Customer_Ticket SET customer_id = ?, ticket_id = ?, amount_spent = ?, valid_start = ?, valid_end = ?';
-        db.query(updateQuery, [customer_id, ticket_id, amount_spent, valid_start, valid_end], (updateErr, updateResult) => {
+        const updateQuery = 'UPDATE Customer_Ticket SET customer_id = ?, ticket_id = ?, amount_spent = ?, valid_start = ?, valid_end = ? WHERE customer_ticket_id = ?';
+        db.query(updateQuery, [customer_id, ticket_id, amount_spent, valid_start, valid_end, customerTicketId], (updateErr, updateResult) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
@@ -70,9 +70,9 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// DELETE a customer ticket
+// Soft DELETE a customer ticket (change is_deleted to TRUE)
 router.delete('/:id', (req, res) => {
-    db.query('DELETE FROM Customer_Ticket WHERE customer_ticket_id = ?', [req.params.id], (err, result) => {
+    db.query(`UPDATE Customer_Ticket SET is_deleted = TRUE WHERE customer_ticket_id = ? AND is_deleted = FALSE`, [req.params.id], (err, result) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -82,6 +82,21 @@ router.delete('/:id', (req, res) => {
             return;
         }
         res.json({ message: 'Customer Ticket successfully deleted' });
+    });
+});
+
+// Optional: Reactivate a customer ticket
+router.patch('/:id/reactivate', (req, res) => {
+    db.query('UPDATE Customer_Ticket SET is_deleted = FALSE WHERE customer_ticket_id = ?', [req.params.id], (err, result) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (result.affectedRows === 0) {
+            res.status(404).json({ message: 'Customer Ticket not found' });
+            return;
+        }
+        res.json({ message: 'Customer Ticket successfully reactivated' });
     });
 });
 
