@@ -38,9 +38,6 @@ app.use('/customer_product', customerProductRouter);
 const productCategoryRouter = require('./routes/product_category');
 app.use('/product_category', productCategoryRouter);
 
-const productCategoryRouter = require('./routes/product_category');
-app.use('/product_category', productCategoryRouter);
-
 app.get("/", (req, res) => {
     res.json("Hello, this is the backend!");
 });
