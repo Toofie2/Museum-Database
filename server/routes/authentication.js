@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// GET all users authentication credentials
+// GET all users authentication credentials (idk why I added this lol)
 router.get('/', (req, res) => {
     db.query('SELECT * FROM Authentication', (err, results) => {
         if (err) {
@@ -13,8 +13,29 @@ router.get('/', (req, res) => {
     });
 });
 
+// GET authentication by email
+router.get('/email', (req, res) => {
+    const email = req.query.email;
+
+    if (!email) {
+        return res.status(400).json({ error: "Email query parameter is required" });
+    }
+
+    db.query('SELECT password FROM Authentication WHERE email = ?', [email], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (results.length == 0) {
+            res.status(404).json({ message: 'No User found with that email' });
+            return;
+        }
+        res.json(results[0]);
+    });
+});
+
 // GET authentication by customer ID
-router.get('/:id', (req, res) => {
+router.get('/customer:id', (req, res) => {
     db.query('SELECT * FROM Authentication WHERE customer_id = ?', [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -29,8 +50,8 @@ router.get('/:id', (req, res) => {
 });
 
 // GET authentication by employee ID
-router.get('/:id', (req, res) => {
-    db.query('SELECT * FROM Employee WHERE employee_id = ?', [req.params.id], (err, results) => {
+router.get('/employee:id', (req, res) => {
+    db.query('SELECT * FROM Authentication WHERE employee_id = ?', [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
