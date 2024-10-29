@@ -2,6 +2,18 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+// GET products by product category id
+router.get('/product_category/:product_category_id', (req, res) => {
+    const { product_category_id } = req.params;
+
+    db.query('SELECT * FROM Product WHERE product_category_id = ?', [product_category_id], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
 // GET all products
 router.get('/', (req, res) => {
     db.query('SELECT * FROM Product WHERE is_deleted = FALSE', (err, results) => {
