@@ -28,16 +28,20 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// POST a new customer product
+// POST new customer_product(s)
 router.post('/', (req, res) => {
-    const { customer_id, product_id, amount_spent, quantity } = req.body;
+    let reqBodyArr = {...req.body};
     const insertQuery = "INSERT INTO Customer_Product (customer_id, product_id, amount_spent, quantity) VALUES (?, ?, ?, ?)";
-    db.query(insertQuery, [customer_id, product_id, amount_spent, quantity], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ id: result.insertId, ...req.body });
-    });
+
+    for(let i in reqBodyArr){
+        const { customer_id, product_id, amount_spent, quantity} = {...reqBodyArr[i]};
+        db.query(insertQuery, [customer_id, product_id, amount_spent, quantity], (err) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+        });
+    }
+    res.status(201).json({...req.body});
 });
 
 // PUT (update) a customer product
