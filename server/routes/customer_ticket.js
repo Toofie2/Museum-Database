@@ -28,16 +28,20 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// POST a new customer_ticket
+// POST new customer_ticket(s)
 router.post('/', (req, res) => {
-    const { customer_id, ticket_id, amount_spent, valid_day} = req.body;
+    let reqBodyArr = {...req.body};
     const insertQuery = "INSERT INTO Customer_Ticket (customer_id, ticket_id, amount_spent, valid_day) VALUES (?, ?, ?, ?)";
-    db.query(insertQuery, [customer_id, ticket_id, amount_spent, valid_day], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ id: result.insertId, ...req.body });
-    });
+
+    for(let i in reqBodyArr){
+        const { customer_id, ticket_id, amount_spent, valid_day} = {...reqBodyArr[i]};
+        db.query(insertQuery, [customer_id, ticket_id, amount_spent, valid_day], (err) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+        });
+    }
+    res.status(201).json({...req.body});
 });
 
 // PUT (update) a customer ticket
