@@ -5,6 +5,7 @@ import TicketPage from "./pages/TicketPage.jsx"
 import ExhibitionsPage from './pages/ExhibitionsPage';
 import ExhibitionViewPage from './pages/ExhibitionViewPage';
 import GiftShopPage from "./pages/GiftShopPage";
+import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/exhibitions" element={<ExhibitionsPage />} />
         <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
         <Route path="/giftshop" element={<GiftShopPage />} />
+        <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
     </Routes>
     </BrowserRouter>
   )
