@@ -42,6 +42,9 @@ app.use('/product', productRouter);
 const customerProductRouter = require('./routes/customer_product');
 app.use('/customer_product', customerProductRouter);
 
+const productCategoryRouter = require('./routes/product_category');
+app.use('/product_category', productCategoryRouter);
+
 const reviewRouter = require('./routes/review');
 app.use('/review', reviewRouter);
 
