@@ -14,11 +14,13 @@ const TicketForm = () => {
         veteran: 0
     }); 
     const purchasedTicket = {
-        customer_id: 1,
-        ticket_id: 0,
-        amount_spent: 0,
-        valid_day:""
+        "customer_id": 1,
+        "ticket_id": 0,
+        "amount_spent": 0,
+        "valid_day":""
     };
+    
+    const customerID = 1;
 
     const{render, selectedDate} = DatePickerComponent();
 
@@ -39,40 +41,30 @@ const TicketForm = () => {
 
     const handleSubmit = async e=>{
         try{
-            let promises = [];
+            let purchasedTicketsArr = []
             const convertedDate = selectedDate.toISOString().split("T")[0];
-            purchasedTicket.ticket_id = ticketIDs.at(0);
-            purchasedTicket.amount_spent = ticketPrices.at(0);
-            purchasedTicket.valid_day = convertedDate;
+
             for(let j = 0; j < formData.adult; j++){
-                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                purchasedTicketsArr.push({"customer_id":customerID, "ticket_id":ticketIDs.at(0), "amount_spent":ticketPrices.at(0), "valid_day":convertedDate});
             }
-            purchasedTicket.ticket_id = ticketIDs.at(1);
-            purchasedTicket.amount_spent = ticketPrices.at(1);
             for(let j = 0; j < formData.senior; j++){
-                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                purchasedTicketsArr.push({"customer_id":customerID, "ticket_id":ticketIDs.at(1), "amount_spent":ticketPrices.at(1), "valid_day":convertedDate});
             }
-            purchasedTicket.ticket_id = ticketIDs.at(2);
-            purchasedTicket.amount_spent = ticketPrices.at(2);
             for(let j = 0; j < formData.youth; j++){
-                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                purchasedTicketsArr.push({"customer_id":customerID, "ticket_id":ticketIDs.at(2), "amount_spent":ticketPrices.at(2), "valid_day":convertedDate});
             }
-            purchasedTicket.ticket_id = ticketIDs.at(3);
-            purchasedTicket.amount_spent = ticketPrices.at(3);
             for(let j = 0; j < formData.child; j++){
-                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                purchasedTicketsArr.push({"customer_id":customerID, "ticket_id":ticketIDs.at(3), "amount_spent":ticketPrices.at(3), "valid_day":convertedDate});
             }
-            purchasedTicket.ticket_id = ticketIDs.at(4);
-            purchasedTicket.amount_spent = ticketPrices.at(4);
             for(let j = 0; j < formData.student; j++){
-                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                purchasedTicketsArr.push({"customer_id":customerID, "ticket_id":ticketIDs.at(4), "amount_spent":ticketPrices.at(4), "valid_day":convertedDate});
             }
-            purchasedTicket.ticket_id = ticketIDs.at(5);
-            purchasedTicket.amount_spent = ticketPrices.at(5);
             for(let j = 0; j < formData.veteran; j++){
-                promises.push(await axios.post("http://localhost:3000/customer_ticket", purchasedTicket));
+                 purchasedTicketsArr.push({"customer_id":customerID, "ticket_id":ticketIDs.at(5), "amount_spent":ticketPrices.at(5), "valid_day":convertedDate});
             }
-            let allPromises = Promise.all(promises).then(() => console.log('tickets submitted in database'));
+
+            await axios.post("http://localhost:3000/customer_ticket", purchasedTicketsArr);
+
         }catch(err){
             console.log(err)
         }
@@ -93,12 +85,17 @@ const TicketForm = () => {
         }
         fetchAllTickets()
     }, [])
+
+
     const ticketPrices = tickets?.map(ticket=>{
         return ticket.price
     })
     const ticketIDs = tickets?.map(ticket=>{
         return ticket.ticket_id
     })
+
+    console.log(selectedDate);
+
     return (
         <div className="ticketForm">
             <h1 class="text-3xl font-medium">Purchase</h1>
@@ -208,7 +205,7 @@ const TicketForm = () => {
                     <span class="font-medium">Subtotal</span>${subtotal}
                 </div>
                 <button class="w-full mt-4 bg-black text-white py-2 px-52 border-black rounded" onClick={handleSubmit}>
-                    Checkout
+                    Purchase
                 </button>   
             </form>
         </div>
