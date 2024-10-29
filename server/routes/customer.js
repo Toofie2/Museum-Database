@@ -13,6 +13,17 @@ router.get('/', (req, res) => {
     });
 });
 
+// GET latest customer id
+router.get('/last', (req, res) => {
+    db.query('SELECT * FROM Customer ORDER BY customer_id DESC LIMIT 1', (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(results[0]);
+    });
+});
+
 // GET customer by ID
 router.get('/:id', (req, res) => {
     db.query('SELECT * FROM Customer WHERE customer_id = ?', [req.params.id], (err, results) => {
