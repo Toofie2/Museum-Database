@@ -13,12 +13,6 @@ const TicketForm = () => {
         student: 0,
         veteran: 0
     }); 
-    const purchasedTicket = {
-        "customer_id": 1,
-        "ticket_id": 0,
-        "amount_spent": 0,
-        "valid_day":""
-    };
     
     const customerID = 1;
 
@@ -93,8 +87,6 @@ const TicketForm = () => {
     const ticketIDs = tickets?.map(ticket=>{
         return ticket.ticket_id
     })
-
-    console.log(selectedDate);
 
     return (
         <div className="ticketForm">
