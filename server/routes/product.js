@@ -30,9 +30,9 @@ router.get('/:id', (req, res) => {
 
 // POST a new product
 router.post('/', (req, res) => {
-    const { name, description, price, image_path, } = req.body;
-    const insertQuery = 'INSERT INTO Product (name, description, price, image_path) VALUES (?, ?, ?, ?)';
-    db.query(insertQuery, [name, description, price, image_path], (err, result) => {
+    const { name, description, price, image_path, product_category_id, quantity } = req.body;
+    const insertQuery = 'INSERT INTO Product (name, description, price, image_path, product_category_id, quantity) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(insertQuery, [name, description, price, image_path, product_category_id, quantity], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -56,9 +56,9 @@ router.put('/:id', (req, res) => {
         const currentProduct = fetchResult[0];
         // Merge the updates with the current data
         const updatedProduct = { ...currentProduct, ...updates };
-        const { name, description, price, image_path } = updatedProduct;
-        const updateQuery = 'UPDATE Product SET name = ?, description = ?, price = ?, image_path = ? WHERE product_id = ?';
-        db.query(updateQuery, [name, description, price, image_path, productId], (updateErr, updateResult) => {
+        const { name, description, price, image_path, product_category_id, quantity } = updatedProduct;
+        const updateQuery = 'UPDATE Product SET name = ?, description = ?, price = ?, image_path = ?, product_category_id = ?, quantity = ? WHERE product_id = ?';
+        db.query(updateQuery, [name, description, price, image_path, product_category_id, quantity, productId], (updateErr, updateResult) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
