@@ -56,8 +56,13 @@ router.post('/', (req, res) => {
     const { title, description, room_id, image_path, is_active } = req.body;
 
     const insertQuery = `
+<<<<<<< HEAD
         INSERT INTO Collection (title, description, room_id, image_path, is_active)
         VALUES (?, ?, ?, ?, ?)
+=======
+        INSERT INTO Collection (title, description)
+        VALUES (?, ?)
+>>>>>>> f50d9922785bd7cf047be6f3968269a6cac0161d
     `;
 
     db.query(insertQuery, [title, description, room_id, image_path, is_active], (err, result) => {
@@ -70,6 +75,7 @@ router.post('/', (req, res) => {
         res.status(201).json({ collection_id: result.insertId, title, description, room_id, image_path, is_active });
     });
 });
+
 
 // PUT (update) collection by ID
 router.put('/:id', (req, res) => {
@@ -90,7 +96,11 @@ router.put('/:id', (req, res) => {
 
         const updateQuery = `
             UPDATE Collection 
+<<<<<<< HEAD
             SET title = ?, description = ?, room_id = ?, image_path = ?, is_active = ?
+=======
+            SET title = ?, description = ?
+>>>>>>> f50d9922785bd7cf047be6f3968269a6cac0161d
             WHERE collection_id = ?
         `;
         db.query(updateQuery, [title, description, room_id, image_path, is_active, collectionId], (err) => {
@@ -117,5 +127,6 @@ router.delete('/:id', (req, res) => {
         res.json({ message: 'Collection successfully deactivated' });
     });
 });
+
 
 module.exports = router;

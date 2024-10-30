@@ -63,7 +63,11 @@ router.post('/', (req, res) => {
     }
 
     const insertQuery = `
+<<<<<<< HEAD
         INSERT INTO Art (artist_id, collection_id, title, description, image_path, medium, date_created, date_received)
+=======
+        INSERT INTO Art (artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received)
+>>>>>>> f50d9922785bd7cf047be6f3968269a6cac0161d
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
