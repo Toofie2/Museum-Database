@@ -1,4 +1,3 @@
-import React from 'react'
 import {useEffect} from 'react'
 import {useState} from 'react'
 import { NavLink } from 'react-router-dom'
@@ -22,28 +21,40 @@ const CustomerPage = () => {
     },[]);
 
     return (
-        <div>
-        <h1>Museum Customer List</h1>
-        <div className="Customer">
-            {customers.map((cust) => (
-                <div className="Customer" key={cust.customer_id}>
-                    <h2>{cust.first_name}</h2>
-                    <p>{cust.middle_initial}</p>
-                    <p>{cust.last_name}</p>
-                    <p>{cust.is_member}</p>
-                    <span>{cust.membership_start_date}</span>
-                    <button className="delete" onClick={()=>handleDelete(cust.customer_id)}>Delete</button>
-                    <button className="update"><NavLink to={`/update/${cust.customer_id}`}>Update</NavLink></button>
-                </div>
-            ))}
+        <div className="container mx-auto pb-12 px-4">
+            <h1 className="text-4xl font-bold text-center mb-8">Museum Customer List</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {customers.map((cust) => (
+                    <div className="bg-white shadow-md rounded-lg p-6" key={cust.customer_id}>
+                        <h2 className="text-2xl font-semibold">{cust.first_name} {cust.last_name}</h2>
+                        <p className="text-lg text-gray-600">Middle Initial: {cust.middle_initial}</p>
+                        <p className="text-lg text-gray-600">Member: {cust.is_member ? 'Yes' : 'No'}</p>
+                        <p className="text-lg text-gray-600">Membership Start Date: {cust.membership_start_date ? new Date(cust.membership_start_date).toLocaleDateString() : 'N/A'}</p>
+                        <div className="mt-4 flex justify-between">
+                            <button 
+                                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+                                onClick={() => handleDelete(cust.customer_id)}>
+                                Delete
+                            </button>
+                            <NavLink 
+                                to={`/updatecustomer/${cust.customer_id}`} 
+                                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                                Update
+                            </NavLink>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className="text-center mt-8">
+                <NavLink 
+                    to="/addcustomer" 
+                    className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition">
+                    Add New Customer
+                </NavLink>
+            </div>
         </div>
-        <button>
-            <NavLink to="/add">Add new Customer</NavLink>
-        </button>
-    </div>
     );
 }
-
 
 /*previous attempt lol
 
