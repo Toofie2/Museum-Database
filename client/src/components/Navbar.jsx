@@ -51,10 +51,6 @@ const NavBar = () => {
       link: "/login",
     },
     {
-        name: "Signup",
-        link: "/signup",
-      },
-    {
       name: "Cart (0)",
       link: "/cart",
     },
