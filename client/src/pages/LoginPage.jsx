@@ -1,5 +1,6 @@
 import {useState} from 'react'
 import Navbar from "../components/Navbar";
+import { NavLink } from 'react-router-dom'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 
@@ -86,6 +87,16 @@ const LoginPage = () => {
                     {confirmationMessage}
                 </div>
             )}
+    
+            {/* Sign-up Message and Button */}
+            <div className="mt-8 text-center">
+                <p className="text-gray-600 text-lg">Not a member? Sign up now!</p>
+                <NavLink to="/signup">
+                    <button className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
+                        Sign Up
+                    </button>
+                </NavLink>
+            </div>
         </div>
     );
 }
