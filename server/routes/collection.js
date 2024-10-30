@@ -53,24 +53,23 @@ router.get('/:id', (req, res) => {
 
 // POST a new collection
 router.post('/', (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, room_id, image_path, is_active } = req.body;
 
     const insertQuery = `
-        INSERT INTO Collection (title, description)
-        VALUES (?, ?)
+        INSERT INTO Collection (title, description, room_id, image_path, is_active)
+        VALUES (?, ?, ?, ?, ?)
     `;
 
-    db.query(insertQuery, [title, description], (err, result) => {
+    db.query(insertQuery, [title, description, room_id, image_path, is_active], (err, result) => {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
                 return res.status(400).json({ message: 'Collection ID already exists' });
             }
             return res.status(500).json({ error: err.message });
         }
-        res.status(201).json({ collection_id: result.insertId, title, description });
+        res.status(201).json({ collection_id: result.insertId, title, description, room_id, image_path, is_active });
     });
 });
-
 
 // PUT (update) collection by ID
 router.put('/:id', (req, res) => {
@@ -87,18 +86,18 @@ router.put('/:id', (req, res) => {
 
         const currentCollection = results[0];
         const updatedCollection = { ...currentCollection, ...updates };
-        const { title, description } = updatedCollection;
+        const { title, description, room_id, image_path, is_active } = updatedCollection;
 
         const updateQuery = `
             UPDATE Collection 
-            SET title = ?, description = ?
+            SET title = ?, description = ?, room_id = ?, image_path = ?, is_active = ?
             WHERE collection_id = ?
         `;
-        db.query(updateQuery, [title, description, collectionId], (err) => {
+        db.query(updateQuery, [title, description, room_id, image_path, is_active, collectionId], (err) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
-            res.json({ collection_id: collectionId, title, description });
+            res.json({ collection_id: collectionId, title, description, room_id, image_path, is_active });
         });
     });
 });
@@ -118,6 +117,5 @@ router.delete('/:id', (req, res) => {
         res.json({ message: 'Collection successfully deactivated' });
     });
 });
-
 
 module.exports = router;
