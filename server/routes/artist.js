@@ -54,14 +54,14 @@ router.get('/:id', (req, res) => {
 
 // POST a new Artist
 router.post('/', (req, res) => {
-    const { first_name, middle_initial, last_name, artist_image_path } = req.body;
+    const { first_name, middle_initial, last_name} = req.body;
 
     const insertQuery = `
-        INSERT INTO Artist (first_name, middle_initial, last_name, artist_image_path)
+        INSERT INTO Artist (first_name, middle_initial, last_name)
         VALUES (?, ?, ?, ?)
     `;
 
-    db.query(insertQuery, [first_name, middle_initial, last_name, artist_image_path], (err, result) => {
+    db.query(insertQuery, [first_name, middle_initial, last_name], (err, result) => {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
                 return res.status(400).json({ message: 'Artist ID already exists' });
@@ -88,14 +88,14 @@ router.put('/:id', (req, res) => {
 
         const currentArtist = results[0];
         const updatedArtist = { ...currentArtist, ...updates };
-        const { first_name, middle_initial, last_name, artist_image_path } = updatedArtist;
+        const { first_name, middle_initial, last_name} = updatedArtist;
 
         const updateQuery = `
             UPDATE Artist 
-            SET first_name = ?, middle_initial = ?, last_name = ?, artist_image_path = ?
+            SET first_name = ?, middle_initial = ?, last_name = ?
             WHERE artist_id = ?
         `;
-        db.query(updateQuery, [first_name, middle_initial, last_name, artist_image_path, artistId], (err) => {
+        db.query(updateQuery, [first_name, middle_initial, last_name, artistId], (err) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }

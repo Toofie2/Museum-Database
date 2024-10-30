@@ -72,12 +72,10 @@ router.post("/", (req, res) => {
 
   // Make sure date_created <= date_received
   if (new Date(date_created) > new Date(date_received)) {
-    return res
-      .status(400)
-      .json({
-        message:
-          "Invalid dates: date_created should be before or equal to date_received",
-      });
+    return res.status(400).json({
+      message:
+        "Invalid dates: date_created should be before or equal to date_received",
+    });
   }
 
   const insertQuery = `
@@ -137,12 +135,10 @@ router.put("/:id", (req, res) => {
 
     // Ensure valid dates
     if (new Date(date_created) > new Date(date_received)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Invalid dates: date_created should be before or equal to date_received",
-        });
+      return res.status(400).json({
+        message:
+          "Invalid dates: date_created should be before or equal to date_received",
+      });
     }
 
     const updateQuery = `
