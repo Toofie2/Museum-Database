@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import backgroundImage from "../assets/gift_shop_background.jpg"
-import FramedPrints from "../assets/Framed_Prints.jpg"
-import ArtSupplies from "../assets/Art_Supplies.jpg"
+
 
 const GiftShopPage = () => {
   const [productCategories, setProductCategories] = useState([]);

@@ -6,6 +6,7 @@ import ExhibitionsPage from './pages/ExhibitionsPage';
 import ExhibitionViewPage from './pages/ExhibitionViewPage';
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
+import TicketPurchasedPage from "./pages/TicketPurchasedPage.jsx";
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
       <Routes>
         <Route path="/home" element={<HomePage />} />
         <Route path="/tickets" element={<TicketPage />} />
+        <Route path="/tickets/purchased" element={<TicketPurchasedPage />} />
         <Route path="/exhibitions" element={<ExhibitionsPage />} />
         <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
         <Route path="/giftshop" element={<GiftShopPage />} />

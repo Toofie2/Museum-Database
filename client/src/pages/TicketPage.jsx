@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import TicketInfo from "../components/TicketInfo.jsx"
 import TicketForm from "../components/TicketForm.jsx"
 import Navbar from "../components/Navbar.jsx";
