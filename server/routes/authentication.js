@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
-        }
+        };
         res.json(results);
     });
 });
