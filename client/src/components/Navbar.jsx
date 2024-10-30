@@ -26,7 +26,7 @@ const NavBar = () => {
     },
     {
       name: "Membership",
-      link: "/membership",
+      link: "/registermember",
     },
     {
       name: "Exhibitions",
@@ -41,7 +41,7 @@ const NavBar = () => {
       link: "/shop",
     },
     {
-      name: "Review",
+      name: "Reviews",
       link: "/review",
     },
   ];
