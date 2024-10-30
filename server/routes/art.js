@@ -55,7 +55,7 @@ router.get('/:id', (req, res) => {
 
 // POST a new Art piece
 router.post('/', (req, res) => {
-    const { artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received } = req.body;
+    const { artist_id, collection_id, title, description, image_path, medium, date_created, date_received } = req.body;
 
     // Make sure date_created <= date_received
     if (new Date(date_created) > new Date(date_received)) {
@@ -63,11 +63,11 @@ router.post('/', (req, res) => {
     }
 
     const insertQuery = `
-        INSERT INTO Art (artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received)
+        INSERT INTO Art (artist_id, collection_id, title, description, image_path, medium, date_created, date_received)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(insertQuery, [artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received], (err, result) => {
+    db.query(insertQuery, [artist_id, collection_id, title, description, image_path, medium, date_created, date_received], (err, result) => {
         if (err) {
             if (err.code === 'ER_DUP_ENTRY') {
                 return res.status(400).json({ message: 'Art ID already exists' });
@@ -94,7 +94,7 @@ router.put('/:id', (req, res) => {
 
         const currentArt = results[0];
         const updatedArt = { ...currentArt, ...updates };
-        const { artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received } = updatedArt;
+        const { artist_id, collection_id, title, description, image_path, medium, date_created, date_received } = updatedArt;
 
         // Ensure valid dates
         if (new Date(date_created) > new Date(date_received)) {
@@ -103,10 +103,10 @@ router.put('/:id', (req, res) => {
 
         const updateQuery = `
             UPDATE Art 
-            SET artist_id = ?, collection_id = ?, room_id = ?, title = ?, description = ?, image_path = ?, medium = ?, date_created = ?, date_received = ?
+            SET artist_id = ?, collection_id = ?, title = ?, description = ?, image_path = ?, medium = ?, date_created = ?, date_received = ?
             WHERE art_id = ?
         `;
-        db.query(updateQuery, [artist_id, collection_id, room_id, title, description, image_path, medium, date_created, date_received, artIdrtId], (err) => {
+        db.query(updateQuery, [artist_id, collection_id, title, description, image_path, medium, date_created, date_received, artIdrtId], (err) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
