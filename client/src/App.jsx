@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
+import CollectionsPage from "./pages/CollectionsPage";
+import CollectionsViewPage from "./pages/CollectionsViewPage";
 import TicketPage from "./pages/TicketPage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
@@ -21,6 +23,8 @@ const App = () => {
       <Route path="/tickets/purchased" element={<TicketPurchasedPage />} />
       <Route path="/exhibitions" element={<ExhibitionsPage />} />
       <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
+      <Route path="/collections" element={<CollectionsPage />} />
+      <Route path="/collection/:id" element={<CollectionsViewPage />} />
       <Route path="/shop" element={<GiftShopPage />} />
       <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
       <Route path="/customer" element={<CustomerPage />} />
