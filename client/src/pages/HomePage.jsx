@@ -58,7 +58,7 @@ const HomePage = () => {
           <div className="flex gap-5 min-w-max mx-16">
             {exhibitions.map((exhibition) => (
               <div
-                key={exhibition.id}
+                key={exhibition.exhibit_id}
                 className="w-[30rem] flex flex-col space-y-0.5"
               >
                 <img
