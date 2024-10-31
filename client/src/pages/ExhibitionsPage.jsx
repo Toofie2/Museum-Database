@@ -50,10 +50,10 @@ const ExhibitionsPage = () => {
           className="object-cover absolute top-0 left-0 h-full w-screen"
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center pl-10 space-y-2">
-          <h1 className="text-8xl font-regular text-white z-10 w-[600px] p-6">
+          <h1 className="text-8xl font-cavas text-white w-[600px] p-6">
             Exhibitions
           </h1>
-          <p className="text-3xl font-thin text-white z-10 w-[800px] p-10">
+          <p className="text-3xl font-thin text-white w-[800px] p-10">
             Explore our diverse exhibitions, from stunning paintings to
             captivating illustrations, thought-provoking installations to
             beautiful sculptures.

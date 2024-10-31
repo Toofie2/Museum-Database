@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
 import backgroundImage from "../assets/HomePageBackground.jpg";
+import floor1Image from "../assets/Floor 1.png";
+import floor2Image from "../assets/Floor 2.png";
 
 const HomePage = () => {
   const [exhibitions, setExhibitions] = useState([]);
@@ -58,7 +60,7 @@ const HomePage = () => {
           <div className="flex gap-5 min-w-max mx-16">
             {exhibitions.map((exhibition) => (
               <div
-                key={exhibition.id}
+                key={exhibition.exhibit_id}
                 className="w-[30rem] flex flex-col space-y-0.5"
               >
                 <img
@@ -86,7 +88,7 @@ const HomePage = () => {
         <div className="flex mx-16 gap-5">
           <div className="w-1/2 flex flex-col">
             <img
-              src={"../src/assets/Floor 1.png"}
+              src={floor1Image}
               alt={"Floor 1"}
               className="h-full object-cover"
             />
@@ -94,7 +96,7 @@ const HomePage = () => {
           </div>
           <div className="w-1/2 flex flex-col">
             <img
-              src={"../src/assets/Floor 2.png"}
+              src={floor2Image}
               alt={"Floor 2"}
               className="h-full object-cover"
             />
