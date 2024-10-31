@@ -1,13 +1,11 @@
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import axios from "axios";
-=======
->>>>>>> f50d9922785bd7cf047be6f3968269a6cac0161d
 import Navbar from "../components/Navbar.jsx";
 import backgroundImage from "../assets/HomePageBackground.jpg";
+import floor1Image from "../assets/Floor 1.png";
+import floor2Image from "../assets/Floor 2.png";
 
 const HomePage = () => {
-<<<<<<< HEAD
   const [exhibitions, setExhibitions] = useState([]);
 
   useEffect(() => {
@@ -62,7 +60,7 @@ const HomePage = () => {
           <div className="flex gap-5 min-w-max mx-16">
             {exhibitions.map((exhibition) => (
               <div
-                key={exhibition.id}
+                key={exhibition.exhibit_id}
                 className="w-[30rem] flex flex-col space-y-0.5"
               >
                 <img
@@ -90,7 +88,7 @@ const HomePage = () => {
         <div className="flex mx-16 gap-5">
           <div className="w-1/2 flex flex-col">
             <img
-              src={"../src/assets/Floor 1.png"}
+              src={floor1Image}
               alt={"Floor 1"}
               className="h-full object-cover"
             />
@@ -98,7 +96,7 @@ const HomePage = () => {
           </div>
           <div className="w-1/2 flex flex-col">
             <img
-              src={"../src/assets/Floor 2.png"}
+              src={floor2Image}
               alt={"Floor 2"}
               className="h-full object-cover"
             />
@@ -108,17 +106,6 @@ const HomePage = () => {
       </div>
     </>
   );
-=======
-    return (
-        <div className="relative min-h-screen">
-            <Navbar />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="min-h-screen bg-[url('../assets/HomePageBackground.jpg')] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${backgroundImage})` }}>
-                <p className="text-white text-4xl">The Fine Arts Museum</p>
-            </div>
-        </div>
-    );
->>>>>>> f50d9922785bd7cf047be6f3968269a6cac0161d
 };
 
 export default HomePage;
