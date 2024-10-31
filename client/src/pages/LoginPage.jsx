@@ -29,11 +29,13 @@ const LoginPage = () => {
             const response = await axios.get(`http://localhost:3000/authentication/email?email=${login.email}`)
             if(response.data.password === login.password) {
                 setConfirmationMessage("Login successful!");
+                setTimeout(() => {
+                    navigate("/");
+                }, 1500);
             }
             else {
                 setConfirmationMessage("Login failed. Please try again.");
             }
-            //navigate("/")
         }
         catch(err){
             setConfirmationMessage("Login failed. Please try again.");
