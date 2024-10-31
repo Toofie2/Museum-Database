@@ -6,6 +6,12 @@ import TicketPage from "./pages/TicketPage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
 import TicketPurchasedPage from "./pages/TicketPurchasedPage.jsx";
+import CustomerPage from "./pages/CustomerPage.jsx";
+import ReviewPage from "./pages/ReviewPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
+import PostreviewPage from "./pages/PostreviewPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import MembershipregPage from "./pages/MembershipregPage.jsx";
 
 const App = () => {
   return (
@@ -17,6 +23,12 @@ const App = () => {
       <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
       <Route path="/shop" element={<GiftShopPage />} />
       <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
+      <Route path="/customer" element={<CustomerPage />} />
+      <Route path="/review" element={<ReviewPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/postreview" element={<PostreviewPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/registermember" element={<MembershipregPage />} />
     </Routes>
   );
 };
