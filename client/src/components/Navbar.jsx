@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { TheFAMLogo } from "../constants/components.jsx";
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
 
 const NavBar = () => {
@@ -36,10 +35,7 @@ const NavBar = () => {
     {
       name: "Art",
       link: "/art",
-    },{
-        name: "Collections",
-        link: "/collections",
-      },
+    },
     {
       name: "Shop",
       link: "/shop",
@@ -70,10 +66,7 @@ const NavBar = () => {
           <ul className="flex justify-start gap-8">
             {leftnavigation.map((item) => (
               <li key={item.name}>
-                <Link
-                  className="text-light-grey hover:text-white cursor-pointer"
-                  to={item.link}
-                >
+                <Link className="text-light-grey cursor-pointer" to={item.link}>
                   {item.name}
                 </Link>
               </li>
@@ -97,79 +90,6 @@ const NavBar = () => {
       </div>
     </nav>
   );
-=======
-
-const NavBar = () => {
-    const leftnavigation = [
-        {
-            name: "Tickets",
-            link: "/tickets",
-        },
-        {
-            name: "Membership",
-            link: "/membership",
-        },
-        {
-            name: "Exhibitions",
-            link: "/exhibitions",
-        },
-        {
-            name: "Art",
-            link: "/art",
-        },
-        {
-            name: "Shop",
-            link: "/shop",
-        },
-        {
-            name: "Review",
-            link: "/review",
-        }
-    ];
-    const rightnavigation = [
-        {
-            name: "Login",
-            link: "/login"
-        },
-        {
-            name: "Cart (0)",
-            link: "/cart"
-        }
-    ];
-    return (
-        <nav className="fixed z-10 w-full text-white">
-            <div className="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
-                <div className="w-1/2">
-                    <ul className="flex justify-start gap-8">
-                        {leftnavigation.map((item) => (
-                            <li key={item.name}>
-                                <Link >
-                                    {item.name}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div className="flex justify-center">
-                    <Link>
-                        <TheFAMLogo className="text-white" />
-                    </Link>
-                </div>
-                <div className="flex justify-end w-1/2">
-                    <ul className="flex justify-start gap-8">
-                        {rightnavigation.map((item) => (
-                            <li key={item.name}>
-                                <Link >
-                                    {item.name}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    );
->>>>>>> f50d9922785bd7cf047be6f3968269a6cac0161d
 };
 
 export default NavBar;
