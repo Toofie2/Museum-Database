@@ -9,7 +9,9 @@ const ExhibitionsPage = () => {
   useEffect(() => {
     const fetchExhibitions = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/exhibition");
+        const response = await axios.get(
+          `${process.env.BACKEND_URL}/exhibition`
+        );
         // Sort exhibitions by end date
         const sortedExhibitions = response.data.sort(
           (a, b) => new Date(a.end_date) - new Date(b.end_date)
