@@ -1,4 +1,3 @@
-import React from 'react'
 import Navbar from "../components/Navbar.jsx";
 import { Link } from 'react-router-dom'
 
@@ -12,7 +11,7 @@ const TicketPurchasedPage = () => {
                     Thank you for your purchase.
                 </h1>
                 <div>
-                    <Link to={'/home'}>
+                    <Link to={'/'}>
                         <button className=" text-2xl w-52 h-20 border-2 border-black rounded">
                             Home
                         </button>
