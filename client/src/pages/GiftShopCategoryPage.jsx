@@ -36,8 +36,8 @@ const GiftShopCategoryPage = () => {
       </h1>
       <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-8">
         {products.map((p) => (
-          <div className="static">
-            <div key={p.product_id} className="h-[300px] art-item overflow-hidden hover:drop-shadow-md">
+          <div key={p.product_id} className="static">
+            <div className="h-[300px] art-item overflow-hidden hover:drop-shadow-md">
               <img
                 src={`${p.image_path}`}
                 alt={p.name}
