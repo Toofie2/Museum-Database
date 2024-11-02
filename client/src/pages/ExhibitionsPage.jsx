@@ -10,7 +10,7 @@ const ExhibitionsPage = () => {
     const fetchExhibitions = async () => {
       try {
         const response = await axios.get(
-          `${process.env.BACKEND_URL}/exhibition`
+          `${import.meta.env.VITE_BACKEND_URL}/exhibition`
         );
         // Sort exhibitions by end date
         const sortedExhibitions = response.data.sort(
