@@ -1,11 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-//import cors from 'cors'
 
 const app = express();
 
-const allowedOrigins = ["https://museum-database-project.vercel.app"];
+const allowedOrigins = [
+  "https://museum-database-project.vercel.app",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -18,12 +21,10 @@ app.use(
   })
 );
 
-app.use(cors());
 const port = process.env.PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 // Backend routes for each table
 const employeeRouter = require("./routes/employee");
