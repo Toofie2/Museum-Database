@@ -15,6 +15,38 @@ router.get('/', (req, res) => {
 
 */
 
+// GET Art pieces by Exhibit ID
+router.get("/exhibit/:exhibit_id", (req, res) => {
+  const { exhibit_id } = req.params;
+
+  db.query(
+    "SELECT * FROM Art WHERE exhibit_id = ?",
+    [exhibit_id],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(results);
+    }
+  );
+});
+
+// GET Art pieces by Exhibit ID
+router.get("/collection/:collection_id", (req, res) => {
+  const { collection_id } = req.params;
+
+  db.query(
+    "SELECT * FROM Art WHERE collection_id = ?",
+    [collection_id],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(results);
+    }
+  );
+});
+
 // GET all Art
 router.get("/", (req, res) => {
   db.query("SELECT * FROM Art", (err, results) => {
@@ -24,6 +56,7 @@ router.get("/", (req, res) => {
     res.json(results);
   });
 });
+
 /*
 // GET Artwork by ID
 router.get('/:id', (req, res) => {
@@ -38,6 +71,7 @@ router.get('/:id', (req, res) => {
     });
 });
  */
+
 // GET Art by ID
 router.get("/:id", (req, res) => {
   db.query(
