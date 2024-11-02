@@ -39,7 +39,7 @@ const GiftShopCategoryPage = () => {
       <h1 className="text-2xl content- font-medium mt-24 mb-4 flex justify-center items-center">
         {productCategory.name}
       </h1>
-      <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-8">
+      <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-auto px-8">
         {products.map((p) => (
           <div className="static">
             <div
