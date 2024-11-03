@@ -12,13 +12,13 @@ const ExhibitionViewPage = () => {
     const fetchExhibitionView = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/exhibition/${id}`
+          `${import.meta.env.VITE_BACKEND_URL}/exhibition/${id}`
         );
         setExhibition(response.data);
 
         // Fetch art pieces where exhibit_id matches
         const artResponse = await axios.get(
-          `http://localhost:3000/art/exhibit/${id}`
+          `${import.meta.env.VITE_BACKEND_URL}/art/exhibit/${id}`
         );
         setArtPieces(artResponse.data);
       } catch (error) {
