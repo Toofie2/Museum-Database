@@ -26,7 +26,7 @@ const CollectionsPage = () => {
       {/* Banner Section */}
       <div className="relative flex items-center h-[800px]">
         <img
-          src="https://images.unsplash.com/phothttps://images.unsplash.com/photo-1563292769-4e05b684851a?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Do-1573164574235-1b7a94cd87e5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" // Adjust to a suitable collection banner
+          src="https://images.unsplash.com/photo-1563292769-4e05b684851a?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" // Adjust to a suitable collection banner
           alt="Collections Banner"
           className="w-full h-full object-cover absolute top-0 left-0"
         />
