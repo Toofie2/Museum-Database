@@ -26,22 +26,22 @@ const NavBar = () => {
     },
     {
       name: "Membership",
-      link: "/registermember",
+      link: "/membership",
     },
     {
       name: "Exhibitions",
       link: "/exhibitions",
     },
     {
-      name: "Art",
-      link: "/art",
+      name: "Collections",
+      link: "/collections",
     },
     {
       name: "Shop",
       link: "/shop",
     },
     {
-      name: "Reviews",
+      name: "Review",
       link: "/review",
     },
   ];
@@ -66,10 +66,7 @@ const NavBar = () => {
           <ul className="flex justify-start gap-8">
             {leftnavigation.map((item) => (
               <li key={item.name}>
-                <Link
-                  className="text-light-grey hover:text-white cursor-pointer"
-                  to={item.link}
-                >
+                <Link className="text-light-grey cursor-pointer" to={item.link}>
                   {item.name}
                 </Link>
               </li>
