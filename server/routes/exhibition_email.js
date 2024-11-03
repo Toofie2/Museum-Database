@@ -71,7 +71,7 @@ router.post('/sendNotifications', async (req, res) => {
 });
 
 // Call the notification function immediately for testing
-sendExhibitionNotifications();
+//sendExhibitionNotifications();
 
 // Schedule the function for daily execution
 setInterval(sendExhibitionNotifications, 86400000); 
