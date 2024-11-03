@@ -51,8 +51,8 @@ const ReviewPage = () => {
             <div className="space-y-6">
                 {reviews.map((rev) => (
                     <div key={rev.review_id} className="bg-white shadow-md rounded-lg p-6 border border-gray-200">
-                        <h2 className="text-xl font-medium text-gray-800">Title: {rev.title}</h2>
-                        <p className="text-base text-gray-700">Feedback: {rev.feedback}</p>
+                        <h2 className="text-xl font-medium text-gray-800">{rev.title}</h2>
+                        <p className="text-base text-gray-700">{rev.feedback}</p>
                         <p className="text-lg text-gray-600">Rating: {rev.rating}</p>
                         <p className="text-sm text-gray-500">Date Posted: {rev.date_posted}</p>
                     </div>
