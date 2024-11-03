@@ -11,7 +11,9 @@ const HomePage = () => {
   useEffect(() => {
     const fetchExhibitions = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/exhibition");
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/exhibition`
+        );
         console.log(response);
         setExhibitions(response.data);
       } catch (error) {
