@@ -28,6 +28,30 @@ const TicketForm = () => {
     }));
   };
 
+  const handleDecrease = (e) => {
+    e.preventDefault();
+    let { name, value } = e.target;
+    value--;
+    {value >= 0 && 
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleIncrease = (e) => {
+    e.preventDefault();
+    let { name, value } = e.target;
+    value++;
+    {value <= 20 && 
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value
+      }));
+    }
+  };
+
   const handleSubtotal = (formData) => {
     let ans =
       formData.adult * ticketPrices.at(0) +
@@ -136,114 +160,115 @@ const TicketForm = () => {
       <div className="w-64 mt-5 py-2 px-5 border-2 border-black rounded">
         {render}
       </div>
-      <form className="mt-6">
-        <span>
-          <label className="flex justify-between">
-            <div>
-              <span className="font-medium">Adult Admission (19+)</span> $
-              {ticketPrices.at(0)}
-            </div>
+      <form className="mt-6 grid grid-cols-1 divide-y-2">
+        <div className="flex justify-between">
+          <label htmlFor="adult">
+            <span className="font-medium">Adult Admission (19+)</span> ${ticketPrices.at(0)}
+          </label>
+          <div>
+            <button name="adult" value={formData.adult} onClick={handleDecrease}>-</button>
             <input
               type="number"
               name="adult"
+              id="adult"
               min="0"
-              max="50"
+              max="20"
               placeholder="0"
               value={formData.adult}
               onChange={handleChange}
-              className="w-12"
+              className="w-12 text-center"
             />
-          </label>
-          <br></br>
-          <label className="flex justify-between">
-            <div>
-              <span className="font-medium">Senior Admission (65+)</span> $
-              {ticketPrices.at(1)}
-            </div>
-            <input
-              type="number"
-              name="senior"
-              min="0"
-              max="50"
-              placeholder="0"
-              value={formData.senior}
-              onChange={handleChange}
-              className="w-12"
-            />
-          </label>
-          <br></br>
-          <label className="flex justify-between">
-            <div>
-              <span className="font-medium">Youth Admission (13-18)</span> $
-              {ticketPrices.at(2)}
-            </div>
-            <input
-              type="number"
-              name="youth"
-              min="0"
-              max="50"
-              placeholder="0"
-              value={formData.youth}
-              onChange={handleChange}
-              className="w-12"
-            />
-          </label>
-          <br></br>
-          <label className="flex justify-between">
-            <div>
-              <span className="font-medium">Child Admission (12 & Under)</span>{" "}
-              ${ticketPrices.at(3)}
-            </div>
-            <input
-              type="number"
-              name="child"
-              min="0"
-              max="50"
-              placeholder="0"
-              value={formData.child}
-              onChange={handleChange}
-              className="w-12"
-            />
-          </label>
-          <br></br>
-          <label className="flex justify-between">
-            <div>
-              <span className="font-medium">
-                Student Admission (with valid ID)
-              </span>{" "}
-              ${ticketPrices.at(4)}
-            </div>
-            <input
-              type="number"
-              name="student"
-              min="0"
-              max="50"
-              placeholder="0"
-              value={formData.student}
-              onChange={handleChange}
-              className="w-12"
-            />
-          </label>
-          <br></br>
-          <label className="flex justify-between">
-            <div>
-              <span className="font-medium">
-                Veteran Admission (with valid ID)
-              </span>{" "}
-              ${ticketPrices.at(5)}
-            </div>
-            <input
-              type="number"
-              name="veteran"
-              min="0"
-              max="50"
-              placeholder="0"
-              value={formData.veteran}
-              onChange={handleChange}
-              className="w-12"
-            />
-          </label>
-        </span>
+            <button name="adult" value={formData.adult} onClick={handleIncrease}>+</button>
+          </div>
+        </div>
+        <label className="flex justify-between">
+          <div>
+            <span className="font-medium">Senior Admission (65+)</span> $
+            {ticketPrices.at(1)}
+          </div>
+          <input
+            type="number"
+            name="senior"
+            min="0"
+            max="50"
+            placeholder="0"
+            value={formData.senior}
+            onChange={handleChange}
+            className="w-12"
+          />
+        </label>
+        <br></br>
+        <label className="flex justify-between">
+          <div>
+            <span className="font-medium">Youth Admission (13-18)</span> $
+            {ticketPrices.at(2)}
+          </div>
+          <input
+            type="number"
+            name="youth"
+            min="0"
+            max="50"
+            placeholder="0"
+            value={formData.youth}
+            onChange={handleChange}
+            className="w-12"
+          />
+        </label>
+        <br></br>
+        <label className="flex justify-between">
+          <div>
+            <span className="font-medium">Child Admission (12 & Under)</span>{" "}
+            ${ticketPrices.at(3)}
+          </div>
+          <input
+            type="number"
+            name="child"
+            min="0"
+            max="50"
+            placeholder="0"
+            value={formData.child}
+            onChange={handleChange}
+            className="w-12"
+          />
+        </label>
+        <br></br>
+        <label className="flex justify-between">
+          <div>
+            <span className="font-medium">
+              Student Admission (with valid ID)
+            </span>{" "}
+            ${ticketPrices.at(4)}
+          </div>
+          <input
+            type="number"
+            name="student"
+            min="0"
+            max="50"
+            placeholder="0"
+            value={formData.student}
+            onChange={handleChange}
+            className="w-12"
+          />
+        </label>
+        <br></br>
+        <label className="flex justify-between">
+          <div>
+            <span className="font-medium">
+              Veteran Admission (with valid ID)
+            </span>{" "}
+            ${ticketPrices.at(5)}
+          </div>
+          <input
+            type="number"
+            name="veteran"
+            min="0"
+            max="50"
+            placeholder="0"
+            value={formData.veteran}
+            onChange={handleChange}
+            className="w-12"
+          />
+        </label>
         <div className="mt-10 text-default-gray text-lg flex justify-between">
           <span className="font-medium">Subtotal</span>${subtotal}
         </div>
