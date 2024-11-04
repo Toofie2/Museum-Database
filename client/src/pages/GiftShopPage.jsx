@@ -32,7 +32,7 @@ const GiftShopPage = () => {
           className="object-cover absolute top-0 left-0 h-full w-screen"
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center pl-10 space-y-2">
-          <h1 className="text-8xl font-regular text-white z-10 w-[600px] p-6">
+          <h1 className="text-8xl font-regular font-cavas text-white z-10 w-[600px] p-6">
             THE GIFT <br /> SHOP
           </h1>
           <p className="text-3xl font-thin text-white z-10 w-[800px] p-6">
