@@ -33,8 +33,8 @@ const NavBar = () => {
       link: "/exhibitions",
     },
     {
-      name: "Art",
-      link: "/art",
+      name: "Collections",
+      link: "/collections",
     },
     {
       name: "Shop",
