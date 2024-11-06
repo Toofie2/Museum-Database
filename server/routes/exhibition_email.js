@@ -33,7 +33,7 @@ const sendExhibitionNotifications = async () => {
 
         try {
           const info = await transporter.sendMail({
-            from: `"Museum" <${process.env.EMAIL_USER}>`,
+            from: `"Houston Museum of Fine Arts" <${process.env.EMAIL_USER}>`,
             to: customer.email,
             subject: `${exhibition.name} Ending Soon`,
             html: `
