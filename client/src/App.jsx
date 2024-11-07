@@ -6,6 +6,8 @@ import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CollectionsViewPage from "./pages/CollectionsViewPage";
+import CollectionsPage from "./pages/CollectionsPage";
+import CollectionsViewPage from "./pages/CollectionsViewPage";
 import TicketPage from "./pages/TicketPage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
