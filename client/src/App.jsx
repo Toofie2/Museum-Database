@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./components/authentication";
+import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
@@ -17,23 +19,77 @@ import MembershipregPage from "./pages/MembershipregPage.jsx";
 
 const App = () => {
   return (
+    <AuthProvider>
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/tickets" element={<TicketPage />} />
-      <Route path="/tickets/purchased" element={<TicketPurchasedPage />} />
-      <Route path="/exhibitions" element={<ExhibitionsPage />} />
-      <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
-      <Route path="/collections" element={<CollectionsPage />} />
-      <Route path="/collection/:id" element={<CollectionsViewPage />} />
-      <Route path="/shop" element={<GiftShopPage />} />
-      <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
-      <Route path="/customer" element={<CustomerPage />} />
-      <Route path="/review" element={<ReviewPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/postreview" element={<PostreviewPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/membership" element={<MembershipregPage />} />
-    </Routes>
+    {/* Unprotected Routes */}
+    <Route path="/" element={<HomePage />} />
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/signup" element={<SignupPage />} />
+    <Route path="/collections" element={<CollectionsPage />} />
+    <Route path="/collection/:id" element={<CollectionsViewPage />} />
+    <Route path="/exhibitions" element={<ExhibitionsPage />} />
+    <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
+    <Route path="/review" element={<ReviewPage />} />
+
+    {/* Protected Routes */}
+    <Route
+      path="/tickets"
+      element={
+        <ProtectedRoute>
+          <TicketPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/tickets/purchased"
+      element={
+        <ProtectedRoute>
+          <TicketPurchasedPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/shop"
+      element={
+        <ProtectedRoute>
+          <GiftShopPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/giftshop/:id"
+      element={
+        <ProtectedRoute>
+          <GiftShopCategoryPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/customer"
+      element={
+        <ProtectedRoute>
+          <CustomerPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/postreview"
+      element={
+        <ProtectedRoute>
+          <PostreviewPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/membership"
+      element={
+        <ProtectedRoute>
+          <MembershipregPage />
+        </ProtectedRoute>
+      }
+    />
+  </Routes>
+    </AuthProvider>
   );
 };
 
