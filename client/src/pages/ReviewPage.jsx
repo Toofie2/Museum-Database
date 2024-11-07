@@ -2,12 +2,27 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+import NavbarBlack from "../components/NavbarBlack";
 
 const ReviewPage = () => {
   const [reviews, setReviews] = useState([]);
+  const [customers, setCustomers] = useState({});
 
   useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/customer`
+        );
+        const customerMap = res.data.reduce((acc, customer) => {
+          acc[customer.customer_id] = `${customer.first_name} ${customer.last_name}`;
+          return acc;
+        }, {});
+        setCustomers(customerMap);
+      } catch (err) {
+        console.log("Error fetching customers:", err);
+      }
+    };
     const fetchAllReviews = async () => {
       try {
         const res = await axios.get(
@@ -21,19 +36,19 @@ const ReviewPage = () => {
         setReviews(formattedReviews);
         console.log(res);
       } catch (err) {
-        console.log(err);
+        console.log("Error fetching reviews:", err);
       }
     };
+    fetchCustomers();
     fetchAllReviews();
   }, []);
 
   return (
-    <div className="container mx-auto pb-12 px-4">
-      <Navbar />
+    <>
+      <NavbarBlack />
       {/* Banner Section */}
       <div className="relative flex items-center h-[75px] w-full mb-8">
-        <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center pl-4">
-          {/* Optionally, you can add content to the banner if needed */}
+        <div className="absolute inset-0 bg-white bg-opacity-40 flex flex-col justify-center pl-4">
         </div>
       </div>
         {/* Button to Add New Review */}
@@ -45,7 +60,7 @@ const ReviewPage = () => {
         </NavLink>
       </div>
       {/* Reviews Title */}
-      <h1 className="text-5xl md:text-5xl font-bold text-gray-800 mb-4">
+      <h1 className="text-5xl md:text-5xl font-bold text-black mb-4 translate-x-6">
         Reviews
       </h1>
 
@@ -56,18 +71,21 @@ const ReviewPage = () => {
             key={rev.review_id}
             className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
           >
-            <h2 className="text-xl font-medium text-gray-800">
+            <h2 className="text-xl font-medium text-black">
               Title: {rev.title}
             </h2>
-            <p className="text-base text-gray-700">Feedback: {rev.feedback}</p>
-            <p className="text-lg text-gray-600">Rating: {rev.rating}</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-base text-gray-900">Feedback: {rev.feedback}</p>
+            <p className="text-lg text-gray-900">Rating: {rev.rating}</p>
+            <p className="text-base text-gray-900">
+             {customers[rev.customer_id] || "Unknown"}
+            </p>
+            <p className="text-sm text-gray-900">
               Date Posted: {rev.date_posted}
             </p>
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

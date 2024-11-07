@@ -37,6 +37,13 @@ const SignupPage = () => {
 
   const handleClick = async (e) => {
     e.preventDefault();
+
+    // Validation: Check if all fields are filled
+    if (!customer.first_name || !customer.last_name || !credentials.email || !credentials.password) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
     try {
       // Post customer data
       await axios.post(
@@ -69,7 +76,7 @@ const SignupPage = () => {
   console.log(credentials);
 
   return (
-    <div className="container mx-auto pb-12 px-4">
+    <>
       <Navbar />
       {/* Banner Section */}
       <div className="relative flex items-center h-[75px] w-full mb-8">
@@ -175,7 +182,7 @@ const SignupPage = () => {
           {confirmationMessage}
         </div>
       )}
-    </div>
+    </>
   );
 };
 
