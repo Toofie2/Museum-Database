@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import axios from 'axios'
-import Navbar from "../components/Navbar";
+import NavbarBlack from "../components/NavbarBlack";
 import { useNavigate } from 'react-router-dom';
 
 
@@ -23,10 +23,10 @@ const MembershipregPage = () => {
 
     return (
         <div className="container mx-auto pb-12 px-4">
-            <Navbar />
+            <NavbarBlack />
             {/* Banner Section */}
             <div className="relative flex items-center h-[75px] w-full mb-8">
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center pl-4"></div>
+                <div className="absolute inset-0 bg-white bg-opacity-40 flex flex-col justify-center pl-4"></div>
             </div>
     
             {/* Membership Information Box */}
