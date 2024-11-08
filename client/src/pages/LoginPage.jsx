@@ -34,8 +34,8 @@ const LoginPage = () => {
       if (response.data.password === login.password) {
         setConfirmationMessage("Login successful!");
         setTimeout(() => {
-            navigate("/");
-          }, 1500);
+          navigate("/");
+        }, 1500);
       } else {
         setConfirmationMessage("Login failed. Please try again.");
       }
@@ -98,15 +98,14 @@ const LoginPage = () => {
       )}
       {/* Sign-up Message and Button */}
       <div className="mt-8 text-center">
-            <p className="text-gray-600 text-lg">Not a member? Sign up now!</p>
-            <NavLink to="/signup">
-                <button className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
-                    Sign Up
-                </button>
-            </NavLink>
-        </div>
+        <p className="text-gray-600 text-lg">Not a member? Sign up now!</p>
+        <NavLink to="/signup">
+          <button className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
+            Sign Up
+          </button>
+        </NavLink>
+      </div>
     </div>
-    
   );
 };
 
