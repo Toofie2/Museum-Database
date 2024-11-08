@@ -13,7 +13,12 @@ const ReviewPage = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/review`
         );
-        setReviews(res.data);
+        // Format the date to show only date for each review item
+        const formattedReviews = res.data.map((review) => ({
+          ...review,
+          date_posted: new Date(review.date_posted).toLocaleDateString(),
+        }));
+        setReviews(formattedReviews);
         console.log(res);
       } catch (err) {
         console.log(err);
@@ -31,7 +36,14 @@ const ReviewPage = () => {
           {/* Optionally, you can add content to the banner if needed */}
         </div>
       </div>
-
+      {/* Button to Add New Review */}
+      <div className="flex justify-center mt-8">
+        <NavLink to="/postreview">
+          <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
+            Add New Review
+          </button>
+        </NavLink>
+      </div>
       {/* Reviews Title */}
       <h1 className="text-5xl md:text-5xl font-bold text-gray-800 mb-4">
         Reviews
@@ -54,15 +66,6 @@ const ReviewPage = () => {
             </p>
           </div>
         ))}
-      </div>
-
-      {/* Button to Add New Review */}
-      <div className="flex justify-center mt-8">
-        <NavLink to="/postreview">
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
-            Add New Review
-          </button>
-        </NavLink>
       </div>
     </div>
   );
