@@ -45,6 +45,9 @@ app.use("/room", roomRouter);
 const exhibitionRouter = require("./routes/exhibition");
 app.use("/exhibition", exhibitionRouter);
 
+const exhibition_emailRouter = require("./routes/exhibition_email");
+app.use("/exhibition_email", exhibition_emailRouter);
+
 const ticketRouter = require("./routes/ticket");
 app.use("/ticket", ticketRouter);
 
