@@ -43,7 +43,7 @@ const sendExhibitionNotifications = async () => {
                   <h1 style="color: #333;">${exhibition.name} - Ending Soon!</h1>
                   <p style="font-size: 16px;">Dear Customer,</p>
                   <p>Our beloved exhibition "<b>${exhibition.name}</b>" is ending soon on ${new Date(exhibition.end_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}. Don’t miss out on this amazing experience!</p>
-                  <p>Best regards,<br>The Museum Team</p>
+                  <p>Best regards,<br>The Houston Museum of Fine Arts</p>
                 </body>
               </html>`
           });
