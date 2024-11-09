@@ -3,11 +3,17 @@ import { useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
   const navigate = useNavigate();
   const [confirmationMessage, setConfirmationMessage] = useState("");
+
+  const [customer, setCustomer] = useState({
+    first_name: "",
+    middle_initial: "",
+    last_name: "",
+    is_member: "0",
+  });
 
   const [credentials, setCredentials] = useState({
     customer_id: 0,
@@ -79,10 +85,6 @@ const SignupPage = () => {
         </div>
       </div>
 
-      {/* Sign Up Title */}
-      <h1 className="text-4xl font-bold text-center mb-8">
-        Customer Registration
-      </h1>
       {/* Sign Up Title */}
       <h1 className="text-4xl font-bold text-center mb-8">
         Customer Registration
@@ -185,4 +187,3 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
-
