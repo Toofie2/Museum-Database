@@ -2,7 +2,6 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
-
 const router = express.Router();
 
 const db = mysql.createPool({
@@ -12,7 +11,6 @@ const db = mysql.createPool({
   database: 'museum'
 });
 
-// Define the function to send exhibition notifications
 const sendExhibitionNotifications = async () => {
   try {
     console.log('Starting notification process...');
@@ -53,12 +51,11 @@ const sendExhibitionNotifications = async () => {
           console.error(`Failed to send email to ${customer.email}:`, error);
         }
       }
-
+      
       // Reset notification flag to avoid re-sending
       await db.query(`UPDATE Exhibition SET notify_customers = FALSE WHERE exhibit_id = ?`, [exhibition.exhibit_id]);
       console.log(`Notifications sent for exhibition: ${exhibition.name}`);
     }
-    console.log("All notifications sent successfully.");
   } catch (err) {
     console.error('Error in notification process:', err);
   }
