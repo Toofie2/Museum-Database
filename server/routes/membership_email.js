@@ -34,7 +34,7 @@ const sendMembershipNotifications = async () => {
 
       try {
         const info = await transporter.sendMail({
-          from: `"Houston Museum of Fine Arts" <${process.env.EMAIL_USER}>`,
+          from: `"The Fine Arts Museum" <${process.env.EMAIL_USER}>`,
           to: customer.email,
           subject: "Membership Expiring Soon",
           html: `
@@ -44,7 +44,7 @@ const sendMembershipNotifications = async () => {
                 <h1 style="color: #333;">It's time to renew your membership, ${customer.first_name}!</h1>
                 <p style="font-size: 16px;">Dear ${customer.first_name},</p>
                 <p>Your membership will expire soon. Don’t miss out on all of our exclusive benefits!</p>
-                <p>Best regards,<br>The Houston Museum of Fine Arts</p>
+                <p>Best regards,<br>The Fine Arts Museum</p>
               </body>
             </html>`
         });
