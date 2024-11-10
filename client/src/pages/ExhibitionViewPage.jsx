@@ -12,25 +12,25 @@ const ExhibitionViewPage = () => {
   useEffect(() => {
     const fetchExhibitionView = async () => {
       try {
-        // Fetch exhibition details
-        const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/exhibition/${id}`
-        );
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/exhibition/${id}`);
         setExhibition(response.data);
-
-        // Fetch art pieces for the exhibition
-        const artResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/art/exhibit/${id}`
-        );
+        const artResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/art/exhibit/${id}`);
         setArtPieces(artResponse.data);
-
-        // Fetch reviews for the exhibition
-        const reviewResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/review/exhibit/${id}`
+        const reviewResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/review/exhibit/${id}`);
+        const fetchedReviews = reviewResponse.data;
+        const reviewsWithCustomer = await Promise.all(
+          fetchedReviews.map(async (review) => {
+            const customerResponse = await axios.get(
+              `${import.meta.env.VITE_BACKEND_URL}/customer/${review.customer_id}`
+            );
+            return {
+              ...review,
+              first_name: customerResponse.data.first_name,
+            };
+          })
         );
-        console.log("Review Data:", reviewResponse.data); // Check the structure of the review data
-        setReviews(reviewResponse.data);
-        
+
+        setReviews(reviewsWithCustomer);
       } catch (error) {
         console.error("Error fetching exhibition details:", error);
       }
@@ -40,8 +40,6 @@ const ExhibitionViewPage = () => {
   }, [id]);
 
   if (!exhibition) return <div className="text-center mt-20">Loading...</div>;
-
-  // Sort the reviews by rating, with the highest rating first
   const sortedReviews = reviews.sort((a, b) => b.rating - a.rating);
 
   return (
@@ -62,7 +60,7 @@ const ExhibitionViewPage = () => {
           </p>
         </div>
       </div>
-
+      {/*Art pieces from the Exhibition*/}
       <h2 className="text-xl font-semibold mt-6 mb-4 pl-8">
         Sample art pieces from this Exhibition
       </h2>
@@ -84,32 +82,28 @@ const ExhibitionViewPage = () => {
           </div>
         ))}
       </div>
-
       {/* Exhibition Review Section */}
       <div className="mt-12 px-8">
         <h2 className="text-xl font-semibold mb-4">Exhibition Reviews</h2>
         {sortedReviews.length > 0 ? (
           <div className="space-y-6">
-            {sortedReviews.map((review, index) => (
-              <div key={index} className="p-4 border rounded-lg shadow">
-                {/* Star Rating at the Top */}
-                <div className="flex items-center mb-2">
-                  <span className="text-yellow-500">
-                    {"★".repeat(review.rating)}
-                    {"☆".repeat(5 - review.rating)}
-                  </span>
+            {sortedReviews.map((review, index) => {
+              const formattedDate = new Date(review.date_posted).toLocaleDateString("en-US");
+              return (
+                <div key={index} className="p-4 border rounded-lg shadow">
+                  <div className="flex items-center mb-2">
+                    <span className="text-yellow-500">
+                      {"★".repeat(review.rating)}
+                      {"☆".repeat(5 - review.rating)}
+                    </span>
+                    <span className="ml-2 text-gray-500 text-sm">{formattedDate}</span>
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{review.title}</h3>
+                  <p className="italic mb-1">"{review.feedback}"</p>
+                  <p className="text-sm text-gray-600">- {review.first_name}</p>
                 </div>
-
-                {/* Review Title */}
-                <h3 className="text-lg font-bold mb-2">{review.title}</h3>
-
-                {/* Review Feedback */}
-                <p className="italic mb-1">"{review.feedback}"</p>
-
-                {/* Reviewer Name */}
-                <p className="text-sm text-gray-600">- {review.reviewer_name}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div>No reviews available for this exhibition.</div>
