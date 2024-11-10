@@ -12,11 +12,13 @@ const ExhibitionsPage = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/exhibition`
         );
-        // Sort exhibitions by end date
-        const sortedExhibitions = response.data.sort(
-          (a, b) => new Date(a.end_date) - new Date(b.end_date)
-        );
-        setExhibitions(sortedExhibitions);
+
+        // Filter out exhibitions with exhibit_id of 0 and sort by end date
+        const filteredExhibitions = response.data
+          .filter((exhibition) => exhibition.exhibit_id !== 0)
+          .sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
+          
+        setExhibitions(filteredExhibitions);
       } catch (error) {
         console.error("Error fetching exhibitions:", error);
       }
