@@ -30,9 +30,9 @@ router.get('/:id', (req, res) => {
 
 // POST a new ticket
 router.post('/', (req, res) => {
-    const { type, price } = req.body;
-    const insertQuery = "INSERT INTO Ticket (type, price) VALUES (?, ?)";
-    db.query(insertQuery, [type, price], (err, result) => {
+    const { type, price, requirement } = req.body;
+    const insertQuery = "INSERT INTO Ticket (type, price, requirement) VALUES (?, ?)";
+    db.query(insertQuery, [type, price, requirement], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -56,9 +56,9 @@ router.put('/:id', (req, res) => {
         const currentTicket = fetchResult[0];
         // Merge the updates with the current data
         const updatedTicket = { ...currentTicket, ...updates };
-        const { type, price } = updatedTicket;
-        const updateQuery = 'UPDATE Ticket SET type = ?, price = ? WHERE ticket_id = ?';
-        db.query(updateQuery, [type, price, ticketId], (updateErr, updateResult) => {
+        const { type, price, requirement } = updatedTicket;
+        const updateQuery = 'UPDATE Ticket SET type = ?, price = ?, requirement = ? WHERE ticket_id = ?';
+        db.query(updateQuery, [type, price, requirement, ticketId], (updateErr, updateResult) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }

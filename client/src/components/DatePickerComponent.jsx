@@ -11,6 +11,8 @@ const DatePickerComponent = () =>{
         return temp
       }
 
+      
+
     const [selectedDate, setSelectedDate] = useState(new Date())
     const minDate = new Date();
     const maxDate = addMonths(minDate, 3);
@@ -30,6 +32,7 @@ const DatePickerComponent = () =>{
             dateFormat="MMMM dd, yyyy"
             minDate={minDate}
             maxDate={maxDate}
+            onKeyDown={(e) => e.preventDefault()}
             />
         </div>
         )

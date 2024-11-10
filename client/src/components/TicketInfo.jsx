@@ -30,7 +30,4 @@ const TicketInfo = () => {
     )
 }
 
-
-
-
 export default TicketInfo
