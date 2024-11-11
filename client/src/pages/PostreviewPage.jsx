@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import NavbarBlack from "../components/NavbarBlack";
 import { useNavigate } from "react-router-dom";
@@ -9,18 +9,33 @@ const PostreviewPage = () => {
   const navigate = useNavigate();
   const { customerId } = useAuth();
 
+  const [exhibits, setExhibits] = useState([]);
+
   const [review, setReview] = useState({
     title: "",
     feedback: "",
     rating: "",
+    exhibit_id: "",
   });
+
+  useEffect(() => {
+    const fetchExhibits = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/exhibition`);
+        setExhibits(response.data);
+      } catch (error) {
+        console.log("Error fetching exhibits:", error);
+      }
+    };
+    fetchExhibits();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     // Update review fields if the input name matches review properties
     if (
-      ["title", "feedback", "rating"].includes(
+      ["title", "feedback", "rating", "exhibit_id"].includes(
         name
       )
     ) {
@@ -32,7 +47,7 @@ const PostreviewPage = () => {
     e.preventDefault();
 
     // Validation: Check if all fields are filled
-    if (!review.title || !review.feedback || !review.rating) {
+    if (!review.title || !review.feedback || !review.rating || !review.exhibit_id) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -77,6 +92,25 @@ const PostreviewPage = () => {
           <h1 className="text-2xl font-bold text-center mb-6">Please describe your experience and leave a rating</h1>
           <form>
             <div className="mb-6">
+            <div className="mb-6">
+              <label className="block text-gray-700 text-lg mb-2" htmlFor="exhibit_id">
+                Exhibit
+              </label>
+              <select
+                name="exhibit_id"
+                value={review.exhibit_id}
+                onChange={handleChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              >
+                <option value="" disabled hidden>Select an exhibit</option>
+                {exhibits.map((exhibit) => (
+                  <option key={exhibit.exhibit_id} value={exhibit.exhibit_id}>
+                    {exhibit.name}
+                  </option>
+                ))}
+              </select>
+            </div>
               <label className="block text-gray-700 text-lg mb-2" htmlFor="title">
                 Title
               </label>

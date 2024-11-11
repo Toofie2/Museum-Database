@@ -16,6 +16,7 @@ import SignupPage from "./pages/SignupPage.jsx";
 import PostreviewPage from "./pages/PostreviewPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import MembershipregPage from "./pages/MembershipregPage.jsx";
+import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
     <Route path="/" element={<HomePage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<SignupPage />} />
+    <Route path="/resetpassword" element={<ResetpasswordPage />} />
     <Route path="/collections" element={<CollectionsPage />} />
     <Route path="/collection/:id" element={<CollectionsViewPage />} />
     <Route path="/exhibitions" element={<ExhibitionsPage />} />
