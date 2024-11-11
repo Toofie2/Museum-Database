@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import { TheFAMLogo } from "../constants/components.jsx";
 import { useState, useEffect } from "react";
 
-const NavBar = () => {
+const NavBar = (props) => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const forceBlackText = props.forceBlackText;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,7 +59,7 @@ const NavBar = () => {
   return (
     <nav
       className={`fixed z-10 w-full transition-all duration-300 ${
-        isScrolled ? "bg-white [&_svg]:text-black shadow-md" : "text-white"
+        isScrolled? "bg-white [&_svg]:text-black shadow-md" : (forceBlackText ? "text-black" : "text-white")
       }`}
     >
       <div className="flex justify-between items-center max-w-full mx-auto px-16 py-4">
