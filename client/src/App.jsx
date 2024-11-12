@@ -52,72 +52,56 @@ const App = () => {
           <Route path="reports" element={<Reports />} />
         </Route>
 
-    {/* Protected Routes */}
-    <Route
-      path="/tickets"
-      element={
-        <ProtectedRoute>
-          <TicketPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/tickets/purchased"
-      element={
-        <ProtectedRoute>
-          <TicketPurchasedPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/shop"
-      element={
-        <ProtectedRoute>
-          <GiftShopPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/giftshop/:id"
-      element={
-        <ProtectedRoute>
-          <GiftShopCategoryPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/customer"
-      element={
-        <ProtectedRoute>
-          <CustomerPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/postreview"
-      element={
-        <ProtectedRoute>
-          <PostreviewPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/membership"
-      element={
-        <ProtectedRoute>
-          <MembershipregPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/profile"
-      element={
-        <ProtectedRoute>
-          <ViewprofilePage />
-        </ProtectedRoute>
-      }
-    />
-  </Routes>
+        {/* Protected Routes */}
+        <Route
+          path="/tickets"
+          element={
+            <ProtectedRoute>
+              <TicketPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tickets/purchased"
+          element={
+            <ProtectedRoute>
+              <TicketPurchasedPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customer"
+          element={
+            <ProtectedRoute>
+              <CustomerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/postreview"
+          element={
+            <ProtectedRoute>
+              <PostreviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/membership"
+          element={
+            <ProtectedRoute>
+              <MembershipregPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ViewprofilePage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </AuthProvider>
   );
 };
