@@ -128,7 +128,6 @@ const ReviewPage = () => {
             <p className="text-base text-gray-900">
               Date Posted: {rev.date_posted}
             </p>
-            <p className="text-base text-gray-900">Date Posted: {rev.date_posted}</p>
           </div>
         ))}
       </div>
