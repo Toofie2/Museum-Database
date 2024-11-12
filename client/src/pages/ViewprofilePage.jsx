@@ -150,6 +150,6 @@ const EditProfilePage = () => {
       </div>
     </>
   );
-};
+}
 
 export default EditProfilePage;
