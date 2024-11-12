@@ -43,7 +43,7 @@ const NavBarBlack = () => {
       link: "/shop",
     },
     {
-      name: "Review",
+      name: "Reviews",
       link: "/review",
     },
   ];
