@@ -1,5 +1,4 @@
 import { useState } from "react";
-import NavbarBlack from "../components/NavbarBlack";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
@@ -8,7 +7,7 @@ import { useAuth } from "../components/authentication";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();  // Update authentication status
+  const { login } = useAuth(); // Update authentication status
 
   const [loginData, setLogin] = useState({
     email: "",
@@ -28,11 +27,13 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${loginData.email}`
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${
+          loginData.email
+        }`
       );
       if (response.data.password === loginData.password) {
         const customer_id = response.data.customer_id;
-        console.log("Customer ID:",response.data.customer_id)
+        console.log("Customer ID:", response.data.customer_id);
         // Use login to set customer_id to later store in authentication component
         login(customer_id); // Login successful
         setConfirmationMessage("Login successful!");
@@ -54,7 +55,6 @@ const LoginPage = () => {
       {/* focus:ring focus:ring-blue-300 */}
       {/* Main Section with Flexbox Layout */}
       <div className="flex h-screen">
-  
         {/* Left Half - Login Form */}
         <div className="flex flex-col justify-center items-center w-1/2 bg-white shadow-md">
           <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
@@ -84,17 +84,19 @@ const LoginPage = () => {
               Login
             </button>
           </form>
-          
+
           {/* Conditional rendering for confirmation message */}
           {confirmationMessage && (
             <div className="mt-4 text-green-600 text-lg text-center">
               {confirmationMessage}
             </div>
           )}
-          
+
           {/* Sign-up Message and Button */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600 text-lg">Don't have an account? Sign up now!</p>
+            <p className="text-gray-600 text-lg">
+              Don&apos;t have an account? Sign up now!
+            </p>
             <NavLink to="/signup">
               <button className="mt-4 bg-gray-300 text-gray-800 px-20 py-3 rounded-md hover:bg-gray-400 transition duration-200">
                 Sign Up
@@ -103,14 +105,14 @@ const LoginPage = () => {
           </div>
           {/* Reset Password */}
           <div className="mt-8 text-center">
-           <NavLink to="/resetpassword">
-            <p className="text-gray-600 text-sm hover:underline cursor-pointer">
-              Forgot your password? Click here to reset
-            </p>
-          </NavLink>
+            <NavLink to="/resetpassword">
+              <p className="text-gray-600 text-sm hover:underline cursor-pointer">
+                Forgot your password? Click here to reset
+              </p>
+            </NavLink>
           </div>
         </div>
-  
+
         {/* Right Half - Background Image */}
         <div
           className="w-1/2 bg-cover bg-center"
