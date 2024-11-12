@@ -113,6 +113,6 @@ const NavBarBlack = () => {
       </div>
     </nav>
   );
-};
+}
 
 export default NavBarBlack;
