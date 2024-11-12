@@ -7,7 +7,7 @@ import { useAuth } from "../components/authentication";
 
 const MembershipregPage = () => {
     const navigate = useNavigate();
-    const { customerId } = useAuth();
+    const { userId } = useAuth();
     const [purchaseMessage, setPurchaseMessage] = useState('');
 
     const handleClick = async (e) => {
@@ -15,7 +15,7 @@ const MembershipregPage = () => {
 
         try {
             // Check if the customer already has a membership
-            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer/${customerId}`);
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`);
 
             if (res.data.is_member === 1) {
                 // Customer already has a membership
@@ -37,7 +37,7 @@ const MembershipregPage = () => {
                 membership_start_date: today,
             };
 
-            await axios.put(`${import.meta.env.VITE_BACKEND_URL}/customer/${customerId}`, membershipData);
+            await axios.put(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`, membershipData);
 
             // If membership purchase is successful
             setPurchaseMessage("Membership Purchase Successful!"); // Set the success message
