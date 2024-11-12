@@ -41,9 +41,9 @@ router.get('/:id', (req, res) => {
 
 // POST a new customer (is_member will require a trigger)
 router.post('/', (req, res) => {
-    const { first_name, middle_initial, last_name, is_member, membership_start_date , notify_customer } = req.body;
-    const insertQuery = 'INSERT INTO Customer (first_name, middle_initial, last_name, is_member, membership_start_date, notify_customer ) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(insertQuery, [first_name, middle_initial, last_name, is_member, membership_start_date, notify_customer ], (err, result) => {
+    const { first_name, middle_initial, last_name, is_member, membership_start_date } = req.body;
+    const insertQuery = 'INSERT INTO Customer (first_name, middle_initial, last_name, is_member, membership_start_date) VALUES (?, ?, ?, ?, ?)';
+    db.query(insertQuery, [first_name, middle_initial, last_name, is_member, membership_start_date], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
