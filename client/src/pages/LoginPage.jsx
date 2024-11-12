@@ -33,11 +33,23 @@ const LoginPage = () => {
       );
       if (response.data.password === loginData.password) {
         const customer_id = response.data.customer_id;
-        console.log("Customer ID:", response.data.customer_id);
-        // Use login to set customer_id to later store in authentication component
-        login(customer_id); // Login successful
-        setConfirmationMessage("Login successful!");
-        setTimeout(() => navigate("/"), 1500); // Redirect to home page after login
+        const employee_id = response.data.employee_id;
+
+        if (customer_id !== null) {
+          console.log("Customer ID:", customer_id);
+          // Handle customer login
+          login(customer_id, "customer"); // Track role as "customer"
+          setConfirmationMessage("Login successful!");
+          setTimeout(() => navigate("/"), 1500); // Redirect to home page after login
+        } else if (employee_id !== null) {
+          console.log("Employee ID:", employee_id);
+          // Handle employee login
+          login(employee_id, "employee"); // Track role as "employee"
+          setConfirmationMessage("Login successful!");
+          setTimeout(() => navigate("/employee"), 1500); // Redirect to employee dashboard
+        } else {
+          setConfirmationMessage("Login failed. Invalid credentials.");
+        }
       } else {
         setConfirmationMessage("Login failed. Please try again.");
       }
@@ -52,7 +64,6 @@ const LoginPage = () => {
   return (
     <>
       {/*<NavbarBlack />*/}
-      {/* focus:ring focus:ring-blue-300 */}
       {/* Main Section with Flexbox Layout */}
       <div className="flex h-screen">
         {/* Left Half - Login Form */}
@@ -111,6 +122,14 @@ const LoginPage = () => {
               </p>
             </NavLink>
           </div>
+          {/* Home */}
+          <div className="mt-8 text-center">
+            <NavLink to="/">
+              <p className="text-gray-600 text-sm hover:underline cursor-pointer">
+                Return to home
+              </p>
+            </NavLink>
+          </div>
         </div>
 
         {/* Right Half - Background Image */}
@@ -126,4 +145,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

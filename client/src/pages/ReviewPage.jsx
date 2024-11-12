@@ -16,9 +16,7 @@ const ReviewPage = () => {
           `${import.meta.env.VITE_BACKEND_URL}/customer`
         );
         const customerMap = res.data.reduce((acc, customer) => {
-          acc[
-            customer.customer_id
-          ] = `${customer.first_name} ${customer.last_name}`;
+          acc[customer.customer_id] = `${customer.first_name} ${customer.last_name}`;
           return acc;
         }, {});
         setCustomers(customerMap);
@@ -49,9 +47,19 @@ const ReviewPage = () => {
         );
         const formattedReviews = res.data.map((review) => ({
           ...review,
-          date_posted: new Date(review.date_posted).toLocaleDateString(),
+          date_posted: new Date(review.date_posted), // Convert date to Date object
         }));
-        setReviews(formattedReviews);
+
+        // Sort reviews by the most recent date (newest first)
+        formattedReviews.sort((a, b) => b.date_posted - a.date_posted);
+
+        // Convert the date back to a readable format
+        const updatedReviews = formattedReviews.map((review) => ({
+          ...review,
+          date_posted: review.date_posted.toLocaleDateString(),
+        }));
+
+        setReviews(updatedReviews);
       } catch (err) {
         console.log("Error fetching reviews:", err);
       }
@@ -68,8 +76,10 @@ const ReviewPage = () => {
 
   // Filter reviews based on the selected exhibit
   const filteredReviews = selectedExhibit
-    ? reviews.filter(
-        (review) => review.exhibit_id === parseInt(selectedExhibit)
+    ? reviews.filter((review) =>
+        selectedExhibit === "general_admission"
+          ? review.exhibit_id === null
+          : review.exhibit_id === parseInt(selectedExhibit)
       )
     : reviews;
 
@@ -81,7 +91,7 @@ const ReviewPage = () => {
         <div className="absolute inset-0 bg-white bg-opacity-40 flex flex-col justify-center pl-4"></div>
       </div>
 
-      {/* Add New Review Button and Filter Dropdown */}
+      {/* Filter Dropdown */}
       <div className="flex justify-between items-center mx-8 mb-4">
         <NavLink to="/postreview">
           <button className="bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-black transition duration-200">
@@ -93,7 +103,8 @@ const ReviewPage = () => {
           onChange={handleExhibitChange}
           className="bg-white border border-gray-300 rounded-md px-4 py-2"
         >
-          <option value="">All Exhibits</option>
+          <option value="">All Reviews</option>
+          <option value="general_admission">General Admission</option>
           {Object.entries(exhibits).map(([id, name]) => (
             <option key={id} value={id}>
               {name}
@@ -123,7 +134,7 @@ const ReviewPage = () => {
               Customer: {customers[rev.customer_id] || "Unknown"}
             </p>
             <p className="text-base text-gray-900">
-              Exhibit: {exhibits[rev.exhibit_id] || "Unknown"}
+              Exhibit: {rev.exhibit_id ? exhibits[rev.exhibit_id] : "General Admission"}
             </p>
             <p className="text-base text-gray-900">
               Date Posted: {rev.date_posted}
