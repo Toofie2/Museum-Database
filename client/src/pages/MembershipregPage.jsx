@@ -117,6 +117,6 @@ const MembershipregPage = () => {
             </div>
         </div>
     );
-}
+};
 
 export default MembershipregPage;
