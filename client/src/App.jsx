@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
@@ -14,6 +14,11 @@ import SignupPage from "./pages/SignupPage.jsx";
 import PostreviewPage from "./pages/PostreviewPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import MembershipregPage from "./pages/MembershipregPage.jsx";
+import EmployeeLayout from "./pages/employee/EmployeeLayout.jsx";
+import Dashboard from "./pages/employee/Dashboard.jsx";
+import Settings from "./pages/employee/Settings.jsx";
+import CategoryLog from "./components/CategoryLog.jsx";
+import Reports from "./pages/employee/reports/Reports.jsx";
 
 const App = () => {
   return (
@@ -33,6 +38,15 @@ const App = () => {
       <Route path="/postreview" element={<PostreviewPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/membership" element={<MembershipregPage />} />
+      <Route path="/employee" element={<EmployeeLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="settings" element={<Settings />}>
+          <Route index element={<Navigate to="exhibition" replace />} />
+          <Route path=":category" element={<CategoryLog />} />
+        </Route>
+        <Route path="reports" element={<Reports />} />
+      </Route>
     </Routes>
   );
 };
