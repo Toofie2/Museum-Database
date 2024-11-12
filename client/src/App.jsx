@@ -137,6 +137,6 @@ const App = () => {
   </Routes>
     </AuthProvider>
   );
-};
+}
 
 export default App;
