@@ -1,18 +1,17 @@
-import { useAuth } from "../components/authentication";
+import { useAuth } from "./authentication";
 import { Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+const AdminProtectedRoute = ({ children }) => {
+  const { isAuthenticated, role } = useAuth();
   const [showPopup, setShowPopup] = useState(false);
   const [redirect, setRedirect] = useState(false); // Track whether to redirect
 
   useEffect(() => {
-    // If the user is not authenticated, show the popup
-    if (!isAuthenticated) {
-      setShowPopup(true);
+    if (!isAuthenticated || role !== "admin") {
+      setShowPopup(true);  // Trigger the popup only when user is not authorized
     }
-  }, [isAuthenticated]); // Depend on isAuthenticated to trigger the effect
+  }, [isAuthenticated, role]); // Depend on isAuthenticated and role to trigger the effect
 
   const handleClosePopup = () => {
     setShowPopup(false); // Close the popup
@@ -21,10 +20,10 @@ const ProtectedRoute = ({ children }) => {
     }, 100); // Give enough time for popup to close
   };
 
-  // If the user is not authenticated, show the popup and then redirect
-  if (!isAuthenticated) {
+  // If the user is not authenticated or doesn't have the 'admin' role
+  if (!isAuthenticated || role !== "admin") {
     if (redirect) {
-      return <Navigate to="/login" replace />; // Redirect to login after popup
+      return <Navigate to="/employee" replace />; // Redirect after popup is closed
     }
 
     return (
@@ -32,10 +31,11 @@ const ProtectedRoute = ({ children }) => {
         {showPopup && (
           <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded shadow-lg">
-              <h3 className="text-xl">Please login to access this page</h3>
+              <h3 className="text-xl">No Permission</h3>
+              <p>You do not have the necessary permissions to access this page.</p>
               <button
                 onClick={handleClosePopup} // Close popup and trigger redirect
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+                className="mt-4 bg-red-600 text-white px-4 py-2 rounded"
               >
                 Close
               </button>
@@ -46,7 +46,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return children; // If authenticated, render the protected route
+  return children; // If authorized, render the protected route
 };
 
-export default ProtectedRoute;
+export default AdminProtectedRoute;
