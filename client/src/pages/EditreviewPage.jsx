@@ -29,16 +29,20 @@ const EditReviewPage = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/review/customer/${userId}`
         );
-        const formattedReviews = res.data.map((review) => ({
-          ...review,
-          date_posted: new Date(review.date_posted),
-        }));
+
+        // Filter out reviews with is_active = 0
+        const activeReviews = res.data
+          .filter((review) => review.is_active === 1) // Keep only active reviews
+          .map((review) => ({
+            ...review,
+            date_posted: new Date(review.date_posted),
+          }));
 
         // Sort reviews by the most recent date
-        formattedReviews.sort((a, b) => b.date_posted - a.date_posted);
+        activeReviews.sort((a, b) => b.date_posted - a.date_posted);
 
         // Convert the date back to a readable format
-        const updatedReviews = formattedReviews.map((review) => ({
+        const updatedReviews = activeReviews.map((review) => ({
           ...review,
           date_posted: review.date_posted.toLocaleDateString(),
         }));
@@ -178,7 +182,9 @@ const EditReviewPage = () => {
                 <h2 className="text-xl font-medium text-black">Title: {rev.title}</h2>
                 <p className="text-base text-gray-900">Feedback: {rev.feedback}</p>
                 <p className="text-base text-gray-900">Rating: {rev.rating}</p>
-                <p className="text-base text-gray-900"> Exhibit: {rev.exhibit_id === null || rev.exhibit_id === 0 ? "General Admission" : exhibits[rev.exhibit_id] || "Unknown"}</p>
+                <p className="text-base text-gray-900">
+                  Exhibit: {rev.exhibit_id === null || rev.exhibit_id === 0 ? "General Admission" : exhibits[rev.exhibit_id] || "Unknown"}
+                </p>
                 <p className="text-base text-gray-900">Date Posted: {rev.date_posted}</p>
                 <div className="flex space-x-4 mt-2">
                   <button
