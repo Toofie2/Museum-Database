@@ -31,7 +31,7 @@ router.get('/:id', (req, res) => {
 // POST a new ticket
 router.post('/', (req, res) => {
     const { type, price, requirement } = req.body;
-    const insertQuery = "INSERT INTO Ticket (type, price, requirement) VALUES (?, ?)";
+    const insertQuery = "INSERT INTO Ticket (type, price, requirement) VALUES (?, ?, ?)";
     db.query(insertQuery, [type, price, requirement], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });

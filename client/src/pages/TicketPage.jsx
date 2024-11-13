@@ -1,11 +1,11 @@
 import TicketInfo from "../components/TicketInfo.jsx"
 import TicketForm from "../components/TicketForm.jsx"
-import Navbar from "../components/Navbar.jsx";
+import NavbarBlack from "../components/NavbarBlack.jsx";
 
 const TicketPage = () => {
   return (
     <div>
-      <Navbar forceBlackText={true}/>
+      <NavbarBlack/>
       <div className="container mx-auto pb-12 p-1">
         <div className="mt-28 flex justify-between px-16 space-x-24">
           <div>

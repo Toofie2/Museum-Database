@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar.jsx";
+import NavbarBlack from "../components/NavbarBlack.jsx";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -33,7 +33,7 @@ const GiftShopCategoryPage = () => {
 
   return (
     <div>
-      <Navbar forceBlackText={true}/>
+      <NavbarBlack/>
       <div className="container mx-auto pb-12 p-1">
 
         {/* Products Section */}
