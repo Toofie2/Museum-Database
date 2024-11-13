@@ -41,9 +41,9 @@ router.get('/:id', (req, res) => {
 
 // POST a new customer (is_member will require a trigger)
 router.post('/', (req, res) => {
-    const { first_name, middle_initial, last_name, is_member, membership_start_date } = req.body;
-    const insertQuery = 'INSERT INTO Customer (first_name, middle_initial, last_name, is_member, membership_start_date) VALUES (?, ?, ?, ?, ?)';
-    db.query(insertQuery, [first_name, middle_initial, last_name, is_member, membership_start_date], (err, result) => {
+    const { first_name, middle_initial, last_name, is_member, membership_start_date , notify_customer } = req.body;
+    const insertQuery = 'INSERT INTO Customer (first_name, middle_initial, last_name, is_member, membership_start_date, notify_customer ) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(insertQuery, [first_name, middle_initial, last_name, is_member, membership_start_date, notify_customer ], (err, result) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -67,9 +67,9 @@ router.put('/:id', (req, res) => {
         const currentCustomer = fetchResult[0];
         // Merge the updates with the current data
         const updatedCustomer = { ...currentCustomer, ...updates };
-        const { first_name, middle_initial, last_name, is_member, membership_start_date } = updatedCustomer;
-        const updateQuery = 'UPDATE Customer SET first_name = ?, middle_initial = ?, last_name = ?, is_member = ?, membership_start_date = ? WHERE customer_id = ?';
-        db.query(updateQuery, [first_name, middle_initial, last_name, is_member, membership_start_date, customerId], (updateErr, updateResult) => {
+        const { first_name, middle_initial, last_name, is_member, membership_start_date, notify_customer } = updatedCustomer;
+        const updateQuery = 'UPDATE Customer SET first_name = ?, middle_initial = ?, last_name = ?, is_member = ?, membership_start_date = ?, notify_customer WHERE customer_id = ?';
+        db.query(updateQuery, [first_name, middle_initial, last_name, is_member, membership_start_date, notify_customer, customerId], (updateErr, updateResult) => {
             if (updateResult.affectedRows === 0) {
                 return res.status(404).json({ message: 'Customer not found' });
             }
