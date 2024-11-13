@@ -1,63 +1,51 @@
-const express = require("express");
-const nodemailer = require("nodemailer");
-const mysql = require("mysql");
-require("dotenv").config();
+const express = require('express');
+const nodemailer = require('nodemailer');
+const mysql = require('mysql2/promise');
+require('dotenv').config();
+
 const router = express.Router();
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
+  host: 'museum-db.c9i4mkywg672.us-east-2.rds.amazonaws.com',
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  database: 'museum'
 });
 
+// Define the function to send exhibition notifications
 const sendExhibitionNotifications = async () => {
   try {
-    console.log("Starting notification process...");
-    const [exhibitions] = await db.query(
-      `SELECT exhibit_id, name, end_date FROM Exhibition WHERE notify_customers = TRUE`
-    );
+    console.log('Starting notification process...');
+    const [exhibitions] = await db.query(`SELECT exhibit_id, name, end_date FROM Exhibition WHERE notify_customers = TRUE`);
 
     for (const exhibition of exhibitions) {
-      const [customers] = await db.query(
-        `SELECT email FROM Authentication WHERE customer_id IS NOT NULL`
-      );
+      const [customers] = await db.query(`SELECT email FROM Authentication WHERE customer_id IS NOT NULL`);
       console.log(`Sending notifications for exhibition: ${exhibition.name}`);
 
       for (const customer of customers) {
         const transporter = nodemailer.createTransport({
-          service: "gmail",
+          service: 'gmail',
           auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
+            pass: process.env.EMAIL_PASS
+          }
         });
 
         try {
           const info = await transporter.sendMail({
-            from: `"The Museum of Fine Arts" <${process.env.EMAIL_USER}>`,
+            from: `"Houston Museum of Fine Arts" <${process.env.EMAIL_USER}>`,
             to: customer.email,
             subject: `${exhibition.name} Ending Soon`,
             html: `
               <html>
                 <body style="font-family: Arial, sans-serif; color: #333;">
                   <img src="https://cdn.britannica.com/51/194651-050-747F0C18/Interior-National-Gallery-of-Art-Washington-DC.jpg" alt="Gallery" width="600">
-                  <h1 style="color: #333;">${
-                    exhibition.name
-                  } - Ending Soon!</h1>
+                  <h1 style="color: #333;">${exhibition.name} - Ending Soon!</h1>
                   <p style="font-size: 16px;">Dear Customer,</p>
-                  <p>Our beloved exhibition "<b>${
-                    exhibition.name
-                  }</b>" is ending soon on ${new Date(
-              exhibition.end_date
-            ).toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-            })}. Don’t miss out on this amazing experience!</p>
-                  <p>Best regards,<br>The Museum of Fine Arts</p>
+                  <p>Our beloved exhibition "<b>${exhibition.name}</b>" is ending soon on ${new Date(exhibition.end_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}. Don’t miss out on this amazing experience!</p>
+                  <p>Best regards,<br>The Museum Team</p>
                 </body>
-              </html>`,
+              </html>`
           });
 
           console.log(`Email sent to ${customer.email}: ${info.response}`);
@@ -67,19 +55,17 @@ const sendExhibitionNotifications = async () => {
       }
 
       // Reset notification flag to avoid re-sending
-      await db.query(
-        `UPDATE Exhibition SET notify_customers = FALSE WHERE exhibit_id = ?`,
-        [exhibition.exhibit_id]
-      );
+      await db.query(`UPDATE Exhibition SET notify_customers = FALSE WHERE exhibit_id = ?`, [exhibition.exhibit_id]);
       console.log(`Notifications sent for exhibition: ${exhibition.name}`);
     }
+    console.log("All notifications sent successfully.");
   } catch (err) {
-    console.error("Error in notification process:", err);
+    console.error('Error in notification process:', err);
   }
 };
 
 // Create a route to trigger the notifications manually
-router.post("/sendNotifications", async (req, res) => {
+router.post('/sendNotifications', async (req, res) => {
   await sendExhibitionNotifications();
   res.status(200).json({ message: "Notifications sent successfully." });
 });
@@ -88,6 +74,6 @@ router.post("/sendNotifications", async (req, res) => {
 //sendExhibitionNotifications();
 
 // Schedule the function for daily execution
-setInterval(sendExhibitionNotifications, 86400000);
+setInterval(sendExhibitionNotifications, 86400000); 
 
 module.exports = router;
