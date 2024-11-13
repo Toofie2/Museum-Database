@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { TheFAMLogo } from "../constants/components.jsx";
 import { useState, useEffect } from "react";
+import { useAuth } from "../components/authentication";
 
 const NavBar = (props) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const forceBlackText = props.forceBlackText;
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,20 +43,11 @@ const NavBar = (props) => {
       link: "/shop",
     },
     {
-      name: "Review",
+      name: "Reviews",
       link: "/review",
     },
   ];
-  const rightnavigation = [
-    {
-      name: "Login",
-      link: "/login",
-    },
-    {
-      name: "Cart (0)",
-      link: "/cart",
-    },
-  ];
+
   return (
     <nav
       className={`fixed z-10 w-full transition-all duration-300 ${
@@ -81,11 +73,27 @@ const NavBar = (props) => {
         </div>
         <div className="flex justify-end w-1/2">
           <ul className="flex justify-start gap-8">
-            {rightnavigation.map((item) => (
-              <li key={item.name}>
-                <Link to={item.link}>{item.name}</Link>
+            {isAuthenticated ? (
+              <li>
+                <button
+                  onClick={logout}
+                  className="text-light-grey cursor-pointer"
+                >
+                  Logout
+                </button>
               </li>
-            ))}
+            ) : (
+              <li>
+                <Link to="/login" className="text-light-grey cursor-pointer">
+                  Login
+                </Link>
+              </li>
+            )}
+            <li>
+              <Link to="/cart" className="text-light-grey cursor-pointer">
+                Cart (0)
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
