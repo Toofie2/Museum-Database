@@ -32,8 +32,6 @@ const LoginPage = () => {
       if (response.data.password === loginData.password) {
         const customer_id = response.data.customer_id;
         const employee_id = response.data.employee_id;
-        console.log("Employee ID:", employee_id);
-        console.log("Customer ID:", customer_id);
 
         if (customer_id !== null) {
           // Handle customer login
