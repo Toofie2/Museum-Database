@@ -13,6 +13,7 @@ const ExhibitionsPage = () => {
           `${import.meta.env.VITE_BACKEND_URL}/exhibition`
         );
         const filteredExhibitions = response.data
+          .filter((exhibition) => exhibition.is_active !== 0)
           .sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
         setExhibitions(filteredExhibitions);
       } catch (error) {
@@ -22,13 +23,11 @@ const ExhibitionsPage = () => {
     fetchExhibitions();
   }, []);
 
-  // Function to format date and check if it's ending soon
   const formatEndDate = (dateString) => {
     const options = { month: "long", day: "numeric", year: "numeric" };
     const endDate = new Date(dateString);
     const today = new Date();
 
-    // Calculate the difference in days
     const timeDiff = endDate - today;
     const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
     const isEndingSoon = daysRemaining <= 30 && daysRemaining >= 0;
@@ -42,7 +41,6 @@ const ExhibitionsPage = () => {
   return (
     <div className="mx-auto p-0">
       <Navbar />
-      {/* Banner Section */}
       <div className="relative flex items-center h-[800px] w-screen">
         <img
           src="https://images.unsplash.com/photo-1568392388350-a33157b67a8b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -61,7 +59,6 @@ const ExhibitionsPage = () => {
         </div>
       </div>
 
-      {/* Exhibitions List */}
       <div className="container mx-auto py-10 pb-16">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {Exhibitions.map((Exhibition) => {
@@ -85,11 +82,9 @@ const ExhibitionsPage = () => {
                       {Exhibition.name}
                     </h2>
                   </div>
-                  {/* End Date Text */}
                   <div className="text-sm absolute top-0 left-0 m-4 text-white bg-black bg-opacity-60 px-2 py-1 rounded">
                     {formattedDate}
                   </div>
-                  {/* Ending Soon Label */}
                   {isEndingSoon && (
                     <div className="absolute top-0 right-0 m-4 px-2 py-1 rounded bg-red-600 text-white font-bold">
                       Ending Soon
