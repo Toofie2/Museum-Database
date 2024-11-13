@@ -13,25 +13,24 @@ const EditProfilePage = () => {
     last_name: "",
     is_member: 0,
   });
-  const [editingProfile, setEditingProfile] = useState(null); // Track which profile is being edited
-
-  const navigate = useNavigate();  // Initialize useNavigate for page redirection
+  const [editingProfile, setEditingProfile] = useState(null);
+  const [saveMessage, setSaveMessage] = useState(""); // State for success message
+  const navigate = useNavigate();
 
   // Fetch profile data
+  const fetchProfileData = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`);
+      setProfileData(res.data);
+    } catch (err) {
+      console.log("Error fetching profile data:", err);
+    }
+  };
+  
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`);
-        setProfileData(res.data);
-      } catch (err) {
-        console.log("Error fetching profile data:", err);
-      }
-    };
-
     fetchProfileData();
   }, [userId]);
 
-  // Edit profile functions
   const handleEditClick = () => {
     setEditingProfile({ ...profileData });
   };
@@ -43,40 +42,42 @@ const EditProfilePage = () => {
 
   const handleSaveClick = async () => {
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`,
-        editingProfile
-      );
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`, editingProfile);
+      setEditingProfile(null);
+      fetchProfileData();
 
-      if (response.data.success) {
-        setProfileData(editingProfile); // Update the profile data with the edited values
-        setEditingProfile(null); // Exit editing mode
-      }
+      // Set success message and hide it after 3 seconds
+      setSaveMessage("Profile Updates Saved");
+      setTimeout(() => setSaveMessage(""), 3000);
     } catch (err) {
       console.log("Error updating profile:", err);
     }
   };
 
   const handleCancelClick = () => {
-    setEditingProfile(null); // Exit editing mode without saving changes
+    setEditingProfile(null);
   };
 
-  // Function to redirect to the Edit Reviews page
   const handleEditReviewsClick = () => {
-    navigate('/editreview');  // Redirect to /editreview page
+    navigate('/editreview');
   };
 
   return (
     <>
       <NavbarBlack />
-      {/* Banner Section */}
       <div className="relative flex items-center h-[75px] w-full mb-8">
         <div className="absolute inset-0 bg-white bg-opacity-40 flex flex-col justify-center pl-4"></div>
       </div>
 
       <h1 className="text-4xl md:text-3xl font-bold text-black mb-4 text-center">Edit Profile</h1>
 
-      {/* Profile Editing Section */}
+      {/* Success Message */}
+      {saveMessage && (
+        <div className="text-green-600 font-semibold text-center mb-4">
+          {saveMessage}
+        </div>
+      )}
+
       <div className="flex flex-col items-center space-y-6">
         {!editingProfile ? (
           <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 w-full md:w-3/4 lg:w-1/2">

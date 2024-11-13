@@ -30,8 +30,12 @@ const ResetPasswordPage = () => {
         if (!emailCheckResponse.data) {
             return;
         }
-
-           // Check if passwords match
+        // Prevent resetting employee password
+        if (resetData.employee_id !== null) {
+            setConfirmationMessage("Cannot edit this user's password.");
+            return;
+        }
+        // Check if passwords match
         if (resetData.newPassword !== resetData.confirmPassword) {
             setConfirmationMessage("Passwords do not match.");
             return;

@@ -162,7 +162,7 @@ const EditReviewPage = () => {
                 <h2 className="text-xl font-medium text-black">Title: {rev.title}</h2>
                 <p className="text-base text-gray-900">Feedback: {rev.feedback}</p>
                 <p className="text-base text-gray-900">Rating: {rev.rating}</p>
-                <p className="text-base text-gray-900">Exhibit: {rev.exhibit_id === null ? "General Admission" : exhibits[rev.exhibit_id] || "Unknown"}</p>
+                <p className="text-base text-gray-900"> Exhibit: {rev.exhibit_id === null || rev.exhibit_id === 0 ? "General Admission" : exhibits[rev.exhibit_id] || "Unknown"}</p>
                 <p className="text-base text-gray-900">Date Posted: {rev.date_posted}</p>
                 <div className="flex space-x-4 mt-2">
                   <button
