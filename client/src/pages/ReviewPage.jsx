@@ -45,20 +45,22 @@ const ReviewPage = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/review`
         );
-        const formattedReviews = res.data.map((review) => ({
-          ...review,
-          date_posted: new Date(review.date_posted), // Convert date to Date object
-        }));
-
+        const formattedReviews = res.data
+          .filter((review) => review.is_active === 1) // Only include active reviews
+          .map((review) => ({
+            ...review,
+            date_posted: new Date(review.date_posted), // Convert date to Date object
+          }));
+    
         // Sort reviews by the most recent date (newest first)
         formattedReviews.sort((a, b) => b.date_posted - a.date_posted);
-
+    
         // Convert the date back to a readable format
         const updatedReviews = formattedReviews.map((review) => ({
           ...review,
           date_posted: review.date_posted.toLocaleDateString(),
         }));
-
+    
         setReviews(updatedReviews);
       } catch (err) {
         console.log("Error fetching reviews:", err);
