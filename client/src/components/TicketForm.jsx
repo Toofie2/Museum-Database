@@ -1,11 +1,18 @@
 import {useEffect, useState} from 'react'
 import axios from 'axios'
 import DatePickerComponent from "./DatePickerComponent"
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import SubtractIcon from './SubtractIcon.jsx'
 import AddIcon from './AddIcon.jsx'
+import { useAuth } from "../components/authentication"
+import "../components/Modal.css"
+
 
 const TicketForm = () => {
+  const { userId } = useAuth();
+  const navigate = useNavigate();
+
+
   // Fetch tickets from database
   const fetchAllTickets = async () => {
     try {
@@ -76,7 +83,7 @@ const TicketForm = () => {
       tickets.map((ticket) => {
         for (let j = 0; j < formData[ticket.type]; j++) {
           purchasedTicketsArr.push({
-            customer_id: customerID,
+            customer_id: userId,
             ticket_id: ticket.ticket_id,
             amount_spent: ticket.price,
             valid_day: convertedDate,
@@ -87,6 +94,7 @@ const TicketForm = () => {
         `${import.meta.env.VITE_BACKEND_URL}/customer_ticket`,
         purchasedTicketsArr
       );
+      navigate('./purchased');
     } catch (err) {
       console.log(err);
     }
@@ -110,9 +118,15 @@ const TicketForm = () => {
   const [tickets, setTickets] = useState([]);
   const [formData, setFormData] = useState({});
   const [subtotal, setSubtotal] = useState(0);
+  const [formDataAsArr, setFormDataAsArr] = useState([]);
+  let ticketTypePricePairs = {};
 
-  // This needs to be changed to the customer ID of the account making the purchase
-  const customerID = 1;
+  useEffect(() => {
+    setFormDataAsArr(Object.entries(formData));
+  }, [formData])
+  
+
+
 
   // Date picker
   const { render, selectedDate } = DatePickerComponent();
@@ -140,6 +154,23 @@ const TicketForm = () => {
     handleSubtotal(formData);
   }, [formData]);
 
+  const [modal, setModal] = useState(false);
+
+  const toggleModal = () => {
+    setModal(!modal);
+  };
+
+  useEffect(() => {
+    console.log(modal)
+  }, [modal])
+  
+
+  if(modal) {
+    document.body.classList.add('active-modal')
+  } else {
+    document.body.classList.remove('active-modal')
+  }
+
   return (
     <div className="ticketForm">
       <h1 className="text-3xl font-medium">Purchase</h1>
@@ -156,6 +187,7 @@ const TicketForm = () => {
         <div className="grid grid-cols-1 divide-y-2">
           <div></div>
           {tickets.map((ticket) => {
+            ticketTypePricePairs[ticket.type] = ticket.price;
             return(
 
               //Entries for each ticket
@@ -211,18 +243,48 @@ const TicketForm = () => {
 
         {/* Display subtotal */}
         <div className="mt-10 text-default-gray text-lg flex justify-between">
-        <span className="font-medium">Subtotal</span>${subtotal}
+          <span className="font-medium">Subtotal</span>${subtotal}
         </div>
-          {/* Link to new page thanking customer for purchase */}
-          <Link to={"/tickets/purchased"}>
+          {/* On click, show confirmation pop up */}
             <button
+              type="button"
               className="w-full mt-4 bg-black text-white py-2 px-52 border-black rounded"
-              onClick={handleSubmit}
+              onClick={toggleModal}
             >
               Purchase
             </button>
-          </Link>
       </form>
+      {modal && (
+        <div className="modal">
+          <div className="overlay"></div>
+          <div className="modal-content">
+            <h2>You are about to purchase:</h2>
+            <div className="font-medium mt-7 mb-7">
+              {
+                formDataAsArr.map(([field, value]) => {
+                  if(value > 0){
+                    return(
+                      <p key={field}>
+                        {capitalize(field)} Admission Ticket ({value}x)<br/>
+                        ${ticketTypePricePairs[field].toFixed(2)} <br/><br/>
+                      </p>
+                    )
+                  }
+                })
+              }
+              <span className="font-bold">Subtotal: ${subtotal}</span>              
+            </div>
+            <div className="flex flex-row justify-center space-x-40">
+              <button onClick={toggleModal}>
+                Cancel
+              </button>
+                <button onClick={()=>{ toggleModal(); handleSubmit() }}>
+                  Confirm
+                </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

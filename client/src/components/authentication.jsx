@@ -5,37 +5,43 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [customerId, setCustomerId] = useState(null);  // Store customer_id in state
+  const [userId, setUserId] = useState(null);  // Store user ID in state
+  const [role, setRole] = useState(null);  // Store user role (customer or employee)
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Retrieve customer_id from localStorage on init
-    const storedCustomerId = localStorage.getItem("authToken");
-    if (storedCustomerId) {
+    // Retrieve user data (userId and role) from localStorage on init
+    const storedUserId = localStorage.getItem("authToken");
+    const storedRole = localStorage.getItem("role");
+    if (storedUserId && storedRole) {
       setIsAuthenticated(true);
-      setCustomerId(storedCustomerId); // Set customer_id from localStorage
+      setUserId(storedUserId); // Set userId from localStorage
+      setRole(storedRole); // Set role from localStorage
     }
   }, []);
 
-  const login = (id) => {
+  const login = (id, userRole) => {
     localStorage.setItem("authToken", id);
-    setCustomerId(id);
+    localStorage.setItem("role", userRole); // Store the user role
+    setUserId(id);
+    setRole(userRole);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
     localStorage.removeItem("authToken");
-    setCustomerId(null);
+    localStorage.removeItem("role"); // Remove role from localStorage
+    setUserId(null);
+    setRole(null);
     setIsAuthenticated(false);
     navigate("/"); // Redirect to home page on logout
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, customerId, setIsAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userId, role, setIsAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-

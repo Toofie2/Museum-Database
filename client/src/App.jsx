@@ -38,8 +38,8 @@ const App = () => {
         <Route path="/exhibitions" element={<ExhibitionsPage />} />
         <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
         <Route path="/review" element={<ReviewPage />} />
+        <Route path="/shop" element={<GiftShopPage />} />
         <Route path="/shop/:prodCatID" element={<GiftShopCategoryPage />} />
-        <Route path="/shop/:prodCatID/:prodID" element={<GiftShopProductPage />} />
 
         {/* Employee Routes */}
         <Route path="/employee" element={<EmployeeLayout />}>
@@ -92,6 +92,14 @@ const App = () => {
               <MembershipregPage />
             </ProtectedRoute>
           }
+        />
+        <Route 
+          path="/shop/:prodCatID/:prodID" 
+          element={
+            <ProtectedRoute>
+              <GiftShopProductPage />
+            </ProtectedRoute>
+          } 
         />
       </Routes>
     </AuthProvider>
