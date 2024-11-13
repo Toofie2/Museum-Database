@@ -21,7 +21,7 @@ router.get('/email', (req, res) => {
         return res.status(400).json({ error: "Email query parameter is required" });
     }
 
-    db.query('SELECT password, customer_id FROM Authentication WHERE email = ?', [email], (err, results) => {
+    db.query('SELECT password, customer_id, employee_id FROM Authentication WHERE email = ?', [email], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;

@@ -27,24 +27,31 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${
-          loginData.email
-        }`
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${loginData.email}`
       );
       if (response.data.password === loginData.password) {
         const customer_id = response.data.customer_id;
         const employee_id = response.data.employee_id;
+        console.log("Employee ID:", employee_id);
+        console.log("Customer ID:", customer_id);
 
         if (customer_id !== null) {
-          console.log("Customer ID:", customer_id);
           // Handle customer login
           login(customer_id, "customer"); // Track role as "customer"
           setConfirmationMessage("Login successful!");
           setTimeout(() => navigate("/"), 1500); // Redirect to home page after login
         } else if (employee_id !== null) {
-          console.log("Employee ID:", employee_id);
-          // Handle employee login
-          login(employee_id, "employee"); // Track role as "employee"
+          // Retrieve employee role
+          const roleResponse = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/employee/${employee_id}`
+          );
+          const role = roleResponse.data.role;
+          console.log("Employee role:", role)
+
+          // Set authentication level based on role
+          const authLevel = role === "Admin" ? "admin" : "staff";
+          login(employee_id, authLevel);
+
           setConfirmationMessage("Login successful!");
           setTimeout(() => navigate("/employee"), 1500); // Redirect to employee dashboard
         } else {
@@ -59,17 +66,11 @@ const LoginPage = () => {
     }
   };
 
-  console.log(loginData);
-
   return (
     <>
-      {/*<NavbarBlack />*/}
-      {/* Main Section with Flexbox Layout */}
       <div className="flex h-screen">
-        {/* Left Half - Login Form */}
         <div className="flex flex-col justify-center items-center w-1/2 bg-white shadow-md">
           <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
-          {/* Welcome Message */}
           <p className="text-center text-gray-600 text-base mt-1">
             Welcome back! Please login to your account.
           </p>
@@ -96,14 +97,12 @@ const LoginPage = () => {
             </button>
           </form>
 
-          {/* Conditional rendering for confirmation message */}
           {confirmationMessage && (
             <div className="mt-4 text-green-600 text-lg text-center">
               {confirmationMessage}
             </div>
           )}
 
-          {/* Sign-up Message and Button */}
           <div className="mt-8 text-center">
             <p className="text-gray-600 text-lg">
               Don&apos;t have an account? Sign up now!
@@ -114,7 +113,6 @@ const LoginPage = () => {
               </button>
             </NavLink>
           </div>
-          {/* Reset Password */}
           <div className="mt-8 text-center">
             <NavLink to="/resetpassword">
               <p className="text-gray-600 text-sm hover:underline cursor-pointer">
@@ -122,7 +120,6 @@ const LoginPage = () => {
               </p>
             </NavLink>
           </div>
-          {/* Home */}
           <div className="mt-8 text-center">
             <NavLink to="/">
               <p className="text-gray-600 text-sm hover:underline cursor-pointer">
@@ -132,7 +129,6 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* Right Half - Background Image */}
         <div
           className="w-1/2 bg-cover bg-center"
           style={{
