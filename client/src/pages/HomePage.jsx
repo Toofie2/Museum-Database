@@ -14,7 +14,6 @@ const HomePage = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/exhibition`
         );
-        console.log(response);
         setExhibitions(response.data);
       } catch (error) {
         console.error("Error fetching exhibitions:", error);
