@@ -7,6 +7,7 @@ import CollectionsViewPage from "./pages/CollectionsViewPage";
 import TicketPage from "./pages/TicketPage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
+import GiftShopProductPage from "./pages/GiftShopProductPage";
 import TicketPurchasedPage from "./pages/TicketPurchasedPage.jsx";
 import CustomerPage from "./pages/CustomerPage.jsx";
 import ReviewPage from "./pages/ReviewPage.jsx";
@@ -26,7 +27,8 @@ const App = () => {
       <Route path="/collections" element={<CollectionsPage />} />
       <Route path="/collection/:id" element={<CollectionsViewPage />} />
       <Route path="/shop" element={<GiftShopPage />} />
-      <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
+      <Route path="/shop/:prodCatID" element={<GiftShopCategoryPage />} />
+      <Route path="/shop/:prodCatID/:prodID" element={<GiftShopProductPage />} />
       <Route path="/customer" element={<CustomerPage />} />
       <Route path="/review" element={<ReviewPage />} />
       <Route path="/signup" element={<SignupPage />} />
