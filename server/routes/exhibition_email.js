@@ -33,7 +33,7 @@ const sendExhibitionNotifications = async () => {
 
         try {
           const info = await transporter.sendMail({
-            from: `"Houston Museum of Fine Arts" <${process.env.EMAIL_USER}>`,
+            from: `"The Museum of Fine Arts" <${process.env.EMAIL_USER}>`,
             to: customer.email,
             subject: `${exhibition.name} Ending Soon`,
             html: `
@@ -42,8 +42,16 @@ const sendExhibitionNotifications = async () => {
                   <img src="https://cdn.britannica.com/51/194651-050-747F0C18/Interior-National-Gallery-of-Art-Washington-DC.jpg" alt="Gallery" width="600">
                   <h1 style="color: #333;">${exhibition.name} - Ending Soon!</h1>
                   <p style="font-size: 16px;">Dear Customer,</p>
-                  <p>Our beloved exhibition "<b>${exhibition.name}</b>" is ending soon on ${new Date(exhibition.end_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}. Don’t miss out on this amazing experience!</p>
-                  <p>Best regards,<br>The Museum Team</p>
+                  <p>Our beloved exhibition "<b>${
+                    exhibition.name
+                  }</b>" is ending soon on ${new Date(
+              exhibition.end_date
+            ).toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}. Don’t miss out on this amazing experience!</p>
+                  <p>Best regards,<br>The Museum of Fine Arts</p>
                 </body>
               </html>`
           });

@@ -21,7 +21,7 @@ router.get('/email', (req, res) => {
         return res.status(400).json({ error: "Email query parameter is required" });
     }
 
-    db.query('SELECT password FROM Authentication WHERE email = ?', [email], (err, results) => {
+    db.query('SELECT password, customer_id FROM Authentication WHERE email = ?', [email], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -94,14 +94,11 @@ router.put('/:id', (req, res) => {
         const updatedUser = { ...currentUser, ...updates };
         const { customer_id, employee_id, email, password } = updatedUser;
         const updateQuery = 'UPDATE Authentication SET customer_id = ?, employee_id = ?, email = ?, password = ? WHERE email = ?';
-        db.query(updateQuery, [customer_id, employee_id, email, password], (updateErr, updateResult) => {
+        db.query(updateQuery, [customer_id, employee_id, email, password, userEmail], (updateErr, updateResult) => {
             if (updateErr) {
                 if (updateErr.code === 'ER_NO_REFERENCED_ROW_2') {
                     return res.status(400).json({ error: "Invalid customer ID." });
                 }
-                return res.status(500).json({ error: updateErr.message });
-            }
-            if (updateErr) {
                 if (updateErr.code === 'ER_NO_REFERENCED_ROW_3') {
                     return res.status(400).json({ error: "Invalid employee ID." });
                 }
@@ -114,6 +111,7 @@ router.put('/:id', (req, res) => {
         });
     });
 });
+
 
 // Soft DELETE user credentials (set is_active to FALSE)
 router.delete('/:id', (req, res) => {
