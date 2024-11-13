@@ -21,8 +21,8 @@ const ProtectedRoute = ({ children }) => {
     }, 100); // Give enough time for popup to close
   };
 
-  // If the user is not authenticated or is an admin/staff, show the popup and then redirect
-  if (!isAuthenticated || role === "admin" || role === "staff") {
+  // If the user is not authenticated show the popup and then redirect
+  if (!isAuthenticated) {
     if (redirect) {
       return <Navigate to="/" replace />; // Redirect to home page after popup
     }
@@ -32,7 +32,33 @@ const ProtectedRoute = ({ children }) => {
         {showPopup && (
           <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded shadow-lg">
-              <h3 className="text-xl">Please login as Customer</h3>
+              <h3 className="text-xl">Please Login To Access This Page</h3>
+              <button
+                onClick={handleClosePopup} // Close popup and trigger redirect
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  // If the user is an employee, show the popup and then redirect
+  else if (role === "admin" || role === "staff") {
+    if (redirect) {
+      return <Navigate to="/login" replace />; // Redirect to home page after popup
+    }
+
+    return (
+      <>
+        {showPopup && (
+          <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow-lg">
+              <h3 className="text-xl">No Permission</h3>
+              <p>Please login as customer to access this page.</p>
               <button
                 onClick={handleClosePopup} // Close popup and trigger redirect
                 className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
