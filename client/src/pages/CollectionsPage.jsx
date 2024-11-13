@@ -21,12 +21,12 @@ const CollectionsPage = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-0">
+    <div className="mx-auto p-0">
       <Navbar />
       {/* Banner Section */}
-      <div className="relative flex items-center h-[800px]">
+      <div className="relative flex items-center h-[800px] w-full">
         <img
-          src="https://ibb.co/WnrFdnL" // Adjust to a suitable collection banner
+          src="https://i.ibb.co/Q9Wnq94/photo-1563292769-4e05b684851a.jpg" // Adjust to a suitable collection banner
           alt="Collections Banner"
           className="w-full h-full object-cover absolute top-0 left-0"
         />
