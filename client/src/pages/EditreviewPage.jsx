@@ -8,6 +8,7 @@ const EditReviewPage = () => {
   const [reviews, setReviews] = useState([]);
   const [exhibits, setExhibits] = useState({});
   const [editingReview, setEditingReview] = useState(null);
+  const [notification, setNotification] = useState(""); // State for the notification
 
   useEffect(() => {
     const fetchExhibits = async () => {
@@ -64,18 +65,26 @@ const EditReviewPage = () => {
   const handleSaveClick = async () => {
     try {
       const { date_posted, ...reviewDataToSave } = editingReview;
-  
+
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/review/${editingReview.review_id}`,
         reviewDataToSave
       );
-  
+
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
           review.review_id === editingReview.review_id ? editingReview : review
         )
       );
       setEditingReview(null); // Exit editing mode
+
+      // Show the "Review Saved" notification
+      setNotification("Review Saved");
+
+      // Hide the notification after 2 seconds
+      setTimeout(() => {
+        setNotification(""); // Clear the notification
+      }, 2000);
     } catch (err) {
       console.log("Error updating review:", err);
     }
@@ -87,7 +96,7 @@ const EditReviewPage = () => {
     if (confirmDelete) {
       try {
         await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/review/${reviewId}`);
-        
+
         // Remove the review from the state (soft delete)
         setReviews((prevReviews) =>
           prevReviews.filter((review) => review.review_id !== reviewId)
@@ -108,6 +117,13 @@ const EditReviewPage = () => {
       <h1 className="text-4xl md:text-3xl font-bold text-black mb-4 translate-x-6">
         Your Reviews ({reviews.length})
       </h1>
+
+      {/* Notification Section */}
+      {notification && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-md">
+          {notification}
+        </div>
+      )}
 
       <div className="space-y-6">
         {reviews.map((rev) => (

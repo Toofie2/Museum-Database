@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/authentication";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
@@ -58,83 +59,92 @@ const App = () => {
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
           </Route>
-          <Route path="reports" element={<Reports />} />
+          
+          {/* Admin Routes */}
+          <Route
+            path="reports"
+            element={
+              <AdminProtectedRoute> {/* Protect admin routes */}
+                <Reports />
+              </AdminProtectedRoute>
+            }
+          />
         </Route>
 
-    {/* Protected Routes */}
-    <Route
-      path="/tickets"
-      element={
-        <ProtectedRoute>
-          <TicketPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/tickets/purchased"
-      element={
-        <ProtectedRoute>
-          <TicketPurchasedPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/shop"
-      element={
-        <ProtectedRoute>
-          <GiftShopPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/giftshop/:id"
-      element={
-        <ProtectedRoute>
-          <GiftShopCategoryPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/customer"
-      element={
-        <ProtectedRoute>
-          <CustomerPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/postreview"
-      element={
-        <ProtectedRoute>
-          <PostreviewPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/membership"
-      element={
-        <ProtectedRoute>
-          <MembershipregPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/profile"
-      element={
-        <ProtectedRoute>
-          <ViewprofilePage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/editreview"
-      element={
-        <ProtectedRoute>
-          <EditreviewPage />
-        </ProtectedRoute>
-      }
-    />
-  </Routes>
+        {/* Protected Routes */}
+        <Route
+          path="/tickets"
+          element={
+            <ProtectedRoute>
+              <TicketPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tickets/purchased"
+          element={
+            <ProtectedRoute>
+              <TicketPurchasedPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shop"
+          element={
+            <ProtectedRoute>
+              <GiftShopPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/giftshop/:id"
+          element={
+            <ProtectedRoute>
+              <GiftShopCategoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customer"
+          element={
+            <ProtectedRoute>
+              <CustomerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/postreview"
+          element={
+            <ProtectedRoute>
+              <PostreviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/membership"
+          element={
+            <ProtectedRoute>
+              <MembershipregPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ViewprofilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/editreview"
+          element={
+            <ProtectedRoute>
+              <EditreviewPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </AuthProvider>
   );
 };
