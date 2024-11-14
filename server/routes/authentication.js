@@ -22,7 +22,7 @@ router.get("/email", (req, res) => {
   }
 
   db.query(
-    "SELECT password, customer_id, employee_id FROM Authentication WHERE email = ?",
+    "SELECT password, customer_id, employee_id, is_active FROM Authentication WHERE email = ?",
     [email],
     (err, results) => {
       if (err) {
@@ -36,36 +36,6 @@ router.get("/email", (req, res) => {
       res.json(results[0]);
     }
   );
-});
-
-// GET authentication by email with user details
-router.get("/user-details", (req, res) => {
-  const email = req.query.email;
-
-  if (!email) {
-    return res.status(400).json({ error: "Email query parameter is required" });
-  }
-
-  const query = `
-        SELECT a.email, 
-               e.first_name, 
-               e.last_name, 
-               e.role 
-        FROM Authentication a
-        LEFT JOIN Employee e ON a.employee_id = e.employee_id
-        WHERE a.email = ?`;
-
-  db.query(query, [email], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    if (results.length == 0) {
-      res.status(404).json({ message: "No User found with that email" });
-      return;
-    }
-    res.json(results[0]);
-  });
 });
 
 // GET authentication by customer ID
@@ -88,7 +58,7 @@ router.get("/customer:id", (req, res) => {
 });
 
 // GET authentication by employee ID
-router.get("/employee:id", (req, res) => {
+router.get("/employee/:id", (req, res) => {
   db.query(
     "SELECT * FROM Authentication WHERE employee_id = ?",
     [req.params.id],

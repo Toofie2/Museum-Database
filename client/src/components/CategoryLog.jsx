@@ -140,6 +140,26 @@ const CategoryLog = () => {
         ),
       },
     ],
+    artist: [
+      { key: "first_name", label: "First Name" },
+      { key: "middle_initial", label: "Middle Initial" },
+      { key: "last_name", label: "Last Name" },
+      {
+        key: "is_active",
+        label: "Status",
+        format: (isActive) => (
+          <span
+            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+              isActive
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {isActive ? "Active" : "Inactive"}
+          </span>
+        ),
+      },
+    ],
     product: [
       { key: "name", label: "Name" },
       { key: "description", label: "Description" },
