@@ -29,7 +29,9 @@ const LoginPage = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${loginData.email}`
       );
-      if (response.data.password === loginData.password) {
+
+      // Check if the password matches and the account is active
+      if (response.data.password === loginData.password && response.data.is_active === 1) {
         const customer_id = response.data.customer_id;
         const employee_id = response.data.employee_id;
 
@@ -44,7 +46,7 @@ const LoginPage = () => {
             `${import.meta.env.VITE_BACKEND_URL}/employee/${employee_id}`
           );
           const role = roleResponse.data.role;
-          console.log("Employee role:", role)
+          console.log("Employee role:", role);
 
           // Set authentication level based on role
           const authLevel = role === "Admin" ? "admin" : "staff";

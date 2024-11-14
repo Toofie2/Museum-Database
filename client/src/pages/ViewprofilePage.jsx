@@ -11,13 +11,15 @@ const EditProfilePage = () => {
     middle_initial: "",
     last_name: "",
     is_member: 0,
-    membership_start_date: null, // New attribute for membership start date
+    membership_start_date: null,
   });
   const [editingProfile, setEditingProfile] = useState(null);
-  const [saveMessage, setSaveMessage] = useState(""); // State for success message
+  const [saveMessage, setSaveMessage] = useState("");
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [authEmail, setAuthEmail] = useState(""); // State to store email from authentication
   const navigate = useNavigate();
 
-  // Calculate membership expiration date by adding 6 months to membership_start_date
+  // Calculate membership expiration date by adding 12 months to membership_start_date
   const getMembershipExpirationDate = () => {
     if (profileData.membership_start_date) {
       const startDate = new Date(profileData.membership_start_date);
@@ -33,8 +35,19 @@ const EditProfilePage = () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`);
       setProfileData(res.data);
+      fetchAuthEmail(res.data.customer_id); // Fetch authentication email based on customer ID
     } catch (err) {
       console.log("Error fetching profile data:", err);
+    }
+  };
+
+  // Fetch authentication email by customer ID
+  const fetchAuthEmail = async (customerId) => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/authentication/customer${customerId}`);
+      setAuthEmail(res.data.email); // Store the email from authentication
+    } catch (err) {
+      console.log("Error fetching authentication email:", err);
     }
   };
 
@@ -57,7 +70,6 @@ const EditProfilePage = () => {
       setEditingProfile(null);
       fetchProfileData();
 
-      // Set success message and hide it after 3 seconds
       setSaveMessage("Profile Updates Saved");
       setTimeout(() => setSaveMessage(""), 3000);
     } catch (err) {
@@ -73,6 +85,29 @@ const EditProfilePage = () => {
     navigate('/editreview');
   };
 
+  // Handle the account deletion
+  const handleDeleteAccount = async () => {
+    try {
+      // Call the delete authentication and customer to deactivate the user
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`);
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/authentication/${authEmail}`);
+      setShowDeleteConfirmation(false);
+      navigate('/login');
+    } catch (err) {
+      console.log("Error deleting account:", err);
+    }
+  };
+
+  // Show delete confirmation dialog
+  const confirmDelete = () => {
+    setShowDeleteConfirmation(true);
+  };
+
+  // Cancel delete confirmation
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
+  };
+
   return (
     <>
       <NavbarBlack />
@@ -82,7 +117,6 @@ const EditProfilePage = () => {
 
       <h1 className="text-4xl md:text-3xl font-bold text-black mb-4 text-center">Edit Profile</h1>
 
-      {/* Success Message */}
       {saveMessage && (
         <div className="text-green-600 font-semibold text-center mb-4">
           {saveMessage}
@@ -111,6 +145,13 @@ const EditProfilePage = () => {
                 className="bg-gray-900 text-white px-6 py-3 rounded-md w-full md:w-1/2 lg:w-1/3 hover:bg-black transition duration-200"
               >
                 Edit Reviews
+              </button>
+
+              <button
+                onClick={confirmDelete}
+                className="bg-red-600 text-white px-6 py-3 rounded-md w-full md:w-1/2 lg:w-1/3 hover:bg-red-700 transition duration-200"
+              >
+                Delete Account
               </button>
             </div>
           </div>
@@ -163,6 +204,28 @@ const EditProfilePage = () => {
           </div>
         )}
       </div>
+
+      {showDeleteConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg">
+            <p className="text-lg font-semibold text-center mb-4">Are you sure you want to delete your account?</p>
+            <div className="flex justify-between space-x-4">
+              <button
+                onClick={handleDeleteAccount}
+                className="bg-red-600 text-white px-6 py-2 rounded-md w-full hover:bg-red-700 transition duration-200"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={cancelDelete}
+                className="bg-gray-400 text-white px-6 py-2 rounded-md w-full hover:bg-gray-500 transition duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
