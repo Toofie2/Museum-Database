@@ -26,7 +26,11 @@ const CollectionsPage = () => {
       {/* Banner Section */}
       <div className="relative flex items-center h-[800px] w-full">
         <img
+<<<<<<< HEAD
           src="https://i.ibb.co/Q9Wnq94/photo-1563292769-4e05b684851a.jpg" // Adjust to a suitable collection banner
+=======
+          src="https://ibb.co/WnrFdnL" // Adjust to a suitable collection banner
+>>>>>>> bc97c7b2b937b00c22f36ec6131fd4d16e5c4ce0
           alt="Collections Banner"
           className="w-full h-full object-cover absolute top-0 left-0"
         />
