@@ -11,6 +11,7 @@ import CollectionsViewPage from "./pages/CollectionsViewPage";
 import TicketPage from "./pages/TicketPage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
+import GiftShopProductPage from "./pages/GiftShopProductPage";
 import TicketPurchasedPage from "./pages/TicketPurchasedPage.jsx";
 import CustomerPage from "./pages/CustomerPage.jsx";
 import ReviewPage from "./pages/ReviewPage.jsx";
@@ -42,13 +43,15 @@ const App = () => {
         <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/shop" element={<GiftShopPage />} />
-        <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
+        <Route path="/shop/:prodCatID" element={<GiftShopCategoryPage />} />
 
         {/* Employee Routes */}
         <Route
           path="/employee"
           element={
-            <EmployeeProtectedRoute> {/* Protect employee routes */}
+            <EmployeeProtectedRoute>
+              {" "}
+              {/* Protect employee routes */}
               <EmployeeLayout />
             </EmployeeProtectedRoute>
           }
@@ -59,12 +62,14 @@ const App = () => {
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
           </Route>
-          
+
           {/* Admin Routes */}
           <Route
             path="reports"
             element={
-              <AdminProtectedRoute> {/* Protect admin routes */}
+              <AdminProtectedRoute>
+                {" "}
+                {/* Protect admin routes */}
                 <Reports />
               </AdminProtectedRoute>
             }
@@ -125,6 +130,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <MembershipregPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shop/:prodCatID/:prodID"
+          element={
+            <ProtectedRoute>
+              <GiftShopProductPage />
             </ProtectedRoute>
           }
         />
