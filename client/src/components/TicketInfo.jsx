@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 
 const TicketInfo = () => {
@@ -22,7 +21,7 @@ const TicketInfo = () => {
                 </p>
                 
                 <Link to={'/membership'}>
-                    <button className=" mt-5 text-white py-2 px-5 border-2 border-white rounded">
+                    <button className=" mt-5 text-white py-2 px-5 border-2 border-white rounded hover:bg-stone-400 transition duration-200">
                         Join now
                     </button>
                 </Link>
@@ -30,8 +29,5 @@ const TicketInfo = () => {
        </div> 
     )
 }
-
-
-
 
 export default TicketInfo

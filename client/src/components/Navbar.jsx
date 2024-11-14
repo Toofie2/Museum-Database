@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import { TheFAMLogo } from "../constants/components.jsx";
 import { useState, useEffect } from "react";
 import { useAuth } from "../components/authentication";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout } = useAuth();
 
@@ -74,14 +76,26 @@ const NavBar = () => {
         <div className="flex justify-end w-1/2">
           <ul className="flex justify-start gap-8">
             {isAuthenticated ? (
-              <li>
-                <button
-                  onClick={logout}
-                  className="text-light-grey cursor-pointer"
-                >
-                  Logout
-                </button>
-              </li>
+              <>
+                {/* Profile Button */}
+                <li>
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className="text-light-grey cursor-pointer"
+                  >
+                    Profile
+                  </button>
+                </li>
+                {/* Logout Button */}
+                <li>
+                  <button
+                    onClick={logout}
+                    className="text-light-grey cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <Link to="/login" className="text-light-grey cursor-pointer">
@@ -89,11 +103,6 @@ const NavBar = () => {
                 </Link>
               </li>
             )}
-            <li>
-              <Link to="/cart" className="text-light-grey cursor-pointer">
-                Cart (0)
-              </Link>
-            </li>
           </ul>
         </div>
       </div>

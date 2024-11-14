@@ -90,9 +90,6 @@ const SignupPage = () => {
     }
   };
 
-  console.log(customer);
-  console.log(credentials);
-
   return (
     <>
       {/* Main Section with Flexbox Layout */}

@@ -1,4 +1,3 @@
-import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
@@ -11,6 +10,8 @@ const DatePickerComponent = () =>{
         if (temp.getDate() != date.getDate()) temp.setDate(0)
         return temp
       }
+
+      
 
     const [selectedDate, setSelectedDate] = useState(new Date())
     const minDate = new Date();
@@ -31,6 +32,7 @@ const DatePickerComponent = () =>{
             dateFormat="MMMM dd, yyyy"
             minDate={minDate}
             maxDate={maxDate}
+            onKeyDown={(e) => e.preventDefault()}
             />
         </div>
         )
