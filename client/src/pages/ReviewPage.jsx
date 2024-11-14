@@ -16,7 +16,9 @@ const ReviewPage = () => {
           `${import.meta.env.VITE_BACKEND_URL}/customer`
         );
         const customerMap = res.data.reduce((acc, customer) => {
-          acc[customer.customer_id] = `${customer.first_name} ${customer.last_name}`;
+          acc[
+            customer.customer_id
+          ] = `${customer.first_name} ${customer.last_name}`;
           return acc;
         }, {});
         setCustomers(customerMap);
@@ -51,16 +53,16 @@ const ReviewPage = () => {
             ...review,
             date_posted: new Date(review.date_posted), // Convert date to Date object
           }));
-    
+
         // Sort reviews by the most recent date (newest first)
         formattedReviews.sort((a, b) => b.date_posted - a.date_posted);
-    
+
         // Convert the date back to a readable format
         const updatedReviews = formattedReviews.map((review) => ({
           ...review,
           date_posted: review.date_posted.toLocaleDateString(),
         }));
-    
+
         setReviews(updatedReviews);
       } catch (err) {
         console.log("Error fetching reviews:", err);
@@ -79,7 +81,7 @@ const ReviewPage = () => {
   // Filter reviews based on the selected exhibit
   const filteredReviews = selectedExhibit
     ? reviews.filter((review) =>
-        selectedExhibit === "general_admission"
+        selectedExhibit === "general_experience"
           ? review.exhibit_id === null
           : review.exhibit_id === parseInt(selectedExhibit)
       )
@@ -106,7 +108,7 @@ const ReviewPage = () => {
           className="bg-white border border-gray-300 rounded-md px-4 py-2"
         >
           <option value="">All Reviews</option>
-          <option value="general_admission">General Admission</option>
+          <option value="general_experience">General Experience</option>
           {Object.entries(exhibits).map(([id, name]) => (
             <option key={id} value={id}>
               {name}
@@ -136,7 +138,8 @@ const ReviewPage = () => {
               Customer: {customers[rev.customer_id] || "Unknown"}
             </p>
             <p className="text-base text-gray-900">
-              Exhibit: {rev.exhibit_id ? exhibits[rev.exhibit_id] : "General Admission"}
+              Exhibit:{" "}
+              {rev.exhibit_id ? exhibits[rev.exhibit_id] : "General Experience"}
             </p>
             <p className="text-base text-gray-900">
               Date Posted: {rev.date_posted}

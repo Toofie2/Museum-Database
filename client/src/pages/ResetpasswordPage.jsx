@@ -1,5 +1,4 @@
 import { useState } from "react";
-import NavbarBlack from "../components/NavbarBlack";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import halfImage from "../assets/login_background.png";
@@ -22,43 +21,46 @@ const ResetPasswordPage = () => {
     e.preventDefault();
 
     try {
-        // Check if email exists
-        const emailCheckResponse = await axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${resetData.email}`
-        );   
-        
-        if (!emailCheckResponse.data) {
-            return;
-        }
-        // Prevent resetting employee password
-        if (resetData.employee_id !== null) {
-            setConfirmationMessage("Cannot edit this user's password.");
-            return;
-        }
-        // Check if passwords match
-        if (resetData.newPassword !== resetData.confirmPassword) {
-            setConfirmationMessage("Passwords do not match.");
-            return;
-        }
-        
-      // Update password
-        const response = await axios.put(
-            `${import.meta.env.VITE_BACKEND_URL}/authentication/${resetData.email}`,
-            {
-                password: resetData.newPassword,
-            }
+      // Check if email exists
+      const emailCheckResponse = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${
+          resetData.email
+        }`
       );
 
-        if (response.data) {
-            setConfirmationMessage("Password has been successfully reset!");
-            setTimeout(() => navigate("/login"), 3000); // Redirect to login page after 3 seconds
-        }   else {
-            setConfirmationMessage("Error resetting password. Please try again.");
+      // Ensure we check for employee_id within the response structure
+      const isEmployee = emailCheckResponse?.data?.employee_id;
+
+      // Prevent resetting employee password
+      if (isEmployee !== null && isEmployee !== undefined) {
+        setConfirmationMessage("Cannot edit this user's password.");
+        return;
+      }
+
+      // Check if passwords match
+      if (resetData.newPassword !== resetData.confirmPassword) {
+        setConfirmationMessage("Passwords do not match.");
+        return;
+      }
+
+      // Update password
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/${resetData.email}`,
+        {
+          password: resetData.newPassword,
         }
-        } catch (err) {
-        setConfirmationMessage("No user registered with this email.");
-        console.log("Reset password error:", err);
-        }
+      );
+
+      if (response.data) {
+        setConfirmationMessage("Password has been successfully reset!");
+        setTimeout(() => navigate("/login"), 3000); // Redirect to login page after 3 seconds
+      } else {
+        setConfirmationMessage("Error resetting password. Please try again.");
+      }
+    } catch (err) {
+      setConfirmationMessage("No user registered with this email.");
+      console.log("Reset password error:", err);
+    }
   };
 
   return (
@@ -67,7 +69,9 @@ const ResetPasswordPage = () => {
       <div className="flex h-screen">
         {/* Left Half - Reset Password Form */}
         <div className="flex flex-col justify-center items-center w-1/2 bg-white shadow-md">
-          <h2 className="text-2xl font-semibold text-center mb-6">Reset Password</h2>
+          <h2 className="text-2xl font-semibold text-center mb-6">
+            Reset Password
+          </h2>
           <p className="text-center text-gray-600 text-base mt-4">
             Enter your email and new password to reset your password.
           </p>
