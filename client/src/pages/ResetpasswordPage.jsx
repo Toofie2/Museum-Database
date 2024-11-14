@@ -25,41 +25,42 @@ const ResetPasswordPage = () => {
         // Check if email exists
         const emailCheckResponse = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${resetData.email}`
-        );   
-        
-        if (!emailCheckResponse.data) {
-            return;
-        }
+        );
+
+        // Ensure we check for employee_id within the response structure
+        const isEmployee = emailCheckResponse?.data?.employee_id;
+
         // Prevent resetting employee password
-        if (resetData.employee_id !== null) {
+        if (isEmployee !== null && isEmployee !== undefined) {
             setConfirmationMessage("Cannot edit this user's password.");
             return;
         }
+
         // Check if passwords match
         if (resetData.newPassword !== resetData.confirmPassword) {
             setConfirmationMessage("Passwords do not match.");
             return;
         }
-        
-      // Update password
+
+        // Update password
         const response = await axios.put(
             `${import.meta.env.VITE_BACKEND_URL}/authentication/${resetData.email}`,
             {
                 password: resetData.newPassword,
             }
-      );
+        );
 
         if (response.data) {
             setConfirmationMessage("Password has been successfully reset!");
             setTimeout(() => navigate("/login"), 3000); // Redirect to login page after 3 seconds
-        }   else {
+        } else {
             setConfirmationMessage("Error resetting password. Please try again.");
         }
-        } catch (err) {
+    } catch (err) {
         setConfirmationMessage("No user registered with this email.");
         console.log("Reset password error:", err);
-        }
-  };
+    }
+};
 
   return (
     <>
