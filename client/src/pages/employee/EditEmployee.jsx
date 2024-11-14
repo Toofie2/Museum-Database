@@ -1,86 +1,69 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../components/authentication";
-import NavbarBlack from "../components/NavbarBlack";
+import { useAuth } from "../../components/authentication";
 import { useNavigate } from "react-router-dom";
 
-const EditProfilePage = () => {
-  const { userId } = useAuth();
-  const [profileData, setProfileData] = useState({
+const EditEmployeePage = () => {
+  const { userId } = useAuth(); // Assuming userId is the logged-in employee's ID
+  const [employeeData, setEmployeeData] = useState({
     first_name: "",
     middle_initial: "",
     last_name: "",
-    is_member: 0,
-    membership_start_date: null, // New attribute for membership start date
+    department_id: 0,
+    salary: "",
+    ssn: "",
+    hire_date: "",
+    start_date: "",
   });
-  const [editingProfile, setEditingProfile] = useState(null);
+  const [editingEmployee, setEditingEmployee] = useState(null);
   const [saveMessage, setSaveMessage] = useState(""); // State for success message
   const navigate = useNavigate();
 
-  // Calculate membership expiration date by adding 6 months to membership_start_date
-  const getMembershipExpirationDate = () => {
-    if (profileData.membership_start_date) {
-      const startDate = new Date(profileData.membership_start_date);
-      const expirationDate = new Date(startDate);
-      expirationDate.setMonth(startDate.getMonth() + 12);
-      return expirationDate.toLocaleDateString();
-    }
-    return "N/A";
-  };
-
-  // Fetch profile data
-  const fetchProfileData = async () => {
+  // Fetch employee data
+  const fetchEmployeeData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`);
-      setProfileData(res.data);
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/employee/${userId}`);
+      setEmployeeData(res.data);
     } catch (err) {
-      console.log("Error fetching profile data:", err);
+      console.log("Error fetching employee data:", err);
     }
   };
 
   useEffect(() => {
-    fetchProfileData();
+    fetchEmployeeData();
   }, [userId]);
 
   const handleEditClick = () => {
-    setEditingProfile({ ...profileData });
+    setEditingEmployee({ ...employeeData });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditingProfile((prev) => ({ ...prev, [name]: value }));
+    setEditingEmployee((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveClick = async () => {
     try {
-      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`, editingProfile);
-      setEditingProfile(null);
-      fetchProfileData();
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/employee/${userId}`, editingEmployee);
+      setEditingEmployee(null);
+      fetchEmployeeData();
 
       // Set success message and hide it after 3 seconds
       setSaveMessage("Profile Updates Saved");
       setTimeout(() => setSaveMessage(""), 3000);
     } catch (err) {
-      console.log("Error updating profile:", err);
+      console.log("Error updating employee data:", err);
     }
   };
 
   const handleCancelClick = () => {
-    setEditingProfile(null);
-  };
-
-  const handleEditReviewsClick = () => {
-    navigate('/editreview');
+    setEditingEmployee(null);
   };
 
   return (
     <>
-      <NavbarBlack />
-      <div className="relative flex items-center h-[75px] w-full mb-8">
-        <div className="absolute inset-0 bg-white bg-opacity-40 flex flex-col justify-center pl-4"></div>
-      </div>
 
-      <h1 className="text-4xl md:text-3xl font-bold text-black mb-4 text-center">Edit Profile</h1>
+      <h1 className="text-4xl md:text-3xl font-bold text-black mb-4 text-center">Edit Your Profile</h1>
 
       {/* Success Message */}
       {saveMessage && (
@@ -90,27 +73,20 @@ const EditProfilePage = () => {
       )}
 
       <div className="flex flex-col items-center space-y-6">
-        {!editingProfile ? (
+        {!editingEmployee ? (
           <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 w-full md:w-3/4 lg:w-1/2">
-            <h2 className="text-base text-black">First Name: {profileData.first_name}</h2>
-            <p className="text-base text-black">M.I: {profileData.middle_initial}</p>
-            <p className="text-base text-black">Last Name: {profileData.last_name}</p>
-            <p className="text-base text-black">Membership Status: {profileData.is_member ? "Member" : "Non-member"}</p>
-            <p className="text-base text-black">
-              Membership Expiration Date: {getMembershipExpirationDate()}
-            </p>
+            <h2 className="text-base text-black">First Name: {employeeData.first_name}</h2>
+            <p className="text-base text-black">M.I: {employeeData.middle_initial}</p>
+            <p className="text-base text-black">Last Name: {employeeData.last_name}</p>
+            <p className="text-base text-black">Department ID: {employeeData.department_id}</p>
+            <p className="text-base text-black">Salary: ${employeeData.salary}</p>
+            <p className="text-base text-black">SSN: {employeeData.ssn}</p>
             <div className="flex flex-col items-center space-y-4 mt-4">
               <button
                 onClick={handleEditClick}
                 className="bg-gray-900 text-white px-6 py-3 rounded-md w-full md:w-1/2 lg:w-1/3 hover:bg-black transition duration-200"
               >
                 Edit Profile
-              </button>
-              <button
-                onClick={handleEditReviewsClick}
-                className="bg-gray-900 text-white px-6 py-3 rounded-md w-full md:w-1/2 lg:w-1/3 hover:bg-black transition duration-200"
-              >
-                Edit Reviews
               </button>
             </div>
           </div>
@@ -122,7 +98,7 @@ const EditProfilePage = () => {
             <input
               type="text"
               name="first_name"
-              value={editingProfile.first_name}
+              value={editingEmployee.first_name}
               onChange={handleInputChange}
               className="border border-gray-300 rounded px-4 py-2 mb-2 w-full"
             />
@@ -132,7 +108,7 @@ const EditProfilePage = () => {
               type="text"
               name="middle_initial"
               maxLength="1"
-              value={editingProfile.middle_initial}
+              value={editingEmployee.middle_initial}
               onChange={handleInputChange}
               className="border border-gray-300 rounded px-4 py-2 mb-2 w-full"
             />
@@ -141,7 +117,34 @@ const EditProfilePage = () => {
             <input
               type="text"
               name="last_name"
-              value={editingProfile.last_name}
+              value={editingEmployee.last_name}
+              onChange={handleInputChange}
+              className="border border-gray-300 rounded px-4 py-2 mb-2 w-full"
+            />
+
+            <label className="text-base text-gray-900">Department ID</label>
+            <input
+              type="number"
+              name="department_id"
+              value={editingEmployee.department_id}
+              onChange={handleInputChange}
+              className="border border-gray-300 rounded px-4 py-2 mb-2 w-full"
+            />
+
+            <label className="text-base text-gray-900">Salary</label>
+            <input
+              type="number"
+              name="salary"
+              value={editingEmployee.salary}
+              onChange={handleInputChange}
+              className="border border-gray-300 rounded px-4 py-2 mb-2 w-full"
+            />
+
+            <label className="text-base text-gray-900">SSN</label>
+            <input
+              type="text"
+              name="ssn"
+              value={editingEmployee.ssn}
               onChange={handleInputChange}
               className="border border-gray-300 rounded px-4 py-2 mb-2 w-full"
             />
@@ -157,7 +160,7 @@ const EditProfilePage = () => {
                 onClick={handleCancelClick}
                 className="bg-gray-400 text-white px-6 py-3 rounded-md w-full md:w-1/2 lg:w-1/3 hover:bg-gray-500 transition duration-200"
               >
-                Back
+                Cancel
               </button>
             </div>
           </div>
@@ -167,4 +170,4 @@ const EditProfilePage = () => {
   );
 };
 
-export default EditProfilePage;
+export default EditEmployeePage;
