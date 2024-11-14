@@ -110,9 +110,16 @@ const EmployeeListPage = () => {
 
   return (
     <>
-      <h1 className="text-4xl md:text-3xl font-bold text-black mb-8 text-center">
-        Employee List
-      </h1>
+      <div className="flex justify-between p-8">
+        <h1 className="text-2xl">Employees</h1>
+        <button
+          onClick={() => navigate("/employee/register")}
+          className="flex bg-white text-gray-dark px-3 py-2 rounded-md transition duration-200 border-gray-medium border justify-between gap-1"
+        >
+          <span className="material-symbols-outlined">add</span>
+          Add Employee
+        </button>
+      </div>
 
       {/* Success Message */}
       {saveMessage && (
