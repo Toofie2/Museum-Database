@@ -62,7 +62,7 @@ const CollectionsViewPage = () => {
               className="h-[300px] art-item relative rounded-lg overflow-hidden"
             >
               <img
-                src={`${art.image_path}`}
+                src={`${art.art_image_path}`}
                 alt={art.title}
                 className="w-full h-full object-cover"
               />
