@@ -125,6 +125,13 @@ const LoginPage = () => {
               </p>
             </NavLink>
           </div>
+          <div className="mt-8 text-center">
+            <NavLink to="/">
+              <p className="text-gray-600 text-sm hover:underline cursor-pointer">
+                Return to home
+              </p>
+            </NavLink>
+          </div>
         </div>
 
         <div
