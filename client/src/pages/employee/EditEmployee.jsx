@@ -63,7 +63,7 @@ const EditEmployeePage = () => {
   return (
     <>
 
-      <h1 className="text-4xl md:text-3xl font-bold text-black mb-4 text-center">Edit Employee Profile</h1>
+      <h1 className="text-4xl md:text-3xl font-bold text-black mb-4 text-center">Edit Your Profile</h1>
 
       {/* Success Message */}
       {saveMessage && (
