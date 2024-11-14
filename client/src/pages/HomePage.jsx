@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
+import { Link } from "react-router-dom";
 import backgroundImage from "../assets/HomePageBackground.jpg";
 import floor1Image from "../assets/Floor 1.png";
 import floor2Image from "../assets/Floor 2.png";
 
 const HomePage = () => {
   const [exhibitions, setExhibitions] = useState([]);
+  const [showBanner, setShowBanner] = useState(false);
+  const [upcomingExhibition, setUpcomingExhibition] = useState(null);
 
   useEffect(() => {
     const fetchExhibitions = async () => {
@@ -14,7 +17,15 @@ const HomePage = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/exhibition`
         );
-        setExhibitions(response.data);
+        const fetchedExhibitions = response.data;
+        setExhibitions(fetchedExhibitions);
+        const upcoming = fetchedExhibitions.find(
+          (exhibition) => exhibition.banner === 1
+        );
+        if (upcoming) {
+          setUpcomingExhibition(upcoming);
+          setShowBanner(true);
+        }
       } catch (error) {
         console.error("Error fetching exhibitions:", error);
       }
@@ -29,8 +40,25 @@ const HomePage = () => {
 
   return (
     <>
+      {showBanner && upcomingExhibition && (
+        <div className="bg-red-600 text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
+          <span className="text-xl ml-14 relative">
+            <span className="absolute left-0 -translate-x-full text-2xl">★</span>
+            Check out our new exhibition{" "}
+            {upcomingExhibition.name} starting on{" "}
+            {formatDate(upcomingExhibition.start_date)} under our exhibitions tab!
+            <span className="absolute right-0 translate-x-full text-2xl">★</span>
+          </span>
+          <button
+            onClick={() => setShowBanner(false)}
+            className="text-black font-medium px-3"
+          >
+            X
+          </button>
+        </div>
+      )}
       <Navbar />
-      <div className="relative h-screen pt-[4.5rem] text-white">
+      <div className={`relative h-screen pt-[4.5rem] text-white ${showBanner ? 'mt-[4.5rem]' : ''}`}>
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -64,11 +92,13 @@ const HomePage = () => {
                 key={exhibition.exhibit_id}
                 className="w-[30rem] flex flex-col space-y-0.5"
               >
-                <img
-                  src={exhibition.image_path}
-                  alt={exhibition.name}
-                  className="w-full h-[18rem] object-cover"
-                />
+                <Link to={`/exhibition/${exhibition.exhibit_id}`}>
+                  <img
+                    src={exhibition.image_path}
+                    alt={exhibition.name}
+                    className="w-full h-[18rem] object-cover cursor-pointer"
+                  />
+                </Link>
                 <h2 className="text-lg font-medium">{exhibition.name}</h2>
                 <p>Through {formatDate(exhibition.end_date)}</p>
               </div>
