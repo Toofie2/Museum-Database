@@ -99,7 +99,7 @@ const App = () => {
             }
           />
           <Route
-            path="employeelist"
+            path="employees"
             element={
               <AdminProtectedRoute>
                 {" "}
