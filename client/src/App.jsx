@@ -25,6 +25,7 @@ import Settings from "./pages/employee/Settings.jsx";
 import RegisterEmployee from "./pages/employee/RegisterEmployee.jsx";
 import EditEmployee from "./pages/employee/EditEmployee.jsx";
 import EmployeeList from "./pages/employee/EmployeeList.jsx";
+import CustomerList from "./pages/employee/CustomerList.jsx";
 import CategoryLog from "./components/CategoryLog.jsx";
 import Reports from "./pages/employee/reports/Reports.jsx";
 import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
@@ -92,13 +93,20 @@ const App = () => {
           <Route
             path="employeelist"
             element={
-              <AdminProtectedRoute> {/* Protect edit employee route */}
+              <AdminProtectedRoute> {/* Protect employee list route */}
                 <EmployeeList />
               </AdminProtectedRoute>
             }
           />
+          <Route
+            path="customerlist"
+            element={
+              <AdminProtectedRoute> {/* Protect customer list route */}
+                <CustomerList />
+              </AdminProtectedRoute>
+            }
+          />
         </Route>
-
         {/* Protected Routes */}
         <Route
           path="/tickets"
@@ -185,14 +193,6 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ViewprofilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/editreview"
-          element={
-            <ProtectedRoute>
-              <EditreviewPage />
             </ProtectedRoute>
           }
         />
