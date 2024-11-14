@@ -3,6 +3,8 @@ import { AuthProvider } from "./components/authentication";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
@@ -11,6 +13,7 @@ import CollectionsViewPage from "./pages/CollectionsViewPage";
 import TicketPage from "./pages/TicketPage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
+import GiftShopProductPage from "./pages/GiftShopProductPage";
 import TicketPurchasedPage from "./pages/TicketPurchasedPage.jsx";
 import CustomerPage from "./pages/CustomerPage.jsx";
 import ReviewPage from "./pages/ReviewPage.jsx";
@@ -29,6 +32,7 @@ import Reports from "./pages/employee/reports/Reports.jsx";
 import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
+import EditreviewPage from "./pages/EditreviewPage.jsx";
 
 const App = () => {
   return (
@@ -45,7 +49,7 @@ const App = () => {
         <Route path="/exhibition/:id" element={<ExhibitionViewPage />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/shop" element={<GiftShopPage />} />
-        <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
+        <Route path="/shop/:prodCatID" element={<GiftShopCategoryPage />} />
 
         {/* Employee Routes */}
         <Route
@@ -132,6 +136,22 @@ const App = () => {
           }
         />
         <Route
+          path="/shop"
+          element={
+            <ProtectedRoute>
+              <GiftShopPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/giftshop/:id"
+          element={
+            <ProtectedRoute>
+              <GiftShopCategoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/customer"
           element={
             <ProtectedRoute>
@@ -156,10 +176,26 @@ const App = () => {
           }
         />
         <Route
+          path="/shop/:prodCatID/:prodID"
+          element={
+            <ProtectedRoute>
+              <GiftShopProductPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/profile"
           element={
             <ProtectedRoute>
               <ViewprofilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/editreview"
+          element={
+            <ProtectedRoute>
+              <EditreviewPage />
             </ProtectedRoute>
           }
         />
