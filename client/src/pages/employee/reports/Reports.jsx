@@ -24,6 +24,18 @@ const Reports = () => {
       customerTicketIds: '1, 2, 3, 4, 5',
     },
     {
+      exhibitionName: 'Vincent Van Gogh',
+      numVisits: 134,
+      totalRevenue: 2765.34,
+      customerTicketIds: '1, 2, 3, 4, 5',
+    },
+    {
+      exhibitionName: 'Women in Art',
+      numVisits: 116,
+      totalRevenue: 3482.41,
+      customerTicketIds: '1, 2, 3, 4, 5',
+    },
+    {
       exhibitionName: 'Modern Art',
       numVisits: 200,
       totalRevenue: 5721.02,
@@ -140,3 +152,94 @@ const Reports = () => {
 };
 
 export default Reports;
+
+/*
+ 
+
+
+
+
+
+
+// Revenue by date range (e.g., monthly)
+
+    SELECT
+        DATE_FORMAT(ct.date_purchased, '%Y-%m') AS month,
+        SUM(ct.amount_spent) AS total_ticket_revenue,
+        SUM(cp.amount_spent) AS total_product_revenue,
+        SUM(ct.amount_spent) + SUM(cp.amount_spent) AS total_revenue
+    FROM
+        Customer_Ticket ct
+    JOIN
+        Customer_Product cp ON cp.customer_ticket_id = ct.customer_ticket_id
+    WHERE
+        ct.date_purchased BETWEEN '2024-01-01' AND '2024-11-14' AND ct.is_deleted = 0 AND cp.is_deleted = 0
+    GROUP BY
+        month
+    ORDER BY
+        month;
+
+
+
+
+
+
+
+
+
+  // Exhibition visits by date range
+
+    SELECT
+        e.name AS exhibition_name,
+        COUNT(DISTINCT ce.customer_ticket_id) AS num_visits
+    FROM
+        Exhibition e
+    JOIN
+        Customer_Exhibition ce ON ce.exhibition_id = e.exhibit_id
+    JOIN
+        Customer_Ticket ct ON ce.customer_ticket_id = ct.customer_ticket_id
+    WHERE
+        ct.date_visited BETWEEN '2024-01-01' AND '2024-11-14' AND ct.is_deleted = 0
+    GROUP BY
+        e.name
+    ORDER BY
+        num_visits DESC;
+
+
+
+
+
+
+// Number of reviews by product
+
+    SELECT
+        p.name AS product_name,
+        COUNT(r.review_id) AS num_reviews
+    FROM
+        Product p
+    JOIN
+        Review r ON r.product_id = p.product_id
+    WHERE
+        r.is_deleted = 0
+    GROUP BY
+        p.name
+    ORDER BY
+        num_reviews DESC; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
