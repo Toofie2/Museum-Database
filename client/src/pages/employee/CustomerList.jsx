@@ -96,13 +96,25 @@ const CustomerList = () => {
   // Handle delete button click (after confirmation)
   const handleDeleteClick = async () => {
     try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/customer${editingCustomer.customer_id}`
+      );
+
+      // First, delete the customer's authentication data
+      console.log("customerid:" ,editingCustomer.customer_id)
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/authentication/${response.data.email}`);
+      
+      // Then, delete the customer from the customer table
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/customer/${editingCustomer.customer_id}`);
+
       setEditingCustomer(null);
       fetchCustomers();
-      setSaveMessage("Customer successfully deleted");
+      setSaveMessage("Customer and authentication data successfully deleted");
       setTimeout(() => setSaveMessage(""), 3000);
     } catch (err) {
-      console.log("Error deleting customer:", err);
+      console.log("Error deleting customer or authentication data:", err);
+      setSaveMessage("Error deleting customer. Please try again.");
+      setTimeout(() => setSaveMessage(""), 3000);
     } finally {
       setShowDeleteConfirmation(false);
     }

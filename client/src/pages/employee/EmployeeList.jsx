@@ -59,13 +59,26 @@ const EmployeeListPage = () => {
   // Handle delete button click (after confirmation)
   const handleDeleteClick = async () => {
     try {
+      // Fetch employee's authentication data (e.g., using email or ID)
+      console.log("edditing employee id:" ,editingEmployee.employee_id)
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/employee/${editingEmployee.employee_id}`
+      );
+      
+      // Delete the authentication record for the employee
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/authentication/${response.data.email}`);
+      
+      // Then, delete the employee record
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/employee/${editingEmployee.employee_id}`);
+      
       setEditingEmployee(null);
       fetchEmployees();
-      setSaveMessage("Employee successfully deactivated");
+      setSaveMessage("Employee and authentication data successfully deleted");
       setTimeout(() => setSaveMessage(""), 3000);
     } catch (err) {
-      console.log("Error deactivating employee:", err);
+      console.log("Error deleting employee or authentication data:", err);
+      setSaveMessage("Error deleting employee. Please try again.");
+      setTimeout(() => setSaveMessage(""), 3000);
     } finally {
       setShowDeleteConfirmation(false);
     }
@@ -147,28 +160,28 @@ const EmployeeListPage = () => {
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
 
-            <div className="flex justify-between space-x-4 mt-6">
+          <div className="flex justify-between space-x-4 mt-6">
             <button
-                onClick={handleSaveClick}
-                className="bg-gray-900 text-white px-6 py-3 rounded-md w-full hover:bg-black transition duration-200"
+              onClick={handleSaveClick}
+              className="bg-gray-900 text-white px-6 py-3 rounded-md w-full hover:bg-black transition duration-200"
             >
-                Save
+              Save
             </button>
             <button
-                onClick={handleCancelClick}
-                className="bg-gray-400 text-white px-6 py-3 rounded-md w-full hover:bg-gray-500 transition duration-200"
+              onClick={handleCancelClick}
+              className="bg-gray-400 text-white px-6 py-3 rounded-md w-full hover:bg-gray-500 transition duration-200"
             >
-                Cancel
+              Cancel
             </button>
             {editingEmployee.role !== "Admin" && (
-                <button
+              <button
                 onClick={confirmDelete}
                 className="bg-red-600 text-white px-6 py-3 rounded-md w-1/4 hover:bg-red-700 transition duration-200"
-                >
+              >
                 Delete
-                </button>
+              </button>
             )}
-        </div>
+          </div>
         </div>
       )}
 
@@ -204,10 +217,11 @@ const EmployeeListPage = () => {
             </h3>
             <p className="text-base text-gray-600 mb-2">Department ID: {employee.department_id}</p>
             <p className="text-base text-gray-600 mb-2">Salary: ${employee.salary}</p>
-            <p className="text-base text-gray-600 mb-4">SSN: {employee.ssn}</p>
+            <p className="text-base text-gray-600 mb-2">SSN: {employee.ssn}</p>
+
             <button
               onClick={() => handleEditClick(employee)}
-              className="bg-gray-900 text-white px-6 py-2 rounded-md hover:bg-black transition duration-200 w-full"
+              className="bg-gray-900 text-white px-6 py-3 rounded-md mt-4 hover:bg-black transition duration-200"
             >
               Edit
             </button>
