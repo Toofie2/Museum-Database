@@ -47,9 +47,26 @@ router.get("/collection/:collection_id", (req, res) => {
   );
 });
 
-// GET all Art
+// GET all Art, including artist name, collection name, and exhibition name
 router.get("/", (req, res) => {
-  db.query("SELECT * FROM Art", (err, results) => {
+  const query = `
+    SELECT 
+      a.*,
+      CONCAT(ar.first_name, 
+        CASE 
+          WHEN ar.middle_initial IS NOT NULL THEN CONCAT(' ', ar.middle_initial, ' ')
+          ELSE ' '
+        END,
+        ar.last_name) AS artist_name,
+      c.title AS collection_name,
+      e.name AS exhibition_name
+    FROM Art a
+    LEFT JOIN Artist ar ON a.artist_id = ar.artist_id
+    LEFT JOIN Collection c ON a.collection_id = c.collection_id
+    LEFT JOIN Exhibition e ON a.exhibit_id = e.exhibit_id
+  `;
+
+  db.query(query, (err, results) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }

@@ -17,9 +17,15 @@ router.get('/', (req, res) => {
 
 // GET all collections
 router.get("/", (req, res) => {
-  db.query("SELECT * FROM Collection", (err, results) => {
+  const query = `
+      SELECT Collection.*, Room.room_name 
+      FROM Collection
+      JOIN Room ON Collection.room_id = Room.room_id
+    `;
+  db.query(query, (err, results) => {
     if (err) {
-      return res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message });
+      return;
     }
     res.json(results);
   });
