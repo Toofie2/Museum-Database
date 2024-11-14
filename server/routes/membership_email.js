@@ -1,20 +1,20 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const mysql = require('mysql2/promise');
-require('dotenv').config();
+const express = require("express");
+const nodemailer = require("nodemailer");
+const mysql = require("mysql");
+require("dotenv").config();
 const router = express.Router();
 
 const db = mysql.createPool({
-  host: 'museum-db.c9i4mkywg672.us-east-2.rds.amazonaws.com',
+  host: "museum-db.c9i4mkywg672.us-east-2.rds.amazonaws.com",
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: 'museum'
+  database: "museum",
 });
 
 const sendMembershipNotifications = async () => {
   try {
-    console.log('Starting membership notification process...');
-    
+    console.log("Starting membership notification process...");
+
     // Select customers whose memberships are about to expire and have not yet been notified
     const [customers] = await db.query(
       `SELECT Customer.customer_id, Customer.first_name, Authentication.email 
@@ -25,11 +25,11 @@ const sendMembershipNotifications = async () => {
 
     for (const customer of customers) {
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
           user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
+          pass: process.env.EMAIL_PASS,
+        },
       });
 
       try {
@@ -46,13 +46,16 @@ const sendMembershipNotifications = async () => {
                 <p>Your membership will expire soon. Don’t miss out on all of our exclusive benefits!</p>
                 <p>Best regards,<br>The Fine Arts Museum</p>
               </body>
-            </html>`
+            </html>`,
         });
 
         console.log(`Email sent to ${customer.email}: ${info.response}`);
 
         // Reset notify_customers in Customer after email is sent
-        await db.query(`UPDATE Customer SET notify_customers = FALSE WHERE customer_id = ?`, [customer.customer_id]);
+        await db.query(
+          `UPDATE Customer SET notify_customers = FALSE WHERE customer_id = ?`,
+          [customer.customer_id]
+        );
       } catch (error) {
         console.error(`Failed to send email to ${customer.email}:`, error);
       }
@@ -60,7 +63,7 @@ const sendMembershipNotifications = async () => {
 
     console.log("All membership notifications sent successfully.");
   } catch (err) {
-    console.error('Error in membership notification process:', err);
+    console.error("Error in membership notification process:", err);
   }
 };
 
