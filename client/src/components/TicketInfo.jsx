@@ -17,7 +17,7 @@ const TicketInfo = () => {
                     Become a Member
                 </h2>
                 <p className="mt-1">
-                    Enjoy <span className="font-medium">unlimited free admission</span> for you and your guest(s) on every visit!
+                    Enjoy <span className="font-medium">unlimited free adult admission</span> on every visit!
                 </p>
                 
                 <Link to={'/membership'}>
