@@ -71,6 +71,6 @@ const sendMembershipNotifications = async () => {
 //sendMembershipNotifications();
 
 // Schedule the function for daily execution
-setInterval(sendMembershipNotifications, 86400000);
+setInterval(sendMembershipNotifications, 30000);
 
 module.exports = router;
