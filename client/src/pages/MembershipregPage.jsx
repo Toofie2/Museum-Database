@@ -83,7 +83,7 @@ const MembershipregPage = () => {
                         <div className="bg-stone-500 text-white p-8 rounded-lg mt-6">
                             <p className="text-lg font-bold mb-6">$110 per year</p>
                             <ul className="list-disc list-inside mb-6 space-y-2">
-                                <li>Free admission for one Member and two paid guests</li>
+                                <li>Free admission adult ticket</li>
                                 <li>15% off Gift Shop Items, and 10% off parking and dining</li>
                                 <li>Express entry with Member Entrance</li>
                                 <li>Special promotions and rewards</li>
