@@ -2,6 +2,7 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const mysql = require("mysql");
 require("dotenv").config();
+
 const router = express.Router();
 
 const db = mysql.createPool({
@@ -11,6 +12,7 @@ const db = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
+// Define the function to send exhibition notifications
 const sendExhibitionNotifications = async () => {
   try {
     console.log("Starting notification process...");
@@ -73,6 +75,7 @@ const sendExhibitionNotifications = async () => {
       );
       console.log(`Notifications sent for exhibition: ${exhibition.name}`);
     }
+    console.log("All notifications sent successfully.");
   } catch (err) {
     console.error("Error in notification process:", err);
   }
