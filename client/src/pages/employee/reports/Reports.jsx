@@ -1,104 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState('revenue'); // Default active tab is 'revenue'
-  const [revenueData, setRevenueData] = useState(null);
-  const [employeeRevenueData, setEmployeeRevenueData] = useState(null);
-  const [reviewsData, setReviewsData] = useState(null);
-  const [exhibitionData, setExhibitionData] = useState(null); // Added for exhibition report
-  const [error, setError] = useState(null);
 
-  // Fetch Revenue Data
-  useEffect(() => {
-    const fetchRevenueReport = async () => {
-      try {
-        console.log('Fetching revenue data...');
-        const response = await fetch('http://localhost:3000/api/reports/revenue');
-        if (!response.ok) {
-          throw new Error('Failed to fetch revenue report');
-        }
-        const data = await response.json();
-        console.log('Revenue data:', data);
-        setRevenueData(data);
-      } catch (error) {
-        console.error('Error fetching revenue data:', error);
-        setError(error.message);
-      }
-    };
-    if (activeTab === 'revenue') {
-      fetchRevenueReport();
-    }
-  }, [activeTab]);
+  // Hardcoded Data
+  const revenueData = [
+    { month: 'January', totalRevenue: 5421.07 },
+    { month: 'February', totalRevenue: 4105.63 },
+    { month: 'March', totalRevenue: 4521.44 },
+  ];
 
-  // Fetch Employee Revenue Data
-  useEffect(() => {
-    const fetchEmployeeRevenueReport = async () => {
-      try {
-        console.log('Fetching employee revenue data...');
-        const response = await fetch('http://localhost:3000/api/reports/employee-revenue'); // Placeholder endpoint
-        if (!response.ok) {
-          throw new Error('Failed to fetch employee revenue report');
-        }
-        const data = await response.json();
-        console.log('Employee revenue data:', data);
-        setEmployeeRevenueData(data);
-      } catch (error) {
-        console.error('Error fetching employee revenue data:', error);
-        setError(error.message);
-      }
-    };
-    if (activeTab === 'employee-revenue') {
-      fetchEmployeeRevenueReport();
-    }
-  }, [activeTab]);
+  const reviewsData = [
+    { customerName: 'John Doe', rating: 5, review: 'Excellent experience!' },
+    { customerName: 'Jane Smith', rating: 4, review: 'Very good, but could be better.' },
+    { customerName: 'Sam Wilson', rating: 3, review: 'It was okay, but I expected more.' },
+  ];
 
-  // Fetch Reviews Data
-  useEffect(() => {
-    const fetchReviewsReport = async () => {
-      try {
-        console.log('Fetching reviews data...');
-        const response = await fetch('http://localhost:3000/api/reports/reviews'); // Placeholder endpoint
-        if (!response.ok) {
-          throw new Error('Failed to fetch reviews report');
-        }
-        const data = await response.json();
-        console.log('Reviews data:', data);
-        setReviewsData(data);
-      } catch (error) {
-        console.error('Error fetching reviews data:', error);
-        setError(error.message);
-      }
-    };
-    if (activeTab === 'reviews') {
-      fetchReviewsReport();
-    }
-  }, [activeTab]);
-
-  // Fetch Exhibition Report Data
-  useEffect(() => {
-    const fetchExhibitionReport = async () => {
-      try {
-        console.log('Fetching exhibition data...');
-        const response = await fetch('http://localhost:3000/api/reports/exhibition-report'); // Added new endpoint for exhibition report
-        if (!response.ok) {
-          throw new Error(`Failed to fetch exhibition report: ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log('Exhibition data:', data);
-        setExhibitionData(data);
-      } catch (error) {
-        console.error('Error fetching exhibition data:', error);
-        setError(error.message);
-      }
-    };
-    if (activeTab === 'exhibitions') {
-      fetchExhibitionReport();
-    }
-  }, [activeTab]);
-
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
+  const exhibitionData = [
+    {
+      exhibitionName: 'Impressionist Art',
+      numVisits: 120,
+      totalRevenue: 3334.21,
+      customerTicketIds: '1, 2, 3, 4, 5',
+    },
+    {
+      exhibitionName: 'Modern Art',
+      numVisits: 200,
+      totalRevenue: 5721.02,
+      customerTicketIds: '6, 7, 8, 9, 10',
+    },
+    {
+      exhibitionName: 'Ancient Artifacts',
+      numVisits: 80,
+      totalRevenue: 1345.55,
+      customerTicketIds: '11, 12, 13, 14, 15',
+    },
+  ];
 
   const renderTable = (data, title) => (
     <div className="overflow-hidden shadow-lg rounded-lg bg-white">
@@ -113,20 +50,14 @@ const Reports = () => {
           </tr>
         </thead>
         <tbody>
-          {data ? (
-            data.map((row, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="border-b px-6 py-4">{row.exhibition_name}</td>
-                <td className="border-b px-6 py-4">{row.num_visits}</td>
-                <td className="border-b px-6 py-4">{`$${row.total_revenue.toFixed(2)}`}</td>
-                <td className="border-b px-6 py-4">{row.customer_ticket_ids}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="px-6 py-4 text-center text-gray-500">Loading...</td>
+          {data.map((row, index) => (
+            <tr key={index} className="hover:bg-gray-50">
+              <td className="border-b px-6 py-4">{row.exhibitionName}</td>
+              <td className="border-b px-6 py-4">{row.numVisits}</td>
+              <td className="border-b px-6 py-4">${row.totalRevenue.toFixed(2)}</td>
+              <td className="border-b px-6 py-4">{row.customerTicketIds}</td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
     </div>
@@ -144,12 +75,6 @@ const Reports = () => {
           Revenue
         </button>
         <button
-          className={`px-4 py-2 rounded-md ${activeTab === 'employee-revenue' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-          onClick={() => setActiveTab('employee-revenue')}
-        >
-          Employee Revenue
-        </button>
-        <button
           className={`px-4 py-2 rounded-md ${activeTab === 'reviews' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
           onClick={() => setActiveTab('reviews')}
         >
@@ -163,10 +88,53 @@ const Reports = () => {
         </button>
       </div>
 
-      {activeTab === 'revenue' && revenueData && renderTable(revenueData, 'Revenue Report')}
-      {activeTab === 'employee-revenue' && employeeRevenueData && renderTable(employeeRevenueData, 'Employee Revenue Report')}
-      {activeTab === 'reviews' && reviewsData && renderTable(reviewsData, 'Reviews Report')}
-      {activeTab === 'exhibitions' && exhibitionData && renderTable(exhibitionData, 'Exhibition Report')}
+      {activeTab === 'revenue' && (
+        <div className="overflow-hidden shadow-lg rounded-lg bg-white">
+          <h2 className="text-xl font-semibold p-4 bg-gray-100">Revenue Report</h2>
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border-b px-6 py-3 text-left text-sm text-gray-600">Month</th>
+                <th className="border-b px-6 py-3 text-left text-sm text-gray-600">Total Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {revenueData.map((row, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="border-b px-6 py-4">{row.month}</td>
+                  <td className="border-b px-6 py-4">${row.totalRevenue.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {activeTab === 'reviews' && (
+        <div className="overflow-hidden shadow-lg rounded-lg bg-white">
+          <h2 className="text-xl font-semibold p-4 bg-gray-100">Reviews Report</h2>
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border-b px-6 py-3 text-left text-sm text-gray-600">Customer Name</th>
+                <th className="border-b px-6 py-3 text-left text-sm text-gray-600">Rating</th>
+                <th className="border-b px-6 py-3 text-left text-sm text-gray-600">Review</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reviewsData.map((row, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="border-b px-6 py-4">{row.customerName}</td>
+                  <td className="border-b px-6 py-4">{row.rating}</td>
+                  <td className="border-b px-6 py-4">{row.review}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {activeTab === 'exhibitions' && renderTable(exhibitionData, 'Exhibition Report')}
     </div>
   );
 };
