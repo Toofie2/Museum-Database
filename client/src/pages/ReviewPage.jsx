@@ -133,7 +133,10 @@ const ReviewPage = () => {
               Title: {rev.title}
             </h2>
             <p className="text-base text-gray-900">Feedback: {rev.feedback}</p>
-            <p className="text-base text-gray-900">Rating: {rev.rating}</p>
+            {/* Star Rating */}
+            <p className="text-base text-yellow-500">
+              {"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}
+            </p>
             <p className="text-base text-gray-900">
               Customer: {customers[rev.customer_id] || "Unknown"}
             </p>
