@@ -27,9 +27,7 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${
-          loginData.email
-        }`
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/email?email=${loginData.email}`
       );
       if (response.data.password === loginData.password) {
         const customer_id = response.data.customer_id;
@@ -46,7 +44,7 @@ const LoginPage = () => {
             `${import.meta.env.VITE_BACKEND_URL}/employee/${employee_id}`
           );
           const role = roleResponse.data.role;
-          console.log("Employee role:", role);
+          console.log("Employee role:", role)
 
           // Set authentication level based on role
           const authLevel = role === "Admin" ? "admin" : "staff";
@@ -103,7 +101,6 @@ const LoginPage = () => {
             </div>
           )}
 
-          {/* Sign-up Message and Button */}
           <div className="mt-8 text-center">
             <p className="text-gray-600 text-lg">
               Don&apos;t have an account? Sign up now!
