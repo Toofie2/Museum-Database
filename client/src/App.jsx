@@ -20,7 +20,7 @@ import EmployeeLayout from "./pages/employee/EmployeeLayout.jsx";
 import Dashboard from "./pages/employee/Dashboard.jsx";
 import Settings from "./pages/employee/Settings.jsx";
 import CategoryLog from "./components/CategoryLog.jsx";
-import Reports from "./pages/employee/reports/Reports.jsx";
+import Reports from "./pages/employee/reports/Reports"; // Corrected import based on your filename
 import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 
 const App = () => {
@@ -48,7 +48,7 @@ const App = () => {
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
           </Route>
-          <Route path="reports" element={<Reports />} />
+          <Route path="reports" element={<Reports />} /> {/* Correctly pointing to Reports */}
         </Route>
 
         {/* Protected Routes */}
