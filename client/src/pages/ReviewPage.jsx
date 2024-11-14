@@ -79,7 +79,7 @@ const ReviewPage = () => {
   // Filter reviews based on the selected exhibit
   const filteredReviews = selectedExhibit
     ? reviews.filter((review) =>
-        selectedExhibit === "general_admission"
+        selectedExhibit === "general_experience"
           ? review.exhibit_id === null
           : review.exhibit_id === parseInt(selectedExhibit)
       )
@@ -106,7 +106,7 @@ const ReviewPage = () => {
           className="bg-white border border-gray-300 rounded-md px-4 py-2"
         >
           <option value="">All Reviews</option>
-          <option value="general_admission">General Admission</option>
+          <option value="general_experience">General Experience</option>
           {Object.entries(exhibits).map(([id, name]) => (
             <option key={id} value={id}>
               {name}
@@ -136,7 +136,7 @@ const ReviewPage = () => {
               Customer: {customers[rev.customer_id] || "Unknown"}
             </p>
             <p className="text-base text-gray-900">
-              Exhibit: {rev.exhibit_id ? exhibits[rev.exhibit_id] : "General Admission"}
+              Exhibit: {rev.exhibit_id ? exhibits[rev.exhibit_id] : "General Experience"}
             </p>
             <p className="text-base text-gray-900">
               Date Posted: {rev.date_posted}

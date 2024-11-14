@@ -99,7 +99,7 @@ const PostreviewPage = () => {
                   required
                 >
                   <option value="" disabled hidden>Select an exhibit</option>
-                  <option value="general_admission">General Admission</option> {/* Add General Admission option */}
+                  <option value="general_experience">General Experience</option> {/* Add General Experience option */}
                   {exhibits.map((exhibit) => (
                     <option key={exhibit.exhibit_id} value={exhibit.exhibit_id}>
                       {exhibit.name}
