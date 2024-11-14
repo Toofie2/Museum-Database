@@ -53,7 +53,7 @@ const NavBar = () => {
   return (
     <nav
       className={`fixed z-10 w-full transition-all duration-300 ${
-        isScrolled ? "bg-white [&_svg]:text-black shadow-md" : "text-white"
+        isScrolled? "bg-white [&_svg]:text-black shadow-md" : "text-white"
       }`}
     >
       <div className="flex justify-between items-center max-w-full mx-auto px-16 py-4">
