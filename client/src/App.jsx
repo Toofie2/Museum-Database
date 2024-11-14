@@ -53,7 +53,9 @@ const App = () => {
         <Route
           path="/employee"
           element={
-            <EmployeeProtectedRoute> {/* Protect employee routes */}
+            <EmployeeProtectedRoute>
+              {" "}
+              {/* Protect employee routes */}
               <EmployeeLayout />
             </EmployeeProtectedRoute>
           }
@@ -64,12 +66,14 @@ const App = () => {
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
           </Route>
-          
-           {/* Admin Routes */}
-           <Route
+
+          {/* Admin Routes */}
+          <Route
             path="reports"
             element={
-              <AdminProtectedRoute> {/* Protect admin routes */}
+              <AdminProtectedRoute>
+                {" "}
+                {/* Protect admin routes */}
                 <Reports />
               </AdminProtectedRoute>
             }
@@ -77,7 +81,9 @@ const App = () => {
           <Route
             path="register"
             element={
-              <AdminProtectedRoute> {/* Protect register employee route */}
+              <AdminProtectedRoute>
+                {" "}
+                {/* Protect register employee route */}
                 <RegisterEmployee />
               </AdminProtectedRoute>
             }
@@ -85,7 +91,9 @@ const App = () => {
           <Route
             path="profile"
             element={
-              <AdminProtectedRoute> {/* Protect edit employee route */}
+              <AdminProtectedRoute>
+                {" "}
+                {/* Protect edit employee route */}
                 <EditEmployee />
               </AdminProtectedRoute>
             }
@@ -93,7 +101,9 @@ const App = () => {
           <Route
             path="employeelist"
             element={
-              <AdminProtectedRoute> {/* Protect employee list route */}
+              <AdminProtectedRoute>
+                {" "}
+                {/* Protect employee list route */}
                 <EmployeeList />
               </AdminProtectedRoute>
             }
@@ -101,7 +111,9 @@ const App = () => {
           <Route
             path="customerlist"
             element={
-              <AdminProtectedRoute> {/* Protect customer list route */}
+              <AdminProtectedRoute>
+                {" "}
+                {/* Protect customer list route */}
                 <CustomerList />
               </AdminProtectedRoute>
             }
