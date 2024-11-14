@@ -24,9 +24,11 @@ const EmployeeListPage = () => {
     fetchEmployees();
   }, []);
 
-  // Handle edit button click
+  // Handle edit button click and scroll to the top
   const handleEditClick = (employee) => {
     setEditingEmployee({ ...employee });
+    // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Handle input field change
@@ -38,8 +40,6 @@ const EmployeeListPage = () => {
   // Handle save button click
   const handleSaveClick = async () => {
     try {
-
-      console.log("Employee ID:",editingEmployee.employee_id); //TEST
       // Send PUT request to update employee details
       const res = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/employee/${editingEmployee.employee_id}`, editingEmployee);
 
