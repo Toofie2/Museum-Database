@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/authentication";
 import ProtectedRoute from "./components/ProtectedRoute";
-import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
@@ -22,6 +22,9 @@ import MembershipregPage from "./pages/MembershipregPage.jsx";
 import EmployeeLayout from "./pages/employee/EmployeeLayout.jsx";
 import Dashboard from "./pages/employee/Dashboard.jsx";
 import Settings from "./pages/employee/Settings.jsx";
+import RegisterEmployee from "./pages/employee/RegisterEmployee.jsx";
+import EditEmployee from "./pages/employee/EditEmployee.jsx";
+import EmployeeList from "./pages/employee/EmployeeList.jsx";
 import CategoryLog from "./components/CategoryLog.jsx";
 import Reports from "./pages/employee/reports/Reports.jsx";
 import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
@@ -62,15 +65,39 @@ const App = () => {
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
           </Route>
-
-          {/* Admin Routes */}
-          <Route
+          
+           {/* Admin Routes */}
+           <Route
             path="reports"
             element={
               <AdminProtectedRoute>
                 {" "}
                 {/* Protect admin routes */}
                 <Reports />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="register"
+            element={
+              <AdminProtectedRoute> {/* Protect register employee route */}
+                <RegisterEmployee />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <AdminProtectedRoute> {/* Protect edit employee route */}
+                <EditEmployee />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="employeelist"
+            element={
+              <AdminProtectedRoute> {/* Protect edit employee route */}
+                <EmployeeList />
               </AdminProtectedRoute>
             }
           />
@@ -90,6 +117,22 @@ const App = () => {
           element={
             <ProtectedRoute>
               <TicketPurchasedPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shop"
+          element={
+            <ProtectedRoute>
+              <GiftShopPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/giftshop/:id"
+          element={
+            <ProtectedRoute>
+              <GiftShopCategoryPage />
             </ProtectedRoute>
           }
         />
@@ -146,6 +189,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ViewprofilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/editreview"
+          element={
+            <ProtectedRoute>
+              <EditreviewPage />
             </ProtectedRoute>
           }
         />
