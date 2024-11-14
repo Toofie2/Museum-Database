@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
 import { TheFAMLogo } from "../constants/components.jsx";
 import { useState, useEffect } from "react";
+import { useAuth } from "../components/authentication";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,24 +45,15 @@ const NavBar = () => {
       link: "/shop",
     },
     {
-      name: "Review",
+      name: "Reviews",
       link: "/review",
     },
   ];
-  const rightnavigation = [
-    {
-      name: "Login",
-      link: "/login",
-    },
-    {
-      name: "Cart (0)",
-      link: "/cart",
-    },
-  ];
+
   return (
     <nav
       className={`fixed z-10 w-full transition-all duration-300 ${
-        isScrolled ? "bg-white [&_svg]:text-black shadow-md" : "text-white"
+        isScrolled? "bg-white [&_svg]:text-black shadow-md" : "text-white"
       }`}
     >
       <div className="flex justify-between items-center max-w-full mx-auto px-16 py-4">
@@ -80,11 +75,39 @@ const NavBar = () => {
         </div>
         <div className="flex justify-end w-1/2">
           <ul className="flex justify-start gap-8">
-            {rightnavigation.map((item) => (
-              <li key={item.name}>
-                <Link to={item.link}>{item.name}</Link>
+            {isAuthenticated ? (
+              <>
+              {/* Profile Button */}
+              <li>
+                <button
+                  onClick={() => navigate("/profile")}
+                  className="text-light-grey cursor-pointer"
+                >
+                  Profile
+                </button>
               </li>
-            ))}
+              {/* Logout Button */}
+              <li>
+                <button
+                  onClick={logout}
+                  className="text-light-grey cursor-pointer"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+            ) : (
+              <li>
+                <Link to="/login" className="text-light-grey cursor-pointer">
+                  Login
+                </Link>
+              </li>
+            )}
+            <li>
+              <Link to="/cart" className="text-light-grey cursor-pointer">
+                Cart (0)
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
