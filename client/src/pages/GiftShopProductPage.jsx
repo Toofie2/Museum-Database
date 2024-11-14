@@ -8,7 +8,27 @@ import { useAuth } from "../components/authentication"
 import "../components/Modal.css"
 
 const GiftShopProductPage = () => {
-  const { userId } = useAuth()
+  const { userId } = useAuth();
+  const [customerInfo, setCustomerInfo] = useState({});
+  const discountPercent = 0.15;
+
+  
+
+  useEffect(() => {
+    const fetchCustomerInfo = async (userId) => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`
+        );
+        setCustomerInfo(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchCustomerInfo(userId);
+  }, [])
+  
+
   // Update form data whenever input changes. Don't allow values out of range 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -53,7 +73,7 @@ const GiftShopProductPage = () => {
     try {
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/customer_product`,
-        [{customer_id: userId, product_id: prodID, amount_spent: subtotal, quantity: formData.quantity}]
+        [{customer_id: userId, product_id: prodID, amount_spent: subtotal - (subtotal * discountPercent), quantity: formData.quantity}]
       );
     } catch (err) {
       console.log(err);
@@ -91,7 +111,6 @@ const GiftShopProductPage = () => {
     return <div className="text-center mt-20">Loading...</div>;
 
   useEffect(() => {
-    console.log(userId, prodID, subtotal, formData.quantity)
     handleSubtotal(formData);
   }, [formData]);
 
@@ -106,6 +125,8 @@ const GiftShopProductPage = () => {
   } else {
     document.body.classList.remove('active-modal')
   }
+
+
   
   return (
     <div>
@@ -170,14 +191,22 @@ const GiftShopProductPage = () => {
       </div>
       {modal && (
         <div className="modal">
-          <div onClick={toggleModal} className="overlay"></div>
+          <div className="overlay"></div>
           <div className="modal-content">
             <h2>You are about to purchase:</h2>
-            <p className="font-medium mt-10 mb-10">
+            <div className="font-medium mt-10 mb-10">
               {productInfo.name} ({formData.quantity}x)<br/>
               ${(productInfo.price).toFixed(2)} <br/><br/>
-              <span className="font-bold">Subtotal: ${subtotal.toFixed(2)}</span>
-            </p>
+              {Boolean(customerInfo.is_member) &&
+                <p className="text-default-gray font-light">
+                  Subtotal: ${subtotal.toFixed(2)}<br/>
+                  Discount (Member, {discountPercent * 100}% off): <span className="text-red-600 font-bold">-${(subtotal * discountPercent).toFixed(2)}</span><br/><br/>
+                </p>
+              }
+              <span className="font-bold">Total: ${(subtotal - (subtotal * discountPercent)).toFixed(2)}</span>
+            </div>
+
+
             <div className="flex flex-row justify-center space-x-40">
               <button onClick={toggleModal}>
                 Cancel

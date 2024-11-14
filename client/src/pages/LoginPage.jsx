@@ -103,6 +103,7 @@ const LoginPage = () => {
             </div>
           )}
 
+          {/* Sign-up Message and Button */}
           <div className="mt-8 text-center">
             <p className="text-gray-600 text-lg">
               Don&apos;t have an account? Sign up now!
