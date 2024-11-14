@@ -196,14 +196,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/editreview"
-          element={
-            <ProtectedRoute>
-              <EditreviewPage />
-            </ProtectedRoute>
-          }
-        />
       </Routes>
     </AuthProvider>
   );
