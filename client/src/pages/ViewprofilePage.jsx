@@ -3,7 +3,6 @@ import axios from "axios";
 import { useAuth } from "../components/authentication";
 import NavbarBlack from "../components/NavbarBlack";
 import { useNavigate } from "react-router-dom";
-import backgroundImage from "../assets/postreview_background.png";
 
 const EditProfilePage = () => {
   const { userId } = useAuth();
@@ -12,10 +11,22 @@ const EditProfilePage = () => {
     middle_initial: "",
     last_name: "",
     is_member: 0,
+    membership_start_date: null, // New attribute for membership start date
   });
   const [editingProfile, setEditingProfile] = useState(null);
   const [saveMessage, setSaveMessage] = useState(""); // State for success message
   const navigate = useNavigate();
+
+  // Calculate membership expiration date by adding 6 months to membership_start_date
+  const getMembershipExpirationDate = () => {
+    if (profileData.membership_start_date) {
+      const startDate = new Date(profileData.membership_start_date);
+      const expirationDate = new Date(startDate);
+      expirationDate.setMonth(startDate.getMonth() + 12);
+      return expirationDate.toLocaleDateString();
+    }
+    return "N/A";
+  };
 
   // Fetch profile data
   const fetchProfileData = async () => {
@@ -26,7 +37,7 @@ const EditProfilePage = () => {
       console.log("Error fetching profile data:", err);
     }
   };
-  
+
   useEffect(() => {
     fetchProfileData();
   }, [userId]);
@@ -85,6 +96,9 @@ const EditProfilePage = () => {
             <p className="text-base text-black">M.I: {profileData.middle_initial}</p>
             <p className="text-base text-black">Last Name: {profileData.last_name}</p>
             <p className="text-base text-black">Membership Status: {profileData.is_member ? "Member" : "Non-member"}</p>
+            <p className="text-base text-black">
+              Membership Expiration Date: {getMembershipExpirationDate()}
+            </p>
             <div className="flex flex-col items-center space-y-4 mt-4">
               <button
                 onClick={handleEditClick}
