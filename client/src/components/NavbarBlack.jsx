@@ -75,27 +75,27 @@ const NavBarBlack = () => {
         </div>
         <div className="flex justify-end w-1/2">
           <ul className="flex justify-start gap-8">
-          {isAuthenticated ? (
+            {isAuthenticated ? (
               <>
-              {/* Profile Button */}
-              <li>
-                <button
-                  onClick={() => navigate("/profile")}
-                  className="text-light-grey cursor-pointer"
-                >
-                  Profile
-                </button>
-              </li>
-              {/* Logout Button */}
-              <li>
-                <button
-                  onClick={logout}
-                  className="text-light-grey cursor-pointer"
-                >
-                  Logout
-                </button>
-              </li>
-            </>
+                {/* Profile Button */}
+                <li>
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className="text-light-grey cursor-pointer"
+                  >
+                    Profile
+                  </button>
+                </li>
+                {/* Logout Button */}
+                <li>
+                  <button
+                    onClick={logout}
+                    className="text-light-grey cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <Link to="/login" className="text-light-grey cursor-pointer">
@@ -103,11 +103,6 @@ const NavBarBlack = () => {
                 </Link>
               </li>
             )}
-            <li>
-              <Link to="/cart" className="text-light-grey cursor-pointer">
-                Cart (0)
-              </Link>
-            </li>
           </ul>
         </div>
       </div>

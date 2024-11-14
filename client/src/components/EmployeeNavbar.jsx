@@ -22,6 +22,11 @@ const EmployeeNavbar = () => {
       link: "/reports",
       symbol: "lab_profile",
     },
+    {
+      name: "Employees",
+      link: "/employees",
+      symbol: "people",
+    },
   ];
   return (
     <nav className="h-screen w-[20rem] bg-white text-black flex flex-col">

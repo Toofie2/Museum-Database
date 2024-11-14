@@ -53,7 +53,7 @@ const NavBar = () => {
   return (
     <nav
       className={`fixed z-10 w-full transition-all duration-300 ${
-        isScrolled? "bg-white [&_svg]:text-black shadow-md" : "text-white"
+        isScrolled ? "bg-white [&_svg]:text-black shadow-md" : "text-white"
       }`}
     >
       <div className="flex justify-between items-center max-w-full mx-auto px-16 py-4">
@@ -77,25 +77,25 @@ const NavBar = () => {
           <ul className="flex justify-start gap-8">
             {isAuthenticated ? (
               <>
-              {/* Profile Button */}
-              <li>
-                <button
-                  onClick={() => navigate("/profile")}
-                  className="text-light-grey cursor-pointer"
-                >
-                  Profile
-                </button>
-              </li>
-              {/* Logout Button */}
-              <li>
-                <button
-                  onClick={logout}
-                  className="text-light-grey cursor-pointer"
-                >
-                  Logout
-                </button>
-              </li>
-            </>
+                {/* Profile Button */}
+                <li>
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className="text-light-grey cursor-pointer"
+                  >
+                    Profile
+                  </button>
+                </li>
+                {/* Logout Button */}
+                <li>
+                  <button
+                    onClick={logout}
+                    className="text-light-grey cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <Link to="/login" className="text-light-grey cursor-pointer">
@@ -103,11 +103,6 @@ const NavBar = () => {
                 </Link>
               </li>
             )}
-            <li>
-              <Link to="/cart" className="text-light-grey cursor-pointer">
-                Cart (0)
-              </Link>
-            </li>
           </ul>
         </div>
       </div>

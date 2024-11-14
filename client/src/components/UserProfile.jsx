@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "./authentication";
 
@@ -16,7 +17,6 @@ const UserProfile = () => {
           return;
         }
 
-        // Fetch employee details using the employee_id
         const response = await axios.get(
           `http://localhost:3000/employee/${userId}`
         );
@@ -55,7 +55,10 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="flex items-center gap-3 p-4">
+    <Link
+      to="/employee/profile"
+      className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors rounded-lg cursor-pointer"
+    >
       <div className="w-10 h-10 rounded-full bg-gray-light flex items-center justify-center">
         <span className="material-symbols-outlined">person</span>
       </div>
@@ -65,7 +68,7 @@ const UserProfile = () => {
         </span>
         <span className="text-sm text-gray-dark">{userInfo.role}</span>
       </div>
-    </div>
+    </Link>
   );
 };
 
