@@ -327,7 +327,7 @@ const TicketForm = () => {
                         <p key={field}>
                           <span className="text-default-gray font-light"> Discount (Member, Free Adult Admission): </span><br/>
                           {capitalize(field)} Admission Ticket (1x)<br/>
-                          <s>${ticketTypePricePairs[field].toFixed(2)}</s> &nbsp;--&gt;&nbsp; <span className="text-red-600">$0.00</span><br/><br/>
+                          <s>${ticketTypePricePairs[field].toFixed(2)}</s> &nbsp;<span className="text-2xl">&rarr;</span>&nbsp; <span className="text-red-600">$0.00</span><br/><br/>
                         </p>
                       )
                     }
