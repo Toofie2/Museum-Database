@@ -28,6 +28,21 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// GET reviews by customer ID
+router.get('/customer/:id', (req, res) => {
+    db.query('SELECT * FROM Review WHERE customer_id = ?', [req.params.id], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (results.length === 0) {
+            res.status(404).json({ message: 'No reviews found for this customer' });
+            return;
+        }
+        res.json(results);
+    });
+});
+
 // POST a new review
 router.post('/', (req, res) => {
     const { customer_id, title, feedback, rating, date_posted, exhibit_id } = req.body;
@@ -40,11 +55,12 @@ router.post('/', (req, res) => {
     });
 });
 
-// PUT (update) a customer
+// PUT (update) a review
 router.put('/:id', (req, res) => {
     const ReviewId = req.params.id;
     const updates = req.body;
-    // Fetch customer data
+
+    // Fetch review data
     const fetchQuery = 'SELECT * FROM Review WHERE review_id = ?';
     db.query(fetchQuery, [ReviewId], (fetchErr, fetchResult) => {
         if (fetchErr) {
@@ -53,12 +69,18 @@ router.put('/:id', (req, res) => {
         if (fetchResult.length === 0) {
             return res.status(404).json({ message: 'Review not found' });
         }
+
         const currentReview = fetchResult[0];
         // Merge the updates with the current data
         const updatedReview = { ...currentReview, ...updates };
-        const { customer_id, title, feedback, rating, date_posted, exhibit_id } = updatedCustomer;
-        const updateQuery = 'UPDATE Customer SET customer_id = ?, title = ?, feedback = ?, rating = ?, date_posted = ?, exhibit_id = ?, WHERE review_id = ?';
-        db.query(updateQuery, [customer_id, title, feedback, rating, date_posted, exhibit_id], (updateErr, updateResult) => {
+
+        const { customer_id, title, feedback, rating, date_posted, exhibit_id } = updatedReview;
+        const updateQuery = 'UPDATE Review SET customer_id = ?, title = ?, feedback = ?, rating = ?, date_posted = ?, exhibit_id = ? WHERE review_id = ?';
+
+        db.query(updateQuery, [customer_id, title, feedback, rating, date_posted, exhibit_id, ReviewId], (updateErr, updateResult) => {
+            if (updateErr) {
+                return res.status(500).json({ error: updateErr.message });
+            }
             if (updateResult.affectedRows === 0) {
                 return res.status(404).json({ message: 'Review not found' });
             }
@@ -66,6 +88,7 @@ router.put('/:id', (req, res) => {
         });
     });
 });
+
 
 // Soft DELETE a review (set is_active to FALSE)
 router.delete('/:id', (req, res) => {
