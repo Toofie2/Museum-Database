@@ -13,7 +13,9 @@ const EditReviewPage = () => {
   useEffect(() => {
     const fetchExhibits = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/exhibition`);
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/exhibition`
+        );
         const exhibitMap = res.data.reduce((acc, exhibit) => {
           acc[exhibit.exhibit_id] = exhibit.name;
           return acc;
@@ -29,16 +31,20 @@ const EditReviewPage = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/review/customer/${userId}`
         );
-        const formattedReviews = res.data.map((review) => ({
-          ...review,
-          date_posted: new Date(review.date_posted),
-        }));
+
+        // Filter out reviews with is_active = 0
+        const activeReviews = res.data
+          .filter((review) => review.is_active === 1) // Keep only active reviews
+          .map((review) => ({
+            ...review,
+            date_posted: new Date(review.date_posted),
+          }));
 
         // Sort reviews by the most recent date
-        formattedReviews.sort((a, b) => b.date_posted - a.date_posted);
+        activeReviews.sort((a, b) => b.date_posted - a.date_posted);
 
         // Convert the date back to a readable format
-        const updatedReviews = formattedReviews.map((review) => ({
+        const updatedReviews = activeReviews.map((review) => ({
           ...review,
           date_posted: review.date_posted.toLocaleDateString(),
         }));
@@ -92,10 +98,14 @@ const EditReviewPage = () => {
 
   const handleDeleteClick = async (reviewId) => {
     // Confirm with the user before deletion
-    const confirmDelete = window.confirm("Are you sure you want to delete this review?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this review?"
+    );
     if (confirmDelete) {
       try {
-        await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/review/${reviewId}`);
+        await axios.delete(
+          `${import.meta.env.VITE_BACKEND_URL}/review/${reviewId}`
+        );
 
         // Remove the review from the state (soft delete)
         setReviews((prevReviews) =>
@@ -127,7 +137,10 @@ const EditReviewPage = () => {
 
       <div className="space-y-6">
         {reviews.map((rev) => (
-          <div key={rev.review_id} className="bg-white shadow-md rounded-lg p-6 border border-gray-200">
+          <div
+            key={rev.review_id}
+            className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
+          >
             {editingReview && editingReview.review_id === rev.review_id ? (
               <>
                 <p className="text-base text-gray-900">Title</p>
@@ -175,11 +188,22 @@ const EditReviewPage = () => {
               </>
             ) : (
               <>
-                <h2 className="text-xl font-medium text-black">Title: {rev.title}</h2>
-                <p className="text-base text-gray-900">Feedback: {rev.feedback}</p>
+                <h2 className="text-xl font-medium text-black">
+                  Title: {rev.title}
+                </h2>
+                <p className="text-base text-gray-900">
+                  Feedback: {rev.feedback}
+                </p>
                 <p className="text-base text-gray-900">Rating: {rev.rating}</p>
-                <p className="text-base text-gray-900"> Exhibit: {rev.exhibit_id === null || rev.exhibit_id === 0 ? "General Admission" : exhibits[rev.exhibit_id] || "Unknown"}</p>
-                <p className="text-base text-gray-900">Date Posted: {rev.date_posted}</p>
+                <p className="text-base text-gray-900">
+                  Exhibit:{" "}
+                  {rev.exhibit_id === null || rev.exhibit_id === 0
+                    ? "General Experience"
+                    : exhibits[rev.exhibit_id] || "Unknown"}
+                </p>
+                <p className="text-base text-gray-900">
+                  Date Posted: {rev.date_posted}
+                </p>
                 <div className="flex space-x-4 mt-2">
                   <button
                     onClick={() => handleEditClick(rev)}
