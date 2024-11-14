@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/authentication";
 import ProtectedRoute from "./components/ProtectedRoute";
+import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
@@ -22,6 +24,8 @@ import Settings from "./pages/employee/Settings.jsx";
 import CategoryLog from "./components/CategoryLog.jsx";
 import Reports from "./pages/employee/reports/Reports.jsx";
 import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
+import ViewprofilePage from "./pages/ViewprofilePage.jsx";
+import EditreviewPage from "./pages/EditreviewPage.jsx";
 
 const App = () => {
   return (
@@ -41,14 +45,30 @@ const App = () => {
         <Route path="/giftshop/:id" element={<GiftShopCategoryPage />} />
 
         {/* Employee Routes */}
-        <Route path="/employee" element={<EmployeeLayout />}>
+        <Route
+          path="/employee"
+          element={
+            <EmployeeProtectedRoute> {/* Protect employee routes */}
+              <EmployeeLayout />
+            </EmployeeProtectedRoute>
+          }
+        >
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="settings" element={<Settings />}>
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
           </Route>
-          <Route path="reports" element={<Reports />} />
+          
+          {/* Admin Routes */}
+          <Route
+            path="reports"
+            element={
+              <AdminProtectedRoute> {/* Protect admin routes */}
+                <Reports />
+              </AdminProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Protected Routes */}
@@ -65,6 +85,22 @@ const App = () => {
           element={
             <ProtectedRoute>
               <TicketPurchasedPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shop"
+          element={
+            <ProtectedRoute>
+              <GiftShopPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/giftshop/:id"
+          element={
+            <ProtectedRoute>
+              <GiftShopCategoryPage />
             </ProtectedRoute>
           }
         />
@@ -89,6 +125,22 @@ const App = () => {
           element={
             <ProtectedRoute>
               <MembershipregPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ViewprofilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/editreview"
+          element={
+            <ProtectedRoute>
+              <EditreviewPage />
             </ProtectedRoute>
           }
         />
