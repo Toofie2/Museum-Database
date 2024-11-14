@@ -7,7 +7,7 @@ import { useAuth } from "../components/authentication";
 
 const PostreviewPage = () => {
   const navigate = useNavigate();
-  const { customerId } = useAuth();
+  const { userId } = useAuth();
 
   const [exhibits, setExhibits] = useState([]);
 
@@ -21,7 +21,9 @@ const PostreviewPage = () => {
   useEffect(() => {
     const fetchExhibits = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/exhibition`);
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/exhibition`
+        );
         setExhibits(response.data);
       } catch (error) {
         console.log("Error fetching exhibits:", error);
@@ -34,11 +36,7 @@ const PostreviewPage = () => {
     const { name, value } = e.target;
 
     // Update review fields if the input name matches review properties
-    if (
-      ["title", "feedback", "rating", "exhibit_id"].includes(
-        name
-      )
-    ) {
+    if (["title", "feedback", "rating", "exhibit_id"].includes(name)) {
       setReview((prev) => ({ ...prev, [name]: value }));
     }
   };
@@ -47,7 +45,12 @@ const PostreviewPage = () => {
     e.preventDefault();
 
     // Validation: Check if all fields are filled
-    if (!review.title || !review.feedback || !review.rating || !review.exhibit_id) {
+    if (
+      !review.title ||
+      !review.feedback ||
+      !review.rating ||
+      !review.exhibit_id
+    ) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -61,11 +64,11 @@ const PostreviewPage = () => {
 
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/review`, {
         ...review,
-        customer_id: customerId,
+        customer_id: userId,
         date_posted: today,
       });
       console.log(review, today);
-      navigate("/review")
+      navigate("/review");
     } catch (err) {
       console.log("Review post error:", err);
     }
@@ -78,7 +81,7 @@ const PostreviewPage = () => {
       <div className="relative flex items-center h-[40px] w-full mb-8">
         <div className="absolute inset-0 bg-white bg-opacity-40 flex flex-col justify-center pl-4"></div>
       </div>
-  
+
       {/* Background */}
       <div
         className="relative bg-cover bg-center flex justify-center items-center min-h-[92.4vh] overflow-hidden"
@@ -86,32 +89,43 @@ const PostreviewPage = () => {
           backgroundImage: `url(${backgroundImage})`,
         }}
       >
-  
         {/* Form Section */}
         <div className="relative z-10 bg-white shadow-md rounded-lg p-12 max-w-6xl w-full mx-4 min-h-[0vh] flex flex-col justify-center">
-          <h1 className="text-2xl font-bold text-center mb-6">Please describe your experience and leave a rating</h1>
+          <h1 className="text-2xl font-bold text-center mb-6">
+            Please describe your experience and leave a rating
+          </h1>
           <form>
             <div className="mb-6">
-            <div className="mb-6">
-              <label className="block text-gray-700 text-lg mb-2" htmlFor="exhibit_id">
-                Exhibit
-              </label>
-              <select
-                name="exhibit_id"
-                value={review.exhibit_id}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              >
-                <option value="" disabled hidden>Select an exhibit</option>
-                {exhibits.map((exhibit) => (
-                  <option key={exhibit.exhibit_id} value={exhibit.exhibit_id}>
-                    {exhibit.name}
+              <div className="mb-6">
+                <label
+                  className="block text-gray-700 text-lg mb-2"
+                  htmlFor="exhibit_id"
+                >
+                  Exhibit
+                </label>
+                <select
+                  name="exhibit_id"
+                  value={review.exhibit_id}
+                  onChange={handleChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                >
+                  <option value="" disabled hidden>
+                    Select an exhibit
                   </option>
-                ))}
-              </select>
-            </div>
-              <label className="block text-gray-700 text-lg mb-2" htmlFor="title">
+                  <option value="general_experience">General Experience</option>{" "}
+                  {/* Add General Experience option */}
+                  {exhibits.map((exhibit) => (
+                    <option key={exhibit.exhibit_id} value={exhibit.exhibit_id}>
+                      {exhibit.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <label
+                className="block text-gray-700 text-lg mb-2"
+                htmlFor="title"
+              >
                 Title
               </label>
               <input
@@ -124,7 +138,10 @@ const PostreviewPage = () => {
               />
             </div>
             <div className="mb-6">
-              <label className="block text-gray-700 text-lg mb-2" htmlFor="feedback">
+              <label
+                className="block text-gray-700 text-lg mb-2"
+                htmlFor="feedback"
+              >
                 Feedback
               </label>
               <textarea
@@ -137,7 +154,10 @@ const PostreviewPage = () => {
               />
             </div>
             <div className="mb-6">
-              <label className="block text-gray-700 text-lg mb-2" htmlFor="rating">
+              <label
+                className="block text-gray-700 text-lg mb-2"
+                htmlFor="rating"
+              >
                 Rating
               </label>
               <select

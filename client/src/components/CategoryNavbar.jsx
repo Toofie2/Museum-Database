@@ -12,6 +12,14 @@ const CategoryNavbar = ({ section }) => {
       link: "/collection",
     },
     {
+      name: "Art",
+      link: "/art",
+    },
+    {
+      name: "Artist",
+      link: "/artist",
+    },
+    {
       name: "Product",
       link: "/product",
     },
