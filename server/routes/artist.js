@@ -58,16 +58,16 @@ router.get("/:id", (req, res) => {
 
 // POST a new Artist
 router.post("/", (req, res) => {
-  const { first_name, middle_initial, last_name } = req.body;
+  const { artist_id, first_name, middle_initial, last_name } = req.body;
 
   const insertQuery = `
-        INSERT INTO Artist (first_name, middle_initial, last_name)
+        INSERT INTO Artist (artist_id, first_name, middle_initial, last_name)
         VALUES (?, ?, ?, ?)
     `;
 
   db.query(
     insertQuery,
-    [first_name, middle_initial, last_name],
+    [artist_id, first_name, middle_initial, last_name],
     (err, result) => {
       if (err) {
         if (err.code === "ER_DUP_ENTRY") {
