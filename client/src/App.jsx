@@ -1,10 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/authentication";
 import ProtectedRoute from "./components/ProtectedRoute";
-import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
-import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import HomePage from "./pages/HomePage.jsx";
 import ExhibitionsPage from "./pages/ExhibitionsPage";
 import ExhibitionViewPage from "./pages/ExhibitionViewPage";
@@ -31,7 +29,6 @@ import CategoryLog from "./components/CategoryLog.jsx";
 import Reports from "./pages/employee/reports/Reports.jsx";
 import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
-import EditreviewPage from "./pages/EditreviewPage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
 
 const App = () => {
