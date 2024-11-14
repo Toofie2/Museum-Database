@@ -6,10 +6,10 @@ require("dotenv").config();
 const router = express.Router();
 
 const db = mysql.createPool({
-  host: "museum-db.c9i4mkywg672.us-east-2.rds.amazonaws.com",
+  host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: "museum",
+  database: process.env.DB_NAME,
 });
 
 // Define the function to send exhibition notifications
