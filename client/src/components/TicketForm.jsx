@@ -11,6 +11,7 @@ import "../components/Modal.css"
 const TicketForm = () => {
   const { userId } = useAuth();
   const navigate = useNavigate();
+  let subtractFromSubtotal = 0;
 
 
   // Fetch tickets from database
@@ -18,6 +19,17 @@ const TicketForm = () => {
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/ticket`
+      );
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchCustomerInfo = async (userId) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/customer/${userId}`
       );
       return res.data;
     } catch (err) {
@@ -79,15 +91,46 @@ const TicketForm = () => {
     try {
       let purchasedTicketsArr = [];
       const convertedDate = selectedDate.toISOString().split("T")[0];
-
+      let freeTicketCounter = 0;
       tickets.map((ticket) => {
         for (let j = 0; j < formData[ticket.type]; j++) {
-          purchasedTicketsArr.push({
-            customer_id: userId,
-            ticket_id: ticket.ticket_id,
-            amount_spent: ticket.price,
-            valid_day: convertedDate,
-          });
+          if(customerInfo.is_member == true){
+            if(ticket.type == "adult" && formData[ticket.type] > 0){
+              if(freeTicketCounter < 1){
+                purchasedTicketsArr.push({
+                  customer_id: userId,
+                  ticket_id: ticket.ticket_id,
+                  amount_spent: 0,
+                  valid_day: convertedDate,
+                });
+                freeTicketCounter++;
+              }
+              else{
+                purchasedTicketsArr.push({
+                  customer_id: userId,
+                  ticket_id: ticket.ticket_id,
+                  amount_spent: ticket.price,
+                  valid_day: convertedDate,
+                });
+              }
+            }
+            else{
+              purchasedTicketsArr.push({
+                customer_id: userId,
+                ticket_id: ticket.ticket_id,
+                amount_spent: ticket.price,
+                valid_day: convertedDate,
+              });
+            }
+          }
+          else{
+            purchasedTicketsArr.push({
+              customer_id: userId,
+              ticket_id: ticket.ticket_id,
+              amount_spent: ticket.price,
+              valid_day: convertedDate,
+            });
+          }
         }
       })
       await axios.post(
@@ -102,7 +145,7 @@ const TicketForm = () => {
 
   // Capitalize the first letter of each word in a ticket type for neater formatting
   const capitalize = (sentence) => {
-    if(!sentence.includes(" ")){
+    if(!(sentence.includes(" "))){
       return sentence[0].toUpperCase() + sentence.substring(1);
     }
     const words = sentence.split(" ");
@@ -119,6 +162,7 @@ const TicketForm = () => {
   const [formData, setFormData] = useState({});
   const [subtotal, setSubtotal] = useState(0);
   const [formDataAsArr, setFormDataAsArr] = useState([]);
+  const [customerInfo, setCustomerInfo] = useState({});
   let ticketTypePricePairs = {};
 
   useEffect(() => {
@@ -139,6 +183,8 @@ const TicketForm = () => {
     const initializeForm = async () => {
       const tickets = await fetchAllTickets();
       setTickets(tickets);
+      const receivedCustomerInfo = await fetchCustomerInfo(userId);
+      setCustomerInfo(receivedCustomerInfo);
       tickets.map((ticket) => {
         setFormData((prevState) => ({
           ...prevState,
@@ -158,11 +204,8 @@ const TicketForm = () => {
 
   const toggleModal = () => {
     setModal(!modal);
+    subtractFromSubtotal = 0;
   };
-
-  useEffect(() => {
-    console.log(modal)
-  }, [modal])
   
 
   if(modal) {
@@ -272,7 +315,26 @@ const TicketForm = () => {
                   }
                 })
               }
-              <span className="font-bold">Subtotal: ${subtotal}</span>              
+              {(Boolean(customerInfo.is_member) && formData.adult > 0) && <p className="text-default-gray font-light">Subtotal: ${subtotal}</p>}
+              {Boolean(customerInfo.is_member) &&
+                formDataAsArr.map(([field, value]) => {
+                  let numAdultDiscounted = 0;
+                  if(field == "adult" && value > 0){
+                    if(numAdultDiscounted < 1){
+                      numAdultDiscounted++;
+                      subtractFromSubtotal += ticketTypePricePairs[field];
+                      return(
+                        <p key={field}>
+                          <span className="text-default-gray font-light"> Discount (Member, Free Adult Admission): </span><br/>
+                          {capitalize(field)} Admission Ticket (1x)<br/>
+                          <s>${ticketTypePricePairs[field].toFixed(2)}</s> &nbsp;<span className="text-2xl">&rarr;</span>&nbsp; <span className="text-red-600">$0.00</span><br/><br/>
+                        </p>
+                      )
+                    }
+                  }
+                })
+              }
+              <span className="font-bold">Total: ${(subtotal - subtractFromSubtotal).toFixed(2)}</span>              
             </div>
             <div className="flex flex-row justify-center space-x-40">
               <button onClick={toggleModal}>

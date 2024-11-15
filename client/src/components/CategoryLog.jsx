@@ -27,11 +27,47 @@ const CategoryLog = () => {
     }
   };
 
+  const getStatus = (isActive, startDate, endDate) => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : null;
+
+    if (!isActive) {
+      return (
+        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+          Inactive
+        </span>
+      );
+    }
+
+    if (now < start) {
+      return (
+        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+          Upcoming
+        </span>
+      );
+    }
+
+    if (end && now > end) {
+      return (
+        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+          Ended
+        </span>
+      );
+    }
+
+    return (
+      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+        Active
+      </span>
+    );
+  };
+
   const columnConfig = {
     exhibition: [
       { key: "name", label: "Name" },
       { key: "description", label: "Description" },
-      { key: "room_id", label: "Room" },
+      { key: "room_name", label: "Room" },
       {
         key: "start_date",
         label: "Start Date",
@@ -45,30 +81,96 @@ const CategoryLog = () => {
       {
         key: "is_active",
         label: "Status",
-        format: (_, item) =>
-          getExhibitionStatus(item?.startDate, item?.endDate),
+        format: (isActive, item) =>
+          getStatus(isActive, item.start_date, item.end_date),
       },
     ],
     collection: [
       { key: "title", label: "Name" },
       { key: "description", label: "Description" },
-      { key: "room_id", label: "Room" },
+      { key: "room_name", label: "Room" },
       {
         key: "is_active",
         label: "Status",
-        format: (_, item) =>
-          getExhibitionStatus(item?.startDate, item?.endDate),
+        format: (isActive) => (
+          <span
+            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+              isActive
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {isActive ? "Active" : "Inactive"}
+          </span>
+        ),
+      },
+    ],
+    art: [
+      { key: "art_title", label: "Title" },
+      { key: "art_desc", label: "Description" },
+      { key: "artist_name", label: "Artist" },
+      { key: "art_medium", label: "Medium" },
+      {
+        key: "location",
+        label: "Location",
+        format: (_, item) => {
+          if (item.collection_name) {
+            return `Collection: ${item.collection_name}`;
+          } else if (item.exhibition_name) {
+            return `Exhibition: ${item.exhibition_name}`;
+          }
+          return "-";
+        },
+      },
+      { key: "date_created", label: "Date Created", format: formatDate },
+      { key: "date_received", label: "Date Received", format: formatDate },
+      {
+        key: "is_active",
+        label: "Status",
+        format: (isActive) => (
+          <span
+            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+              isActive
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {isActive ? "Active" : "Inactive"}
+          </span>
+        ),
+      },
+    ],
+    artist: [
+      { key: "first_name", label: "First Name" },
+      { key: "middle_initial", label: "Middle Initial" },
+      { key: "last_name", label: "Last Name" },
+      {
+        key: "is_active",
+        label: "Status",
+        format: (isActive) => (
+          <span
+            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+              isActive
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {isActive ? "Active" : "Inactive"}
+          </span>
+        ),
       },
     ],
     product: [
       { key: "name", label: "Name" },
+      { key: "description", label: "Description" },
+      { key: "quantity", label: "Quantity" },
       {
         key: "price",
         label: "Price",
         format: formatPrice,
       },
-      { key: "stock", label: "Stock" },
-      { key: "category", label: "Category" },
+      { key: "date_added", label: "Date Added", format: formatDate },
+      { key: "category_name", label: "Category" },
     ],
     ticket: [
       { key: "type", label: "Type" },
@@ -77,8 +179,8 @@ const CategoryLog = () => {
         label: "Price",
         format: formatPrice,
       },
-      { key: "availability", label: "Available" },
-      { key: "validPeriod", label: "Valid Period" },
+      { key: "quantity", label: "Quantity" },
+      { key: "requirement", label: "Requirement" },
     ],
   };
 
@@ -115,7 +217,7 @@ const CategoryLog = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">
+      <h2 className="text-xl font-semibold mb-4">
         {`${category.charAt(0).toUpperCase() + category.slice(1)}${
           category === "product" ? "s" : ""
         } Log`}
@@ -155,48 +257,6 @@ const CategoryLog = () => {
       </div>
     </div>
   );
-};
-
-const getExhibitionStatus = (startDate, endDate) => {
-  if (!startDate || !endDate) {
-    return (
-      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-        Unknown
-      </span>
-    );
-  }
-
-  try {
-    const now = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (now < start) {
-      return (
-        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-          Upcoming
-        </span>
-      );
-    } else if (now > end) {
-      return (
-        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-          Ended
-        </span>
-      );
-    } else {
-      return (
-        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-          Active
-        </span>
-      );
-    }
-  } catch {
-    return (
-      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-        Unknown
-      </span>
-    );
-  }
 };
 
 export default CategoryLog;
