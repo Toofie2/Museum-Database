@@ -13,6 +13,17 @@ router.get('/', (req, res) => {
     });
 });
 
+// GET latest employee id
+router.get('/last', (req, res) => {
+    db.query('SELECT * FROM Employee ORDER BY employee_id DESC LIMIT 1', (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        };
+        res.json(results[0]);
+    });
+});
+
 // GET employee by ID
 router.get('/:id', (req, res) => {
     db.query('SELECT * FROM Employee WHERE employee_id = ?', [req.params.id], (err, results) => {

@@ -41,24 +41,45 @@ const HomePage = () => {
   return (
     <>
       {showBanner && upcomingExhibition && (
-        <div className="bg-red-600 text-white p-6 flex justify-between items-center fixed w-full top-0 z-50">
-          <span className="text-xl ml-14 relative">
-            <span className="absolute left-0 -translate-x-full text-2xl">★</span>
-            Check out our new exhibition{" "}
-            {upcomingExhibition.name} starting on{" "}
-            {formatDate(upcomingExhibition.start_date)} under our exhibitions tab!
-            <span className="absolute right-0 translate-x-full text-2xl">★</span>
-          </span>
-          <button
-            onClick={() => setShowBanner(false)}
-            className="text-black font-medium px-3"
-          >
-            X
-          </button>
+        <div className="bg-gradient-to-r from-gray-light via-white to-gray-light text-black fixed w-full top-0 z-50 shadow-md transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-4 py-3 relative flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <span className="material-symbols-outlined text-yellow-500">
+                stars
+              </span>
+              <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center sm:text-left">
+                <span className="font-medium">New Exhibition:</span>
+                <Link
+                  to={`/exhibition/${upcomingExhibition.exhibit_id}`}
+                  className="hover:text-gray-dark transition-colors"
+                >
+                  {upcomingExhibition.name}
+                </Link>
+                <span className="hidden sm:inline">•</span>
+                <span className="text-gray-dark">
+                  Opening {formatDate(upcomingExhibition.start_date)}
+                </span>
+              </div>
+              <span className="material-symbols-outlined text-yellow-500">
+                stars
+              </span>
+            </div>
+            <button
+              onClick={() => setShowBanner(false)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-dark hover:text-black p-1 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Close banner"
+            >
+              <span className="material-symbols-outlined text-xl">close</span>
+            </button>
+          </div>
         </div>
       )}
       <Navbar />
-      <div className={`relative h-screen pt-[4.5rem] text-white ${showBanner ? 'mt-[4.5rem]' : ''}`}>
+      <div
+        className={`relative h-screen pt-[4.5rem] text-white ${
+          showBanner ? "mt-[3rem]" : ""
+        }`}
+      >
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgroundImage})` }}
