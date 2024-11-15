@@ -12,10 +12,14 @@ const EmployeeListPage = () => {
   // Fetch all active employees and sort by last name
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/employee`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/employee`
+      );
       // Filter out employees who are inactive
-      const activeEmployees = res.data.filter(employee => employee.is_active);
-      const sortedEmployees = activeEmployees.sort((a, b) => a.last_name.localeCompare(b.last_name));
+      const activeEmployees = res.data.filter((employee) => employee.is_active);
+      const sortedEmployees = activeEmployees.sort((a, b) =>
+        a.last_name.localeCompare(b.last_name)
+      );
       setEmployees(sortedEmployees);
     } catch (err) {
       console.log("Error fetching employees:", err);
@@ -41,7 +45,12 @@ const EmployeeListPage = () => {
   // Handle save button click
   const handleSaveClick = async () => {
     try {
-      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/employee/${editingEmployee.employee_id}`, editingEmployee);
+      await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/employee/${
+          editingEmployee.employee_id
+        }`,
+        editingEmployee
+      );
       setEditingEmployee(null);
       fetchEmployees();
       setSaveMessage("Profile Updates Saved");
@@ -60,17 +69,27 @@ const EmployeeListPage = () => {
   const handleDeleteClick = async () => {
     try {
       // Fetch employee's authentication data (e.g., using email or ID)
-      console.log("edditing employee id:" ,editingEmployee.employee_id)
+      console.log("edditing employee id:", editingEmployee.employee_id);
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/authentication/employee/${editingEmployee.employee_id}`
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/employee/${
+          editingEmployee.employee_id
+        }`
       );
-      
+
       // Delete the authentication record for the employee
-      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/authentication/${response.data.email}`);
-      
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/${
+          response.data.email
+        }`
+      );
+
       // Then, delete the employee record
-      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/employee/${editingEmployee.employee_id}`);
-      
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/employee/${
+          editingEmployee.employee_id
+        }`
+      );
+
       setEditingEmployee(null);
       fetchEmployees();
       setSaveMessage("Employee and authentication data successfully deleted");
@@ -91,7 +110,16 @@ const EmployeeListPage = () => {
 
   return (
     <>
-      <h1 className="text-4xl md:text-3xl font-bold text-black mb-8 text-center">Employee List</h1>
+      <div className="flex justify-between p-8">
+        <h1 className="text-2xl">Employees</h1>
+        <button
+          onClick={() => navigate("/employee/register")}
+          className="flex bg-white text-gray-dark px-3 py-2 rounded-md transition duration-200 border-gray-medium border justify-between gap-1"
+        >
+          <span className="material-symbols-outlined">add</span>
+          Add Employee
+        </button>
+      </div>
 
       {/* Success Message */}
       {saveMessage && (
@@ -189,7 +217,9 @@ const EmployeeListPage = () => {
       {showDeleteConfirmation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-            <h3 className="text-xl font-semibold mb-4">Are you sure you want to delete this employee?</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              Are you sure you want to delete this employee?
+            </h3>
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleDeleteClick}
@@ -211,12 +241,19 @@ const EmployeeListPage = () => {
       {/* Employee List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {employees.map((employee) => (
-          <div key={employee.employee_id} className="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-xl transition duration-300 ease-in-out">
+          <div
+            key={employee.employee_id}
+            className="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-xl transition duration-300 ease-in-out"
+          >
             <h3 className="text-xl font-semibold text-gray-800 mb-4">
               {employee.first_name} {employee.last_name}
             </h3>
-            <p className="text-base text-gray-600 mb-2">Department ID: {employee.department_id}</p>
-            <p className="text-base text-gray-600 mb-2">Salary: ${employee.salary}</p>
+            <p className="text-base text-gray-600 mb-2">
+              Department ID: {employee.department_id}
+            </p>
+            <p className="text-base text-gray-600 mb-2">
+              Salary: ${employee.salary}
+            </p>
             <p className="text-base text-gray-600 mb-2">SSN: {employee.ssn}</p>
 
             <button

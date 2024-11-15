@@ -47,9 +47,45 @@ router.get("/collection/:collection_id", (req, res) => {
   );
 });
 
-// GET all Art
+// GET all mediums
+router.get("/mediums", (req, res) => {
+  const query = `
+    SELECT DISTINCT art_medium 
+    FROM Art 
+    WHERE art_medium IS NOT NULL 
+    ORDER BY art_medium
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    // Extract just the medium names from the results
+    const mediums = results.map((result) => result.art_medium);
+    res.json(mediums);
+  });
+});
+
+// GET all Art, including artist name, collection name, and exhibition name
 router.get("/", (req, res) => {
-  db.query("SELECT * FROM Art", (err, results) => {
+  const query = `
+    SELECT 
+      a.*,
+      CONCAT(ar.first_name, 
+        CASE 
+          WHEN ar.middle_initial IS NOT NULL THEN CONCAT(' ', ar.middle_initial, ' ')
+          ELSE ' '
+        END,
+        ar.last_name) AS artist_name,
+      c.title AS collection_name,
+      e.name AS exhibition_name
+    FROM Art a
+    LEFT JOIN Artist ar ON a.artist_id = ar.artist_id
+    LEFT JOIN Collection c ON a.collection_id = c.collection_id
+    LEFT JOIN Exhibition e ON a.exhibit_id = e.exhibit_id
+  `;
+
+  db.query(query, (err, results) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -94,12 +130,13 @@ router.get("/:id", (req, res) => {
 // POST a new Art piece
 router.post("/", (req, res) => {
   const {
+    art_id,
     artist_id,
     collection_id,
-    title,
-    description,
-    image_path,
-    medium,
+    art_title,
+    art_desc,
+    art_image_path,
+    art_medium,
     date_created,
     date_received,
   } = req.body;
@@ -113,19 +150,20 @@ router.post("/", (req, res) => {
   }
 
   const insertQuery = `
-        INSERT INTO Art (artist_id, collection_id, title, description, image_path, medium, date_created, date_received)
+        INSERT INTO Art (art_id, artist_id, collection_id, art_title, art_desc, art_image_path, art_medium, date_created, date_received)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
   db.query(
     insertQuery,
     [
+      art_id,
       artist_id,
       collection_id,
-      title,
-      description,
-      image_path,
-      medium,
+      art_title,
+      art_desc,
+      art_image_path,
+      art_medium,
       date_created,
       date_received,
     ],
@@ -159,7 +197,7 @@ router.put("/:id", (req, res) => {
     const {
       artist_id,
       collection_id,
-      title,
+      art_title,
       description,
       image_path,
       medium,
@@ -177,7 +215,7 @@ router.put("/:id", (req, res) => {
 
     const updateQuery = `
             UPDATE Art 
-            SET artist_id = ?, collection_id = ?, title = ?, description = ?, image_path = ?, medium = ?, date_created = ?, date_received = ?
+            SET artist_id = ?, collection_id = ?, art_title = ?, description = ?, image_path = ?, medium = ?, date_created = ?, date_received = ?
             WHERE art_id = ?
         `;
     db.query(
@@ -185,7 +223,7 @@ router.put("/:id", (req, res) => {
       [
         artist_id,
         collection_id,
-        title,
+        art_title,
         description,
         image_path,
         medium,
