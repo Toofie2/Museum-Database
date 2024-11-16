@@ -18,7 +18,7 @@ const UserProfile = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:3000/employee/${userId}`
+          `${import.meta.env.VITE_BACKEND_URL}/employee/${userId}`
         );
         setUserInfo(response.data);
       } catch (err) {
