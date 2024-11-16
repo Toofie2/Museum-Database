@@ -29,6 +29,7 @@ import CustomerList from "./pages/employee/CustomerList.jsx";
 import CategoryLog from "./components/CategoryLog.jsx";
 import Reports from "./pages/employee/reports/Reports.jsx";
 import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
+import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
 
@@ -41,6 +42,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/resetpassword" element={<ResetpasswordPage />} />
+        <Route path ="/passwordresetrequest" element={<PasswordresetrequestPage />} />
         <Route path="/collections" element={<CollectionsPage />} />
         <Route path="/collection/:id" element={<CollectionsViewPage />} />
         <Route path="/exhibitions" element={<ExhibitionsPage />} />
