@@ -24,17 +24,40 @@ const CustomerList = () => {
   const fetchCustomers = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer`);
-      const activeCustomers = res.data.filter(customer => customer.is_active);
-      const sortedCustomers = activeCustomers.sort((a, b) => a.last_name.localeCompare(b.last_name));
-
+      const activeCustomers = res.data.filter((customer) => customer.is_active);
+      const sortedCustomers = activeCustomers.sort((a, b) =>
+        a.last_name.localeCompare(b.last_name)
+      );
+  
+      const today = new Date();
+      const fifteenDaysFromNow = new Date();
+      fifteenDaysFromNow.setDate(today.getDate() + 15);
+  
       // Filter based on membership status
       const filteredCustomers = sortedCustomers.filter((customer) => {
         if (membershipFilter === "all") return true;
         if (membershipFilter === "member") return customer.is_member;
         if (membershipFilter === "non-member") return !customer.is_member;
+        if (membershipFilter === "expiring-soon") {
+          const membershipStartDate = customer.membership_start_date
+            ? new Date(customer.membership_start_date)
+            : null;
+  
+          // Calculate expiration date as membershipStartDate + 1 year
+          const membershipExpirationDate = membershipStartDate
+            ? new Date(membershipStartDate.setFullYear(membershipStartDate.getFullYear() + 1))
+            : null;
+  
+          return (
+            customer.is_member &&
+            membershipExpirationDate &&
+            membershipExpirationDate <= fifteenDaysFromNow &&
+            membershipExpirationDate > today
+          );
+        }
         return false;
       });
-
+  
       setCustomers(filteredCustomers);
     } catch (err) {
       console.log("Error fetching customers:", err);
@@ -138,19 +161,20 @@ const CustomerList = () => {
 
         {/* Membership Filter Dropdown */}
         <div className="flex space-x-4 p-4">
-        <select
-        value={membershipFilter}
-        onChange={handleMembershipFilterChange}
-        className="border border-gray-300 rounded px-4 py-2"
-        >
-        <option value="all">All Customers</option>
-        <option value="member">Members</option>
-        <option value="non-member">Non-Members</option>
-        </select>
-        <div className="text-2xl rounded px-2 py-2 text-gray-700">
-            ({customers.length})
-        </div>
-        </div>
+  <select
+    value={membershipFilter}
+    onChange={handleMembershipFilterChange}
+    className="border border-gray-300 rounded px-4 py-2"
+  >
+    <option value="all">All Customers</option>
+    <option value="member">Members</option>
+    <option value="non-member">Non-Members</option>
+    <option value="expiring-soon">Membership Expiring Soon</option>
+  </select>
+  <div className="text-2xl rounded px-2 py-2 text-gray-700">
+    ({customers.length})
+  </div>
+</div>
       {/* Success Message */}
       {saveMessage && (
         <div className="text-green-600 font-semibold text-center mb-6">
