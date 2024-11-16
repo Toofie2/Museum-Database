@@ -188,7 +188,9 @@ const CategoryLog = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/${category}`);
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/${category}`
+        );
         const processedData = (response.data || []).map((item, index) => ({
           ...item,
           _id: item.id || `temp-${index}`,
