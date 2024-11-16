@@ -32,6 +32,11 @@ const EmployeeListPage = () => {
     fetchEmployees();
   }, []);
 
+  const [filters, setFilters] = useState({
+    salary: "", // Active salary filter
+    department: "", // Active department filter
+  });
+
   // Handle filter by salary
   const filterBySalary = (type) => {
     let filtered;
@@ -64,14 +69,31 @@ const EmployeeListPage = () => {
 
   // Handle filter change (all filters in one dropdown)
   const handleFilterChange = (filterType, value) => {
-    if (filterType === "salary") {
-      filterBySalary(value);
-    } else if (filterType === "department") {
-      filterByDepartment(Number(value));
-    } else {
-      clearFilters();
-    }
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters, [filterType]: value };
+  
+      // Apply combined filters
+      let filtered = employees;
+  
+      // Apply salary filter
+      if (updatedFilters.salary === "below") {
+        filtered = filtered.filter((emp) => emp.salary < 60000);
+      } else if (updatedFilters.salary === "belowToAbove") {
+        filtered = filtered.filter((emp) => emp.salary >= 60000 && emp.salary <= 100000);
+      } else if (updatedFilters.salary === "above") {
+        filtered = filtered.filter((emp) => emp.salary > 100000);
+      }
+  
+      // Apply department filter
+      if (updatedFilters.department) {
+        filtered = filtered.filter((emp) => emp.department_id === Number(updatedFilters.department));
+      }
+  
+      setFilteredEmployees(filtered); // Update the displayed employees
+      return updatedFilters; // Update the active filters
+    });
   };
+  
 
   // Handle edit button click
   const handleEditClick = (employee) => {
@@ -163,39 +185,44 @@ const EmployeeListPage = () => {
         </button>
       </div>
 
-      {/* Filter Dropdown */}
       <div className="flex space-x-4 p-4">
+        {/* Salary Filter */}
         <select
-          onChange={(e) => handleFilterChange(e.target.name, e.target.value)}
-          className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
-          name="salary" // Salary filter
+            value={filters.salary} // Reflect active salary filter
+            onChange={(e) => handleFilterChange("salary", e.target.value)}
+            className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
         >
-          <option value="">Select Salary Filter</option>
-          <option value="below">Salary &lt; $60,000</option>
-          <option value="belowToAbove">Salary $60,000 - $100,000</option>
-          <option value="above">Salary ≥ $100,000</option>
+            <option value="">Select Salary Filter</option>
+            <option value="below">Salary &lt; $60,000</option>
+            <option value="belowToAbove">Salary $60,000 - $100,000</option>
+            <option value="above">Salary ≥ $100,000</option>
         </select>
 
+        {/* Department Filter */}
         <select
-          onChange={(e) => handleFilterChange(e.target.name, e.target.value)}
-          className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
-          name="department" // Department filter
+            value={filters.department} // Reflect active department filter
+            onChange={(e) => handleFilterChange("department", e.target.value)}
+            className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
         >
-          <option value="">Select Department</option>
-          <option value={1}>Department 1</option>
-          <option value={2}>Department 2</option>
-          <option value={3}>Department 3</option>
-          <option value={4}>Department 4</option>
+            <option value="">Select Department</option>
+            <option value={1}>Department 1</option>
+            <option value={2}>Department 2</option>
+            <option value={3}>Department 3</option>
+            <option value={4}>Department 4</option>
         </select>
 
-        {/* Clear Filter Option */}
+        {/* Clear Filters */}
         <button
-          onClick={() => handleFilterChange("filter", "clear")}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md"
+            onClick={() => {
+            setFilters({ salary: "", department: "" }); // Reset filters
+            setFilteredEmployees(employees); // Show all employees
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md"
         >
-          Show All
+            Show All
         </button>
-      </div>
+        </div>
+
 
       {/* Success Message */}
       {saveMessage && (
