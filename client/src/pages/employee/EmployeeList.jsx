@@ -192,7 +192,7 @@ const EmployeeListPage = () => {
             onChange={(e) => handleFilterChange("salary", e.target.value)}
             className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
         >
-            <option value="">Select Salary Filter</option>
+            <option value="">Select Salary Range</option>
             <option value="below">Salary &lt; $60,000</option>
             <option value="belowToAbove">Salary $60,000 - $100,000</option>
             <option value="above">Salary ≥ $100,000</option>
