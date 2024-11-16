@@ -15,6 +15,7 @@ const LoginPage = () => {
   });
 
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [messageType, setMessageType] = useState("success"); // To differentiate message type
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,6 +40,7 @@ const LoginPage = () => {
           // Handle customer login
           login(customer_id, "customer"); // Track role as "customer"
           setConfirmationMessage("Login successful!");
+          setMessageType("success"); // Successful login
           setTimeout(() => navigate("/"), 1500); // Redirect to home page after login
         } else if (employee_id !== null) {
           // Retrieve employee role
@@ -53,15 +55,19 @@ const LoginPage = () => {
           login(employee_id, authLevel);
 
           setConfirmationMessage("Login successful!");
+          setMessageType("success"); // Successful login
           setTimeout(() => navigate("/employee"), 1500); // Redirect to employee dashboard
         } else {
           setConfirmationMessage("Login failed. Invalid credentials.");
+          setMessageType("error"); // Error message
         }
       } else {
         setConfirmationMessage("Login failed. Please try again.");
+        setMessageType("error"); // Error message
       }
     } catch (err) {
       setConfirmationMessage("Login failed. Please try again.");
+      setMessageType("error"); // Error message
       console.log("Authentication credentials retrieval error:", err);
     }
   };
@@ -98,7 +104,11 @@ const LoginPage = () => {
           </form>
 
           {confirmationMessage && (
-            <div className="mt-4 text-green-600 text-lg text-center">
+            <div
+              className={`mt-4 text-lg text-center ${
+                messageType === "success" ? "text-green-600" : "text-red-600"
+              }`} // Conditional class
+            >
               {confirmationMessage}
             </div>
           )}
@@ -115,7 +125,7 @@ const LoginPage = () => {
             </NavLink>
           </div>
           <div className="mt-8 text-center">
-            <NavLink to="/resetpassword">
+            <NavLink to="/passwordresetrequest">
               <p className="text-gray-600 text-sm hover:underline cursor-pointer">
                 Forgot your password? Click here to reset
               </p>

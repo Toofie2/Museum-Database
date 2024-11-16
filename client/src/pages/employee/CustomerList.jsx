@@ -7,6 +7,7 @@ const CustomerList = () => {
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [saveMessage, setSaveMessage] = useState("");
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [membershipFilter, setMembershipFilter] = useState("all");
   const navigate = useNavigate();
 
   // Helper function to format date to mm/dd/yyyy for display
@@ -19,30 +20,54 @@ const CustomerList = () => {
     return `${month}/${day}/${year}`;
   };
 
-  // Helper function to get the current date in yyyy-mm-dd format
-  const getCurrentDate = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
   // Fetch all customers
   const fetchCustomers = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer`);
-      const activeCustomers = res.data.filter(customer => customer.is_active);
-      const sortedCustomers = activeCustomers.sort((a, b) => a.last_name.localeCompare(b.last_name));
-      setCustomers(sortedCustomers);
+      const activeCustomers = res.data.filter((customer) => customer.is_active);
+      const sortedCustomers = activeCustomers.sort((a, b) =>
+        a.last_name.localeCompare(b.last_name)
+      );
+  
+      const today = new Date();
+      const fifteenDaysFromNow = new Date();
+      fifteenDaysFromNow.setDate(today.getDate() + 15);
+  
+      // Filter based on membership status
+      const filteredCustomers = sortedCustomers.filter((customer) => {
+        if (membershipFilter === "all") return true;
+        if (membershipFilter === "member") return customer.is_member;
+        if (membershipFilter === "non-member") return !customer.is_member;
+        if (membershipFilter === "expiring-soon") {
+          const membershipStartDate = customer.membership_start_date
+            ? new Date(customer.membership_start_date)
+            : null;
+  
+          // Calculate expiration date as membershipStartDate + 1 year
+          const membershipExpirationDate = membershipStartDate
+            ? new Date(membershipStartDate.setFullYear(membershipStartDate.getFullYear() + 1))
+            : null;
+  
+          return (
+            customer.is_member &&
+            membershipExpirationDate &&
+            membershipExpirationDate <= fifteenDaysFromNow &&
+            membershipExpirationDate > today
+          );
+        }
+        return false;
+      });
+  
+      setCustomers(filteredCustomers);
     } catch (err) {
       console.log("Error fetching customers:", err);
     }
   };
 
+  // Run fetchCustomers when membershipFilter changes
   useEffect(() => {
     fetchCustomers();
-  }, []);
+  }, [membershipFilter]); // Depend on membershipFilter
 
   // Handle edit button click
   const handleEditClick = (customer) => {
@@ -101,7 +126,6 @@ const CustomerList = () => {
       );
 
       // First, delete the customer's authentication data
-      console.log("customerid:" ,editingCustomer.customer_id)
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/authentication/${response.data.email}`);
       
       // Then, delete the customer from the customer table
@@ -125,10 +149,32 @@ const CustomerList = () => {
     setEditingCustomer(null);
   };
 
+  const handleMembershipFilterChange = (e) => {
+    setMembershipFilter(e.target.value);
+  };
+
   return (
     <>
-      <h1 className="text-4xl md:text-3xl font-bold text-black mb-8 text-center">Customer List</h1>
+      <div className="flex justify-between p-4">
+        <h1 className="text-4xl md:text-3xl font-bold">Customers</h1>
+      </div>
 
+        {/* Membership Filter Dropdown */}
+        <div className="flex space-x-4 p-4">
+  <select
+    value={membershipFilter}
+    onChange={handleMembershipFilterChange}
+    className="border border-gray-300 rounded px-4 py-2"
+  >
+    <option value="all">All Customers</option>
+    <option value="member">Members</option>
+    <option value="non-member">Non-Members</option>
+    <option value="expiring-soon">Membership Expiring Soon</option>
+  </select>
+  <div className="text-2xl rounded px-2 py-2 text-gray-700">
+    ({customers.length})
+  </div>
+</div>
       {/* Success Message */}
       {saveMessage && (
         <div className="text-green-600 font-semibold text-center mb-6">
@@ -192,23 +238,28 @@ const CustomerList = () => {
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
 
-          <label className="text-base text-gray-900">Membership Status</label>
-          <input
-            type="checkbox"
-            name="is_member"
-            checked={editingCustomer.is_member}
-            onChange={handleInputChange}
-            className="border border-gray-300 rounded mb-4"
-          />
-
-          <label className="text-base text-gray-900">Membership Start Date</label>
-          <input
-            type="text"
-            name="membership_start_date"
-            value={editingCustomer.membership_start_date}
-            onChange={handleInputChange}
-            className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
-          />
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="flex-1">
+              <label className="text-base text-gray-900">Membership Start Date</label>
+              <input
+                type="text"
+                name="membership_start_date"
+                value={editingCustomer.membership_start_date}
+                onChange={handleInputChange}
+                className="border border-gray-300 rounded px-4 py-2 w-full"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <label className="text-base text-gray-900">Membership Status</label>
+              <input
+                type="checkbox"
+                name="is_member"
+                checked={editingCustomer.is_member}
+                onChange={handleInputChange}
+                className="border border-gray-300 rounded"
+              />
+            </div>
+          </div>
 
           <div className="flex justify-between space-x-4 mt-6">
             <button
@@ -244,7 +295,7 @@ const CustomerList = () => {
             <p className="text-base text-gray-600 mb-4">Membership Start Date: {formatDate(customer.membership_start_date)}</p>
             <button
               onClick={() => handleEditClick(customer)}
-              className="bg-gray-900 text-white px-6 py-2 rounded-md hover:bg-black transition duration-200 w-full"
+              className="bg-gray-900 text-white px-6 py-2 rounded-md hover:bg-black transition duration-200 w-1/4"
             >
               Edit
             </button>
