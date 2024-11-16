@@ -18,7 +18,6 @@ db.connect((err) => {
 });
 
 const sendMembershipNotifications = () => {
-  console.log('Starting membership notification process...');
   
   db.query(
     `SELECT Customer.customer_id, Customer.first_name, Authentication.email 
@@ -75,8 +74,6 @@ const sendMembershipNotifications = () => {
           console.error(`Failed to send email to ${customer.email}:`, error);
         }
       });
-
-      console.log("All membership notifications sent successfully.");
     }
   );
 };
