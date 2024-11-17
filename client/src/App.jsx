@@ -36,16 +36,13 @@ import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
 
-/*const TicketFormDataProvider = ({ formData, setFormData }) => {
-    return (
-        <TicketFormDataContext.Provider value = {{formData, setFormData}}>
-            <Outlet />
-        </TicketFormDataContext.Provider>
-    )
-}*/
-
 const App = () => {
   const [formData, setFormData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const getSelectedDate = (data) => {
+    setSelectedDate(data);
+  }
+
   return (
     <AuthProvider>
       <Routes>
@@ -229,7 +226,7 @@ const App = () => {
               path="/tickets"
               element={
                 <ProtectedRoute>
-                  <TicketPage />
+                  <TicketPage onNext={getSelectedDate}/>
                 </ProtectedRoute>
               }
             />
@@ -237,7 +234,7 @@ const App = () => {
               path="/tickets/exhibitions"
               element={
                 <ProtectedRoute>
-                  <ExhibitionsPurchasePage />
+                  <ExhibitionsPurchasePage selDate={selectedDate}/>
                 </ProtectedRoute>
               }
             />

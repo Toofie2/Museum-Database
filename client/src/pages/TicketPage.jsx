@@ -11,7 +11,7 @@ import TicketFormDataContext from "../contexts/TicketFormDataContext.jsx";
 
 
 
-const TicketPage = () => {
+const TicketPage = (props) => {
   const {formData, setFormData} = useContext(TicketFormDataContext);
 
 
@@ -332,7 +332,7 @@ const TicketPage = () => {
                   <span className="font-medium">Subtotal</span>${subtotal}
                 </div>
                   {/* On click, show confirmation pop up */}
-                  <Link to="/tickets/exhibitions">
+                  <Link to="/tickets/exhibitions" onClick={() => {props.onNext(selectedDate)}}>
                     <button
                       type="button"
                       className="w-full mt-4 bg-black text-white py-2 px-52 border-black rounded"
