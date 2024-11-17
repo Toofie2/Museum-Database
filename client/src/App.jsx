@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/authentication";
+import { useState } from "react";
+import TicketFormDataContext from "./contexts/TicketFormDataContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
@@ -9,6 +11,7 @@ import ExhibitionViewPage from "./pages/ExhibitionViewPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CollectionsViewPage from "./pages/CollectionsViewPage";
 import TicketPage from "./pages/TicketPage.jsx";
+import ExhibitionsPurchasePage from "./pages/ExhibitionsPurchasePage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
 import GiftShopProductPage from "./pages/GiftShopProductPage";
@@ -33,7 +36,16 @@ import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
 
+/*const TicketFormDataProvider = ({ formData, setFormData }) => {
+    return (
+        <TicketFormDataContext.Provider value = {{formData, setFormData}}>
+            <Outlet />
+        </TicketFormDataContext.Provider>
+    )
+}*/
+
 const App = () => {
+  const [formData, setFormData] = useState([]);
   return (
     <AuthProvider>
       <Routes>
@@ -123,14 +135,6 @@ const App = () => {
         </Route>
         {/* Protected Routes */}
         <Route
-          path="/tickets"
-          element={
-            <ProtectedRoute>
-              <TicketPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/tickets/purchased"
           element={
             <ProtectedRoute>
@@ -219,6 +223,26 @@ const App = () => {
           }
         />
       </Routes>
+      <TicketFormDataContext.Provider value={{ formData, setFormData }}>
+        <Routes>
+            <Route
+              path="/tickets"
+              element={
+                <ProtectedRoute>
+                  <TicketPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tickets/exhibitions"
+              element={
+                <ProtectedRoute>
+                  <ExhibitionsPurchasePage />
+                </ProtectedRoute>
+              }
+            />
+        </Routes>
+      </TicketFormDataContext.Provider>
     </AuthProvider>
   );
 };
