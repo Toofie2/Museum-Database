@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";  // Add this import
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -39,7 +40,7 @@ const ExhibitionsPage = () => {
   };
 
   return (
-    <div className="mx-auto p-0">
+    <div className="min-h-screen flex flex-col">  {/* Added flex container */}
       <Navbar />
       <div className="relative flex items-center h-[800px] w-screen">
         <img
@@ -59,7 +60,7 @@ const ExhibitionsPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto py-10 pb-16">
+      <div className="container mx-auto py-10 pb-16 flex-grow">  {/* Added flex-grow */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {Exhibitions.map((Exhibition) => {
             const { formattedDate, isEndingSoon } = formatEndDate(
@@ -96,6 +97,7 @@ const ExhibitionsPage = () => {
           })}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

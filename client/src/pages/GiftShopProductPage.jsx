@@ -1,4 +1,5 @@
 import NavbarBlack from "../components/NavbarBlack.jsx";
+import Footer from "../components/Footer.jsx";  // Add this import
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -11,8 +12,6 @@ const GiftShopProductPage = () => {
   const { userId } = useAuth();
   const [customerInfo, setCustomerInfo] = useState({});
   const discountPercent = 0.15;
-
-  
 
   useEffect(() => {
     const fetchCustomerInfo = async (userId) => {
@@ -27,9 +26,7 @@ const GiftShopProductPage = () => {
     };
     fetchCustomerInfo(userId);
   }, [])
-  
 
-  // Update form data whenever input changes. Don't allow values out of range 
   const handleChange = (e) => {
     let { name, value } = e.target;
     if(value > maxProduct){
@@ -45,7 +42,6 @@ const GiftShopProductPage = () => {
     }));
   };
 
-  // Decrease ticket count by 1
   const handleDecrease = (e) => {
     e.preventDefault()
     let { name, value } = e.currentTarget;
@@ -54,10 +50,8 @@ const GiftShopProductPage = () => {
       ...prevState,
       [name]: value >= maxProduct ? maxProduct : value <= 0 ? 0 : value
     }));
-
   };
 
-  // Increase ticket count by 1
   const handleIncrease = (e) => {
     e.preventDefault()
     let { name, value } = e.currentTarget;
@@ -66,7 +60,6 @@ const GiftShopProductPage = () => {
       ...prevState,
       [name]: value >= maxProduct ? maxProduct : value <= 0 ? 0 : value
     }));
-
   };
 
   const handleSubmit = async () => {
@@ -84,8 +77,6 @@ const GiftShopProductPage = () => {
   const handleSubtotal = (formData) => {
     setSubtotal(productInfo.price * formData.quantity);
   };
-
-
 
   const { prodCatID, prodID } = useParams();
   const [productInfo, setProductInfo] = useState([]);
@@ -107,9 +98,6 @@ const GiftShopProductPage = () => {
     fetchGiftShopProductInfo();
   }, [prodID]);
 
-  if (!productInfo)
-    return <div className="text-center mt-20">Loading...</div>;
-
   useEffect(() => {
     handleSubtotal(formData);
   }, [formData]);
@@ -126,14 +114,14 @@ const GiftShopProductPage = () => {
     document.body.classList.remove('active-modal')
   }
 
-
+  if (!productInfo) return <div className="text-center mt-20">Loading...</div>;
   
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">  {/* Added flex container */}
       <NavbarBlack/>
-      <div className="container mx-auto pb-12 p-1 flex flex-row">
+      <div className="container mx-auto pb-12 p-1 flex flex-row flex-grow">  {/* Added flex-grow */}
         <div className="w-[45rem] h-[40rem] ml-20 mt-36">
-        <img
+          <img
             src={productInfo.image_path}
             alt={productInfo.name}
             className="w-full h-full object-contain"
@@ -164,19 +152,17 @@ const GiftShopProductPage = () => {
                 value={formData.quantity || 0}
                 onChange={handleChange}
                 onKeyDown={(e) => {
-                  if(e.key==='.'){e.preventDefault()} // Prevent decimal
+                  if(e.key==='.'){e.preventDefault()}
                 }}
-                onInput={(e) => { // Remove leading zeros
+                onInput={(e) => {
                   if(e.target.value[0] == "0" && (e.target.value).length > 1){
                     e.target.value = e.target.value.replace("0", "");
                   }
-                  e.target.value = e.target.value.replace(/[^0-9]*/g,''); // Do not allow "+" or "-"
+                  e.target.value = e.target.value.replace(/[^0-9]*/g,'');
                 }} 
                 className="w-9 h-8 text-center"
               />
             </form>
-
-            {/* Add a ticket */}
             <button name="quantity" value={formData.quantity} onClick={handleIncrease}>
               <AddIcon/>
             </button>
@@ -205,8 +191,6 @@ const GiftShopProductPage = () => {
               }
               <span className="font-bold">Total: ${(subtotal - (subtotal * discountPercent)).toFixed(2)}</span>
             </div>
-
-
             <div className="flex flex-row justify-center space-x-40">
               <button onClick={toggleModal}>
                 Cancel
@@ -218,6 +202,7 @@ const GiftShopProductPage = () => {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 };

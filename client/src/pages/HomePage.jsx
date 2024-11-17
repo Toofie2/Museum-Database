@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";  // Add this import
 import { Link } from "react-router-dom";
 import backgroundImage from "../assets/HomePageBackground.jpg";
 import floor1Image from "../assets/Floor 1.png";
@@ -32,6 +33,7 @@ const HomePage = () => {
     };
     fetchExhibitions();
   }, []);
+  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { month: "long", day: "numeric", year: "numeric" };
@@ -156,6 +158,7 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

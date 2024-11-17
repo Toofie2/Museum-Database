@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";  // Add this import
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -31,7 +32,7 @@ const CollectionsViewPage = () => {
   if (!collection) return <div className="text-center mt-20">Loading...</div>;
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">  {/* Added flex container */}
       <Navbar />
       {/* Banner Section */}
       <div className="relative flex items-center w-screen h-[800px]">
@@ -51,7 +52,7 @@ const CollectionsViewPage = () => {
       </div>
 
       {/* Art Pieces Section */}
-      <div className="container mx-auto pb-12">
+      <div className="container mx-auto pb-12 flex-grow">  {/* Added flex-grow */}
         <h2 className="text-xl font-semibold mt-6 mb-4 px-8">
           Sample art pieces from this Collection
         </h2>
@@ -74,6 +75,7 @@ const CollectionsViewPage = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
