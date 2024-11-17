@@ -79,7 +79,7 @@ const collectionRouter = require("./routes/collection");
 app.use("/collection", collectionRouter);
 
 const reportsRoutes = require('./routes/reports');
-app.use('/api/reports', reportsRoutes);
+app.use('/reports', reportsRoutes);
 
 app.get("/", (req, res) => {
   res.json("Hello, this is the backend!");
