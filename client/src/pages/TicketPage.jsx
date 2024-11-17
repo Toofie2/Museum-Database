@@ -1,12 +1,13 @@
 import TicketInfo from "../components/TicketInfo.jsx"
 import TicketForm from "../components/TicketForm.jsx"
 import NavbarBlack from "../components/NavbarBlack.jsx";
+import Footer from "../components/Footer.jsx";  // Add this import
 
 const TicketPage = () => {
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">  {/* Added flex container */}
       <NavbarBlack/>
-      <div className="container mx-auto pb-12 p-1">
+      <div className="container mx-auto pb-12 p-1 flex-grow">  {/* Added flex-grow */}
         <div className="mt-28 flex justify-between px-16 space-x-24">
           <div>
             <TicketInfo />
@@ -16,6 +17,7 @@ const TicketPage = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
