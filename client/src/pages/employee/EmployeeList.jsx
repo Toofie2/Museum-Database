@@ -6,17 +6,17 @@ const EmployeeListPage = () => {
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [editingEmployee, setEditingEmployee] = useState(null);
-  const [saveMessage, setSaveMessage] = useState(""); // State for success message
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); // Confirmation popup
+  const [departments, setDepartments] = useState([]);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch all active employees and sort by last name
+  // Fetch all employees
   const fetchEmployees = async () => {
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/employee`
       );
-      // Filter out employees who are inactive
       const activeEmployees = res.data.filter((employee) => employee.is_active);
       const sortedEmployees = activeEmployees.sort((a, b) =>
         a.last_name.localeCompare(b.last_name)
@@ -28,46 +28,31 @@ const EmployeeListPage = () => {
     }
   };
 
+  // Fetch all departments
+  const fetchDepartments = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/department`);
+      setDepartments(res.data);
+    } catch (err) {
+      console.log("Error fetching departments:", err);
+    }
+  };
+  
   useEffect(() => {
     fetchEmployees();
+    fetchDepartments();
   }, []);
 
+  const getDepartmentName = (departmentId) => {
+    const department = departments.find((dep) => dep.department_id === departmentId);
+    return department ? department.name : "Unknown Department";
+  };
+
   const [filters, setFilters] = useState({
-    salary: "", // Active salary filter
-    department: "", // Active department filter
+    salary: "",
+    department: "",
   });
 
-  // Handle filter by salary
-  const filterBySalary = (type) => {
-    let filtered;
-    if (type === "below") {
-      filtered = employees.filter((employee) => employee.salary < 60000);
-    } else if (type === "belowToAbove") {
-      filtered = employees.filter(
-        (employee) => employee.salary >= 60000 && employee.salary <= 100000
-      );
-    } else if (type === "above") {
-      filtered = employees.filter((employee) => employee.salary > 100000);
-    } else {
-      filtered = employees;
-    }
-    setFilteredEmployees(filtered);
-  };
-
-  // Handle filter by department
-  const filterByDepartment = (departmentId) => {
-    const filtered = employees.filter(
-      (employee) => employee.department_id === departmentId
-    );
-    setFilteredEmployees(filtered);
-  };
-
-  // Clear filters
-  const clearFilters = () => {
-    setFilteredEmployees(employees);
-  };
-
-  // Handle filter change (all filters in one dropdown)
   const handleFilterChange = (filterType, value) => {
     setFilters((prevFilters) => {
       const updatedFilters = { ...prevFilters, [filterType]: value };
@@ -84,36 +69,44 @@ const EmployeeListPage = () => {
         filtered = filtered.filter((emp) => emp.salary > 100000);
       }
   
-      // Apply department filter
+      // Apply department filter using department name
       if (updatedFilters.department) {
-        filtered = filtered.filter((emp) => emp.department_id === Number(updatedFilters.department));
+        filtered = filtered.filter((emp) => {
+          const empDepartment = departments.find(
+            (dep) => dep.department_id === emp.department_id
+          );
+          return empDepartment?.name === updatedFilters.department;
+        });
       }
   
-      setFilteredEmployees(filtered); // Update the displayed employees
-      return updatedFilters; // Update the active filters
+      setFilteredEmployees(filtered);
+      return updatedFilters;
     });
   };
-  
 
-  // Handle edit button click
   const handleEditClick = (employee) => {
     setEditingEmployee({ ...employee });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Handle input field change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditingEmployee((prev) => ({ ...prev, [name]: value }));
+    if (name === "department") {
+      // When editing department, convert department name to ID
+      const selectedDepartment = departments.find(dep => dep.name === value);
+      setEditingEmployee(prev => ({
+        ...prev,
+        department_id: selectedDepartment ? selectedDepartment.department_id : prev.department_id
+      }));
+    } else {
+      setEditingEmployee(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  // Handle save button click
   const handleSaveClick = async () => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/employee/${
-          editingEmployee.employee_id
-        }`,
+        `${import.meta.env.VITE_BACKEND_URL}/employee/${editingEmployee.employee_id}`,
         editingEmployee
       );
       setEditingEmployee(null);
@@ -125,33 +118,18 @@ const EmployeeListPage = () => {
     }
   };
 
-  // Show delete confirmation popup
-  const confirmDelete = () => {
-    setShowDeleteConfirmation(true);
-  };
-
-  // Handle delete button click (after confirmation)
   const handleDeleteClick = async () => {
     try {
-      console.log("editing employee id:", editingEmployee.employee_id);
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/authentication/employee/${
-          editingEmployee.employee_id
-        }`
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/employee/${editingEmployee.employee_id}`
       );
 
-      // Delete the authentication record for the employee
       await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/authentication/${
-          response.data.email
-        }`
+        `${import.meta.env.VITE_BACKEND_URL}/authentication/${response.data.email}`
       );
 
-      // Then, delete the employee record
       await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/employee/${
-          editingEmployee.employee_id
-        }`
+        `${import.meta.env.VITE_BACKEND_URL}/employee/${editingEmployee.employee_id}`
       );
 
       setEditingEmployee(null);
@@ -167,7 +145,6 @@ const EmployeeListPage = () => {
     }
   };
 
-  // Handle cancel button click
   const handleCancelClick = () => {
     setEditingEmployee(null);
   };
@@ -184,58 +161,54 @@ const EmployeeListPage = () => {
           Add Employee
         </button>
       </div>
-
+  
       <div className="flex space-x-4 p-4">
-        {/* Salary Filter */}
         <select
-            value={filters.salary} // Reflect active salary filter
-            onChange={(e) => handleFilterChange("salary", e.target.value)}
-            className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
+          value={filters.salary}
+          onChange={(e) => handleFilterChange("salary", e.target.value)}
+          className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
         >
-            <option value="">Select Salary Range</option>
-            <option value="below">Salary &lt; $60,000</option>
-            <option value="belowToAbove">Salary $60,000 - $100,000</option>
-            <option value="above">Salary ≥ $100,000</option>
+          <option value="">Select Salary Range</option>
+          <option value="below">Salary &lt; $60,000</option>
+          <option value="belowToAbove">Salary $60,000 - $100,000</option>
+          <option value="above">Salary ≥ $100,000</option>
         </select>
-
-        {/* Department Filter */}
+  
+        {/* Fixed department filter */}
         <select
-            value={filters.department} // Reflect active department filter
-            onChange={(e) => handleFilterChange("department", e.target.value)}
-            className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
+          value={filters.department}
+          onChange={(e) => handleFilterChange("department", e.target.value)}
+          className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
         >
-            <option value="">Select Department</option>
-            <option value={1}>Department 1</option>
-            <option value={2}>Department 2</option>
-            <option value={3}>Department 3</option>
-            <option value={4}>Department 4</option>
+          <option value="">Select Department</option>
+          {departments.sort((a, b) => a.name.localeCompare(b.name)).map((dep) => (
+            <option key={dep.department_id} value={dep.name}>
+              {dep.name}
+            </option>
+          ))}
         </select>
-
-        {/* Clear Filters */}
+  
         <button
-            onClick={() => {
-            setFilters({ salary: "", department: "" }); // Reset filters
-            setFilteredEmployees(employees); // Show all employees
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          onClick={() => {
+            setFilters({ salary: "", department: "" });
+            setFilteredEmployees(employees);
+          }}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md"
         >
-            Show All
+          Show All
         </button>
-        </div>
-
-
-      {/* Success Message */}
+      </div>
+  
       {saveMessage && (
         <div className="text-green-600 font-semibold text-center mb-6">
           {saveMessage}
         </div>
       )}
-
-      {/* Editing Employee Profile */}
+  
       {editingEmployee && (
         <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 w-full md:w-3/4 lg:w-1/2 mx-auto mb-8">
           <h2 className="text-xl font-medium text-black mb-6">Edit Profile</h2>
-
+  
           <label className="text-base text-gray-900">First Name</label>
           <input
             type="text"
@@ -244,7 +217,7 @@ const EmployeeListPage = () => {
             onChange={handleInputChange}
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
-
+  
           <label className="text-base text-gray-900">M.I (optional)</label>
           <input
             type="text"
@@ -254,7 +227,7 @@ const EmployeeListPage = () => {
             onChange={handleInputChange}
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
-
+  
           <label className="text-base text-gray-900">Last Name</label>
           <input
             type="text"
@@ -263,16 +236,21 @@ const EmployeeListPage = () => {
             onChange={handleInputChange}
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
-
-          <label className="text-base text-gray-900">Department ID</label>
-          <input
-            type="number"
-            name="department_id"
-            value={editingEmployee.department_id}
+  
+          <label className="text-base text-gray-900">Department</label>
+          <select
+            name="department"
+            value={getDepartmentName(editingEmployee.department_id)}
             onChange={handleInputChange}
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
-          />
-
+          >
+            {departments.map((dep) => (
+              <option key={dep.department_id} value={dep.name}>
+                {dep.name}
+              </option>
+            ))}
+          </select>
+  
           <label className="text-base text-gray-900">Salary</label>
           <input
             type="number"
@@ -281,7 +259,7 @@ const EmployeeListPage = () => {
             onChange={handleInputChange}
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
-
+  
           <label className="text-base text-gray-900">SSN</label>
           <input
             type="text"
@@ -290,7 +268,7 @@ const EmployeeListPage = () => {
             onChange={handleInputChange}
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
-
+  
           <div className="flex justify-between space-x-4">
             <button
               onClick={handleCancelClick}
@@ -307,8 +285,7 @@ const EmployeeListPage = () => {
           </div>
         </div>
       )}
-
-      {/* Employee List */}
+  
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredEmployees.map((employee) => (
           <div
@@ -319,7 +296,7 @@ const EmployeeListPage = () => {
               {employee.first_name} {employee.last_name}
             </h3>
             <p className="text-base text-gray-600 mb-2">
-              Department ID: {employee.department_id}
+              Department: {getDepartmentName(employee.department_id)}
             </p>
             <p className="text-base text-gray-600 mb-2">
               Salary: ${employee.salary}
