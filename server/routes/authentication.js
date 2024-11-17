@@ -1,6 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+require("dotenv").config();
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
+// Email transport setup
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+// Password reset token expiry time (1 hour)
+const RESET_PASSWORD_EXPIRY = 3600000;
 
 // GET all users authentication credentials (idk why I added this lol)
 router.get("/", (req, res) => {
@@ -174,4 +189,112 @@ router.patch("/:id/reactivate", (req, res) => {
   );
 });
 
+// Request password reset email
+router.post("/password-reset", (req, res) => {
+  const { email } = req.body;
+  console.log("Received request for password reset:", email); // Log the email received
+
+  if (!email) {
+    console.error("Error: No email provided."); // Log error
+    return res.status(400).json({ error: "Email is required." });
+  }
+
+  db.query(
+    "SELECT * FROM Authentication WHERE email = ?",
+    [email],
+    (err, results) => {
+      if (err) {
+        console.error("Database error:", err.message); // Log database error
+        return res.status(500).json({ error: err.message });
+      }
+
+      if (results.length === 0) {
+        console.error("Error: No user found for email:", email); // Log user not found
+        return res.status(404).json({ message: "User not found." });
+      }
+
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetTokenExpiry = new Date(Date.now() + RESET_PASSWORD_EXPIRY)
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ");
+      console.log("Generated reset token:", resetToken);
+      console.log("Generated reset token expiry:", resetTokenExpiry);
+
+      db.query(
+        "UPDATE Authentication SET reset_token = ?, reset_token_expiry = ? WHERE email = ?",
+        [resetToken, resetTokenExpiry, email],
+        (updateErr) => {
+          if (updateErr) {
+            console.error("Error updating reset token:", updateErr.message); // Log update error
+            return res.status(500).json({ error: updateErr.message });
+          }
+
+          const resetUrl = `${process.env.FRONTEND_URL}?token=${resetToken}`; /*${process.env.FRONTEND_URL}*/ //TODO fix later
+          console.log("Generated reset URL:", resetUrl);
+
+          transporter.sendMail(
+            {
+              to: email,
+              subject: "Password Reset Request",
+              html: `<p>Click the link below to reset your password:</p>
+                     <p><a href="${resetUrl}">${resetUrl}</a></p>
+                     <p>If you did not request this, please ignore this email.</p>`,
+            },
+            (mailErr) => {
+              if (mailErr) {
+                console.error("Error sending email:", mailErr.message); // Log email error
+                return res.status(500).json({ error: "Failed to send email." });
+              }
+              res.status(200).json({ message: "Password reset email sent." });
+            }
+          );
+        }
+      );
+    }
+  );
+});
+
+  
+  // POST: Validate reset token and reset password
+  router.post("/password-reset/validate", (req, res) => {
+    const { token, password } = req.body;
+  
+    if (!token || !password) {
+      return res
+        .status(400)
+        .json({ error: "Reset token and new password are required." });
+    }
+  
+    // Find user with the reset token
+    db.query(
+      "SELECT * FROM Authentication WHERE reset_token = ? AND reset_token_expiry > ?",
+      [token, Date.now()],
+      (err, results) => {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+  
+        if (results.length === 0) {
+          return res
+            .status(400)
+            .json({ message: "Invalid or expired reset token." });
+        }
+  
+        // Reset password and clear token
+        const email = results[0].email;
+        db.query(
+          "UPDATE Authentication SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE email = ?",
+          [password, email],
+          (updateErr) => {
+            if (updateErr) {
+              return res.status(500).json({ error: updateErr.message });
+            }
+            res.status(200).json({ message: "Password reset successfully." });
+          }
+        );
+      }
+    );
+  });
+  
 module.exports = router;

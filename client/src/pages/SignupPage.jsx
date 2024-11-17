@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { NavLink } from "react-router-dom";
@@ -9,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const SignupPage = () => {
   const navigate = useNavigate();
   const [confirmationMessage, setConfirmationMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Error message for password mismatch
+  const [errorMessage, setErrorMessage] = useState(""); // Error message for password mismatch and length
 
   const [customer, setCustomer] = useState({
     first_name: "",
@@ -55,6 +54,12 @@ const SignupPage = () => {
       return;
     }
 
+    // Password length validation
+    if (credentials.password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      return;
+    }
+
     if (credentials.password !== checkpassword.confirmPassword) {
       setErrorMessage("Passwords do not match");
       return;
@@ -64,15 +69,10 @@ const SignupPage = () => {
 
     try {
       // Post customer data
-      await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/customer`,
-        customer
-      );
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/customer`, customer);
 
       // Retrieve the last customer to get the new customer ID
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/customer/last`
-      );
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/customer/last`);
       const lastCustomer = response.data;
 
       // Post to Authentication using the updated customer ID directly
@@ -80,6 +80,7 @@ const SignupPage = () => {
         ...credentials,
         customer_id: lastCustomer.customer_id,
       });
+
       setConfirmationMessage("Registration successful!");
       setTimeout(() => {
         navigate("/login");
@@ -101,7 +102,6 @@ const SignupPage = () => {
             We're glad to have you! Please enter your details.
           </p>
           <form className="w-full max-w-lg mt-8 space-y-4">
-            
             {/* Name Row */}
             <div className="flex space-x-4">
               {/* First Name */}
@@ -117,7 +117,7 @@ const SignupPage = () => {
                   required
                 />
               </div>
-  
+
               {/* Middle Initial */}
               <div className="w-20">
                 <label className="block text-gray-700 text-sm mb-2" htmlFor="middle_initial">
@@ -131,7 +131,7 @@ const SignupPage = () => {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
-  
+
               {/* Last Name */}
               <div className="flex-1">
                 <label className="block text-gray-700 text-sm mb-2" htmlFor="last_name">
@@ -146,7 +146,7 @@ const SignupPage = () => {
                 />
               </div>
             </div>
-  
+
             {/* Email Field */}
             <label className="block text-gray-700 text-sm mb-2" htmlFor="email">
               Email
@@ -158,7 +158,7 @@ const SignupPage = () => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
-  
+
             {/* Password Field */}
             <label className="block text-gray-700 text-sm mb-2" htmlFor="password">
               Password
@@ -182,7 +182,7 @@ const SignupPage = () => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
-  
+
             {/* Register Button */}
             <button
               className="w-full bg-gray-900 text-white p-3 rounded-md hover:bg-black transition duration-200 mt-6"
@@ -191,7 +191,7 @@ const SignupPage = () => {
               Register
             </button>
           </form>
-  
+
           {errorMessage && (
             <div className="mt-4 text-red-600 text-lg text-center">
               {errorMessage}
@@ -204,7 +204,7 @@ const SignupPage = () => {
               {confirmationMessage}
             </div>
           )}
-  
+
           {/* Login Message and Button */}
           <div className="mt-8 text-center">
             <p className="text-gray-600 text-lg">Already have an account? Login here!</p>
@@ -215,7 +215,7 @@ const SignupPage = () => {
             </NavLink>
           </div>
         </div>
-  
+
         {/* Right Half - Background Image */}
         <div
           className="w-1/2 bg-cover bg-center"
