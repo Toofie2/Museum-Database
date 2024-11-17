@@ -7,7 +7,7 @@ import { useAuth } from "../components/authentication"
 import axios from "axios"
 import NavBarBlack from "../components/NavbarBlack.jsx"
 
-const ExhibitionsPurchasePage = () => {
+const ExhibitionsPurchasePage = (props) => {
   const { userId } = useAuth();
   const navigate = useNavigate();
   const {formData, setFormData} = useContext(TicketFormDataContext);
@@ -16,6 +16,9 @@ const ExhibitionsPurchasePage = () => {
   const [exhibitions, setExhibitions] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [maxTickets, setMaxTickets] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [subtotal, setSubtotal] = useState(0);
+  let selectedDate = props.selDate;
 
   const fetchExhibitions = async () => {
     try {
@@ -119,7 +122,7 @@ const ExhibitionsPurchasePage = () => {
     try {
       let permCollectTicketsArr = [];
       let exhibitionTicketsArr = [];
-      const convertedDate = new Date();//selectedDate.toISOString().split("T")[0];
+      const convertedDate = selectedDate.toISOString().split("T")[0];
       tickets.map((ticket) => {
         for (let j = 0; j < formData[ticket.type]; j++) {
           permCollectTicketsArr.push({
@@ -153,6 +156,22 @@ const ExhibitionsPurchasePage = () => {
       console.log(err);
     }
   };
+
+  const handleClosePopup = () => {
+    setShowPopup(false); // Close the popup
+  };
+
+// Calculate subtotal
+const handleSubtotal = (formData, exhibitionFormData) => {
+  let ans = 0;
+  tickets.map((ticket) => {
+    ans += formData[ticket.type] * ticket.price;
+  })
+  exhibitions.map((exhibition) => {
+    ans += exhibitionFormData[exhibition.name] * 1;
+  })
+  setSubtotal(ans.toFixed(2));
+};
   
 
   useEffect(() => {
@@ -168,6 +187,7 @@ const ExhibitionsPurchasePage = () => {
 
 
   useEffect(() => {
+    console.log(selectedDate);
     exhibitions.map((exhibition) => {
       setExhibitionFormData((prevState) => ({
         ...prevState,
@@ -178,9 +198,11 @@ const ExhibitionsPurchasePage = () => {
 
   useEffect(() => {
     setMaxTickets(sumFormData(formData));
-    console.log(maxTickets);
   }, [tickets]);
-
+  
+  useEffect(() => {
+    handleSubtotal(formData, exhibitionFormData);
+  }, [exhibitionFormData]);
   
 
 
@@ -190,15 +212,17 @@ const ExhibitionsPurchasePage = () => {
       <NavBarBlack/>
       <div className="container mx-auto pb-12 p-1">
         <div className="mt-28 flex justify-between px-16 space-x-24">
-          <div className="text-lg font-medium leading-loose w-1/4">
+          <div className="relative text-lg font-medium leading-loose w-1/4">
             Your Tickets:<hr/>
             {tickets.map((ticket) => {
               return(
                 formData[ticket.type] > 0 &&
                 <div 
                   key={ticket.ticket_id}
+                  className="flex flex-row justify-between"
                 >
-                  {capitalize(ticket.type)} Admission ({formData[ticket.type]}x)
+                  <p>{capitalize(ticket.type)} Admission ({formData[ticket.type]}x)</p>
+                  <p>${(ticket.price).toFixed(2)}</p>
                 </div>
               )
             })}
@@ -207,11 +231,16 @@ const ExhibitionsPurchasePage = () => {
                 exhibitionFormData[exhibition.name] > 0 &&
                 <div 
                   key={exhibition.exhibition_id}
+                  className="flex flex-row justify-between"
                 >
-                  {capitalize(exhibition.name)} Admission ({exhibitionFormData[exhibition.name]}x)
+                  <p>{capitalize(exhibition.name)} Admission ({exhibitionFormData[exhibition.name]}x)</p>
+                  <p>$1.00</p>
                 </div>
               )
             })}
+            <div className="mt-10 text-default-gray text-lg flex justify-between absolute bottom-10">
+              <span className="font-medium">Subtotal:</span> &nbsp; ${subtotal}
+            </div>
           </div>
           <div className="w-1/2">
             <h1 className="text-2xl font-medium"> Select the special exhibitions you want to attend </h1>
@@ -273,7 +302,7 @@ const ExhibitionsPurchasePage = () => {
               <button
                 type="button"
                 className="w-full mt-4 bg-black text-white py-2 px-52 border-black rounded"
-                onClick={handleSubmit}
+                onClick={() => {setShowPopup(true)}}
               >
                 Purchase
               </button>
@@ -281,6 +310,54 @@ const ExhibitionsPurchasePage = () => {
           </div>
         </div>
       </div>
+      {showPopup && (
+          <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow-lg">
+              <h3 className="text-2xl">You are about to purchase:</h3>
+              <div className="text-xl leading-loose mt-5">
+                {tickets.map((ticket) => {
+                  return(
+                    formData[ticket.type] > 0 &&
+                    <div 
+                      key={ticket.ticket_id}
+                      className="flex flex-row justify-between"
+                    >
+                      <p>{capitalize(ticket.type)} Admission ({formData[ticket.type]}x)</p>
+                      <p>${(ticket.price).toFixed(2)}</p>
+                    </div>
+                  )
+                })}
+                {exhibitions.map((exhibition) => {
+                  return(
+                    exhibitionFormData[exhibition.name] > 0 &&
+                    <div 
+                      key={exhibition.exhibition_id}
+                      className="flex flex-row justify-between"
+                    >
+                      <p>{capitalize(exhibition.name)} Admission ({exhibitionFormData[exhibition.name]}x)</p>
+                      <p>$1.00</p>
+                    </div>
+                  )
+                })}
+                <span className="font-bold mt-30">Total: ${subtotal}</span>
+              </div>
+              <div className="flex flex-row justify-between">
+                <button
+                  onClick={handleClosePopup} // Close popup and trigger redirect
+                  className="mt-4 bg-red-600 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit} // Close popup and trigger redirect
+                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+      )}  
     </div>
     )
 }
