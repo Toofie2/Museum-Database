@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";  // Add this import
+import Footer from "../components/Footer";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -60,7 +60,7 @@ const ExhibitionsPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto py-10 pb-16 flex-grow">  {/* Added flex-grow */}
+      <div className="container mx-auto py-10 pb-16 flex-grow">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {Exhibitions.map((Exhibition) => {
             const { formattedDate, isEndingSoon } = formatEndDate(

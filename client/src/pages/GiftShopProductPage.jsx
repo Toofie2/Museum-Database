@@ -1,5 +1,5 @@
 import NavbarBlack from "../components/NavbarBlack.jsx";
-import Footer from "../components/Footer.jsx";  // Add this import
+import Footer from "../components/Footer.jsx";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -117,9 +117,9 @@ const GiftShopProductPage = () => {
   if (!productInfo) return <div className="text-center mt-20">Loading...</div>;
   
   return (
-    <div className="min-h-screen flex flex-col">  {/* Added flex container */}
+    <div className="min-h-screen flex flex-col">
       <NavbarBlack/>
-      <div className="container mx-auto pb-12 p-1 flex flex-row flex-grow">  {/* Added flex-grow */}
+      <div className="container mx-auto pb-12 p-1 flex flex-row flex-grow">
         <div className="w-[45rem] h-[40rem] ml-20 mt-36">
           <img
             src={productInfo.image_path}

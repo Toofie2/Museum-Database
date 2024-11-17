@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";  // Add this import
+import Footer from "../components/Footer";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -23,9 +23,9 @@ const GiftShopPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">  {/* Added flex container */}
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="mx-auto p-0 flex-grow">  {/* Added flex-grow */}
+      <div className="mx-auto p-0 flex-grow">
         {/* Banner Section */}
         <div className="relative flex items-center h-[800px] w-screen">
           <img

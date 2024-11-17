@@ -3,13 +3,11 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const Tours = () => {
-  const [isSubmitted, setIsSubmitted] = useState(false); // State to track form submission
-  const [error, setError] = useState(false); // State to track errors
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    // Simulate form submission (you can replace this with actual API call)
     setIsSubmitted(true);
     setError(false);
   };
@@ -29,23 +27,18 @@ const Tours = () => {
             <h2 className="text-3xl font-semibold text-blue-800">Upcoming Tour Dates</h2>
 
             <div className="tour-list mt-6">
-              {/* Tour 1 */}
               <div className="tour-item mb-8">
                 <h3 className="text-2xl font-semibold text-blue-700">November 30, 2024 - Cultural Heritage Tour</h3>
                 <p className="mt-2 text-lg text-gray-700">Join us for an immersive tour through the cultural heritage of our region, with special focus on indigenous art and artifacts.</p>
                 <p className="mt-2 text-lg font-semibold text-gray-800">Location: Main Hall, Houston Fine Arts Museum</p>
                 <p className="mt-2 text-sm text-gray-600">Time: 10:00 AM - 12:00 PM</p>
               </div>
-
-              {/* Tour 2 */}
               <div className="tour-item mb-8">
                 <h3 className="text-2xl font-semibold text-blue-700">December 12, 2024 - Modern Art Tour</h3>
                 <p className="mt-2 text-lg text-gray-700">Explore the latest trends in modern art with our expert guides. This tour will delve into contemporary movements and iconic works of the 21st century.</p>
                 <p className="mt-2 text-lg font-semibold text-gray-800">Location: Modern Art Gallery, Houston Fine Arts Museum</p>
                 <p className="mt-2 text-sm text-gray-600">Time: 1:00 PM - 3:00 PM</p>
               </div>
-
-              {/* Tour 3 */}
               <div className="tour-item mb-8">
                 <h3 className="text-2xl font-semibold text-blue-700">January 5, 2025 - Art in Nature Tour</h3>
                 <p className="mt-2 text-lg text-gray-700">This tour focuses on the relationship between art and the natural world. Featuring landscape paintings, sculptures, and nature-inspired installations.</p>
@@ -54,8 +47,6 @@ const Tours = () => {
               </div>
             </div>
           </div>
-
-          {/* Contact Section */}
           <div className="contact-section mb-12">
             <h2 className="text-3xl font-semibold text-blue-800">Contact Us or RSVP</h2>
             <p className="mt-4 text-lg text-gray-700">Have questions or want to reserve a spot? Contact us below!</p>
@@ -104,8 +95,6 @@ const Tours = () => {
                 </button>
               </div>
             </form>
-
-            {/* Display feedback messages */}
             {isSubmitted && !error && (
               <div className="mt-4 text-green-600 font-semibold">
                 Your message has been sent successfully. We'll get back to you shortly!

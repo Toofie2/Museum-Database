@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
-import Footer from "../components/Footer.jsx";  // Add this import
+import Footer from "../components/Footer.jsx";
 import { Link } from "react-router-dom";
 import backgroundImage from "../assets/HomePageBackground.jpg";
 import floor1Image from "../assets/Floor 1.png";
