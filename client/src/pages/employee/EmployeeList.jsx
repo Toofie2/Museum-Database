@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const EmployeeListPage = () => {
   const [employees, setEmployees] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [saveMessage, setSaveMessage] = useState(""); // State for success message
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); // Confirmation popup
@@ -21,6 +22,7 @@ const EmployeeListPage = () => {
         a.last_name.localeCompare(b.last_name)
       );
       setEmployees(sortedEmployees);
+      setFilteredEmployees(sortedEmployees);
     } catch (err) {
       console.log("Error fetching employees:", err);
     }
@@ -29,6 +31,69 @@ const EmployeeListPage = () => {
   useEffect(() => {
     fetchEmployees();
   }, []);
+
+  const [filters, setFilters] = useState({
+    salary: "", // Active salary filter
+    department: "", // Active department filter
+  });
+
+  // Handle filter by salary
+  const filterBySalary = (type) => {
+    let filtered;
+    if (type === "below") {
+      filtered = employees.filter((employee) => employee.salary < 60000);
+    } else if (type === "belowToAbove") {
+      filtered = employees.filter(
+        (employee) => employee.salary >= 60000 && employee.salary <= 100000
+      );
+    } else if (type === "above") {
+      filtered = employees.filter((employee) => employee.salary > 100000);
+    } else {
+      filtered = employees;
+    }
+    setFilteredEmployees(filtered);
+  };
+
+  // Handle filter by department
+  const filterByDepartment = (departmentId) => {
+    const filtered = employees.filter(
+      (employee) => employee.department_id === departmentId
+    );
+    setFilteredEmployees(filtered);
+  };
+
+  // Clear filters
+  const clearFilters = () => {
+    setFilteredEmployees(employees);
+  };
+
+  // Handle filter change (all filters in one dropdown)
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters, [filterType]: value };
+  
+      // Apply combined filters
+      let filtered = employees;
+  
+      // Apply salary filter
+      if (updatedFilters.salary === "below") {
+        filtered = filtered.filter((emp) => emp.salary < 60000);
+      } else if (updatedFilters.salary === "belowToAbove") {
+        filtered = filtered.filter((emp) => emp.salary >= 60000 && emp.salary <= 100000);
+      } else if (updatedFilters.salary === "above") {
+        filtered = filtered.filter((emp) => emp.salary > 100000);
+      }
+  
+      // Apply department filter
+      if (updatedFilters.department) {
+        filtered = filtered.filter((emp) => emp.department_id === Number(updatedFilters.department));
+      }
+  
+      setFilteredEmployees(filtered); // Update the displayed employees
+      return updatedFilters; // Update the active filters
+    });
+  };
+  
 
   // Handle edit button click
   const handleEditClick = (employee) => {
@@ -68,8 +133,7 @@ const EmployeeListPage = () => {
   // Handle delete button click (after confirmation)
   const handleDeleteClick = async () => {
     try {
-      // Fetch employee's authentication data (e.g., using email or ID)
-      console.log("edditing employee id:", editingEmployee.employee_id);
+      console.log("editing employee id:", editingEmployee.employee_id);
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/authentication/employee/${
           editingEmployee.employee_id
@@ -110,8 +174,8 @@ const EmployeeListPage = () => {
 
   return (
     <>
-      <div className="flex justify-between p-8">
-        <h1 className="text-2xl">Employees</h1>
+      <div className="flex justify-between p-4">
+        <h1 className="text-4xl md:text-3xl font-bold">Employees</h1>
         <button
           onClick={() => navigate("/employee/register")}
           className="flex bg-white text-gray-dark px-3 py-2 rounded-md transition duration-200 border-gray-medium border justify-between gap-1"
@@ -120,6 +184,45 @@ const EmployeeListPage = () => {
           Add Employee
         </button>
       </div>
+
+      <div className="flex space-x-4 p-4">
+        {/* Salary Filter */}
+        <select
+            value={filters.salary} // Reflect active salary filter
+            onChange={(e) => handleFilterChange("salary", e.target.value)}
+            className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
+        >
+            <option value="">Select Salary Range</option>
+            <option value="below">Salary &lt; $60,000</option>
+            <option value="belowToAbove">Salary $60,000 - $100,000</option>
+            <option value="above">Salary ≥ $100,000</option>
+        </select>
+
+        {/* Department Filter */}
+        <select
+            value={filters.department} // Reflect active department filter
+            onChange={(e) => handleFilterChange("department", e.target.value)}
+            className="bg-white border border-gray-300 text-black px-4 py-2 rounded-md"
+        >
+            <option value="">Select Department</option>
+            <option value={1}>Department 1</option>
+            <option value={2}>Department 2</option>
+            <option value={3}>Department 3</option>
+            <option value={4}>Department 4</option>
+        </select>
+
+        {/* Clear Filters */}
+        <button
+            onClick={() => {
+            setFilters({ salary: "", department: "" }); // Reset filters
+            setFilteredEmployees(employees); // Show all employees
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+        >
+            Show All
+        </button>
+        </div>
+
 
       {/* Success Message */}
       {saveMessage && (
@@ -188,59 +291,26 @@ const EmployeeListPage = () => {
             className="border border-gray-300 rounded px-4 py-2 mb-4 w-full"
           />
 
-          <div className="flex justify-between space-x-4 mt-6">
-            <button
-              onClick={handleSaveClick}
-              className="bg-gray-900 text-white px-6 py-3 rounded-md w-full hover:bg-black transition duration-200"
-            >
-              Save
-            </button>
+          <div className="flex justify-between space-x-4">
             <button
               onClick={handleCancelClick}
-              className="bg-gray-400 text-white px-6 py-3 rounded-md w-full hover:bg-gray-500 transition duration-200"
+              className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md"
             >
               Cancel
             </button>
-            {editingEmployee.role !== "Admin" && (
-              <button
-                onClick={confirmDelete}
-                className="bg-red-600 text-white px-6 py-3 rounded-md w-1/4 hover:bg-red-700 transition duration-200"
-              >
-                Delete
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Popup */}
-      {showDeleteConfirmation && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-            <h3 className="text-xl font-semibold mb-4">
-              Are you sure you want to delete this employee?
-            </h3>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={handleDeleteClick}
-                className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition duration-200"
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirmation(false)}
-                className="bg-gray-400 text-white px-6 py-2 rounded-md hover:bg-gray-500 transition duration-200"
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              onClick={handleSaveClick}
+              className="bg-blue-600 text-white px-6 py-2 rounded-md"
+            >
+              Save Changes
+            </button>
           </div>
         </div>
       )}
 
       {/* Employee List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {employees.map((employee) => (
+        {filteredEmployees.map((employee) => (
           <div
             key={employee.employee_id}
             className="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-xl transition duration-300 ease-in-out"
@@ -254,11 +324,9 @@ const EmployeeListPage = () => {
             <p className="text-base text-gray-600 mb-2">
               Salary: ${employee.salary}
             </p>
-            <p className="text-base text-gray-600 mb-2">SSN: {employee.ssn}</p>
-
             <button
               onClick={() => handleEditClick(employee)}
-              className="bg-gray-900 text-white px-6 py-3 rounded-md mt-4 hover:bg-black transition duration-200"
+              className="bg-gray-900 text-white px-6 py-2 rounded-md hover:bg-black transition duration-200 w-1/4"
             >
               Edit
             </button>
