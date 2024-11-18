@@ -5,15 +5,20 @@ import axios from 'axios';
 const ReportsPage = () => {
   const [activeTab, setActiveTab] = useState('popularity');
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    startDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
   });
   const [popularityData, setPopularityData] = useState([]);
   const [ticketData, setTicketData] = useState([]);
-  const [productData, setProductData] = useState([]);
   const [employeeData, setEmployeeData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('All');
+  const [revenueFilter, setRevenueFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
+  const [revenueRange, setRevenueRange] = useState({ min: 0, max: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const filterDataByDateRange = (data, dateRange) => {
     return data
       .filter(item => {
@@ -42,10 +47,9 @@ const ReportsPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [popularityRes, ticketRes, productRes, employeeRes] = await Promise.all([
+        const [popularityRes, ticketRes, employeeRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/popularity`, { params: dateRange }),
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/ticket-revenue`, { params: dateRange }),
-          axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/product-revenue`, { params: dateRange }),
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/employees`)
         ]);
 
@@ -82,7 +86,7 @@ const ReportsPage = () => {
           return acc;
         }, {});
 
-        productRes.data.forEach(item => {
+        ticketRes.data.forEach(item => {
           const date = item.date_purchased.split('T')[0];
           if (!processedRevenueData[date]) {
             processedRevenueData[date] = {
@@ -109,94 +113,261 @@ const ReportsPage = () => {
 
     fetchData();
   }, [dateRange]);
+  
   const renderPopularityTab = () => {
     const filteredData = filterDataByDateRange(popularityData, dateRange);
+    
+    // Create a map of total visitors by exhibition
+    const exhibitionTotals = filteredData.reduce((acc, day) => {
+      day.exhibitions.forEach(exhibition => {
+        if (!acc[exhibition.name]) {
+          acc[exhibition.name] = {
+            name: exhibition.name,
+            totalVisitors: 0,
+            daysWithVisitors: 0
+          };
+        }
+        acc[exhibition.name].totalVisitors += exhibition.visitors;
+        acc[exhibition.name].daysWithVisitors += 1;
+      });
+      return acc;
+    }, {});
+  
     const tableSortedData = [...filteredData].sort((a, b) => 
       new Date(b.date) - new Date(a.date)
     );
-    
+  
+    const getTotalVisitors = () => {
+      return filteredData.reduce((total, day) => total + day.total_visitors, 0);
+    };
+  
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Visitors</h3>
-          <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={filteredData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date" 
-                  tickFormatter={(date) => new Date(date).toLocaleDateString()}
-                />
-                <YAxis />
-                <Tooltip 
-                  labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="total_visitors" 
-                  stroke="#2563eb" 
-                  name="Total Visitors"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="w-full sm:w-64">
+                <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 mb-1">
+                  View By
+                </label>
+                <select
+                  id="sortBy"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="date">Daily Breakdown</option>
+                  <option value="exhibition">Exhibition Summary</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date Range
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    value={dateRange.startDate}
+                    max={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => handleDateChange(e, 'startDate')}
+                    className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <span className="text-gray-600">to</span>
+                  <input
+                    type="date"
+                    value={dateRange.endDate}
+                    max={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => handleDateChange(e, 'endDate')}
+                    className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col justify-end">
+              <p className="text-sm text-gray-500">Total Visitors</p>
+              <p className="text-2xl font-bold text-gray-900">{getTotalVisitors().toLocaleString()}</p>
+            </div>
           </div>
         </div>
-  
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Exhibition Visits by Date</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibitions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {tableSortedData.map((day, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(day.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {day.total_visitors}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        {day.exhibitions.map((exhibition, idx) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <span className="text-gray-900">{exhibition.name}</span>
-                            <span className="text-gray-500">{exhibition.visitors} visitors</span>
-                          </div>
-                        ))}
-                      </div>
-                    </td>
+
+        {sortBy === 'date' ? (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Exhibition Visits by Date</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibitions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {tableSortedData.map((day, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(day.date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {day.total_visitors.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="space-y-1">
+                          {day.exhibitions.map((exhibition, idx) => (
+                            <div key={idx} className="flex justify-between text-sm">
+                              <span className="text-gray-900">{exhibition.name}</span>
+                              <span className="text-gray-500">{exhibition.visitors.toLocaleString()} visitors</span>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Exhibition Summary</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibition Name</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Days with Visitors</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Average Daily Visitors</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {Object.values(exhibitionTotals)
+                    .sort((a, b) => b.totalVisitors - a.totalVisitors)
+                    .map((exhibition, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {exhibition.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {exhibition.totalVisitors.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {exhibition.daysWithVisitors}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {Math.round(exhibition.totalVisitors / exhibition.daysWithVisitors).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
-  
+
   const renderRevenueTab = () => {
     const filteredData = filterDataByDateRange(ticketData, dateRange);
     const tableSortedData = [...filteredData].sort((a, b) => 
       new Date(b.date) - new Date(a.date)
     );
   
+    // Get max revenue for range input
+    const maxRevenue = Math.max(...filteredData.map(day => 
+      day.ticket_revenue + day.product_revenue
+    ));
+  
+    // Filter data based on selected revenue type and range
+    const getFilteredBarData = () => {
+      let data = filteredData.filter(day => {
+        const totalRevenue = day.ticket_revenue + day.product_revenue;
+        return totalRevenue >= revenueRange.min && totalRevenue <= revenueRange.max;
+      });
+  
+      if (revenueFilter === 'tickets') {
+        return data.map(day => ({
+          ...day,
+          product_revenue: 0
+        }));
+      }
+      if (revenueFilter === 'products') {
+        return data.map(day => ({
+          ...day,
+          ticket_revenue: 0
+        }));
+      }
+      return data;
+    };
+  
     return (
       <div className="space-y-6">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <label className="whitespace-nowrap text-sm text-gray-600">Revenue Type</label>
+              <select
+                value={revenueFilter}
+                onChange={(e) => setRevenueFilter(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All Revenue</option>
+                <option value="tickets">Ticket Revenue Only</option>
+                <option value="products">Product Revenue Only</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="whitespace-nowrap text-sm text-gray-600">Min $</label>
+              <input
+                type="number"
+                value={revenueRange.min}
+                onChange={(e) => setRevenueRange(prev => ({ ...prev, min: Math.max(0, Number(e.target.value)) }))}
+                min="0"
+                max={revenueRange.max || maxRevenue}
+                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <label className="whitespace-nowrap text-sm text-gray-600">Max $</label>
+              <input
+                type="number"
+                value={revenueRange.max}
+                onChange={(e) => setRevenueRange(prev => ({ ...prev, max: Math.max(prev.min, Number(e.target.value)) }))}
+                min={revenueRange.min || 0}
+                max={maxRevenue}
+                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                onClick={() => setRevenueRange({ min: 0, max: maxRevenue })}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md transition-colors"
+              >
+                Reset Range
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <input
+              type="date"
+              value={dateRange.startDate}
+              max={new Date().toISOString().split('T')[0]}
+              onChange={(e) => handleDateChange(e, 'startDate')}
+              className="border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <span className="text-gray-600">to</span>
+            <input
+              type="date"
+              value={dateRange.endDate}
+              max={new Date().toISOString().split('T')[0]}
+              onChange={(e) => handleDateChange(e, 'endDate')}
+              className="border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+  
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Total Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${filteredData.reduce((sum, day) => 
+              ${getFilteredBarData().reduce((sum, day) => 
                 sum + day.ticket_revenue + day.product_revenue, 0
               ).toLocaleString()}
             </p>
@@ -204,7 +375,7 @@ const ReportsPage = () => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Ticket Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${filteredData.reduce((sum, day) => 
+              ${getFilteredBarData().reduce((sum, day) => 
                 sum + day.ticket_revenue, 0
               ).toLocaleString()}
             </p>
@@ -212,7 +383,7 @@ const ReportsPage = () => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Product Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${filteredData.reduce((sum, day) => 
+              ${getFilteredBarData().reduce((sum, day) => 
                 sum + day.product_revenue, 0
               ).toLocaleString()}
             </p>
@@ -223,7 +394,7 @@ const ReportsPage = () => {
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue</h3>
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredData} margin={{ left: 20, right: 50, top: 20, bottom: 20 }}>
+              <BarChart data={getFilteredBarData()} margin={{ left: 20, right: 50, top: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis 
                   dataKey="date"
@@ -238,8 +409,12 @@ const ReportsPage = () => {
                   formatter={(value) => [`$${value.toLocaleString()}`, '']}
                 />
                 <Legend />
-                <Bar dataKey="ticket_revenue" name="Ticket Revenue" fill="#2563eb" />
-                <Bar dataKey="product_revenue" name="Product Revenue" fill="#10b981" />
+                {(revenueFilter === 'all' || revenueFilter === 'tickets') && 
+                  <Bar dataKey="ticket_revenue" name="Ticket Revenue" fill="#2563eb" />
+                }
+                {(revenueFilter === 'all' || revenueFilter === 'products') && 
+                  <Bar dataKey="product_revenue" name="Product Revenue" fill="#10b981" />
+                }
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -260,25 +435,33 @@ const ReportsPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {tableSortedData.map((day, index) => (
+                {tableSortedData
+                  .filter(day => {
+                    const totalRevenue = day.ticket_revenue + day.product_revenue;
+                    return totalRevenue >= revenueRange.min && totalRevenue <= revenueRange.max;
+                  })
+                  .map((day, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(day.date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {day.ticket_sales}
+                      {revenueFilter === 'products' ? '-' : day.ticket_sales}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      ${day.ticket_revenue.toLocaleString()}
+                      {revenueFilter === 'products' ? '-' : `$${day.ticket_revenue.toLocaleString()}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {day.product_sales}
+                      {revenueFilter === 'tickets' ? '-' : day.product_sales}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      ${day.product_revenue.toLocaleString()}
+                      {revenueFilter === 'tickets' ? '-' : `$${day.product_revenue.toLocaleString()}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                      ${(day.ticket_revenue + day.product_revenue).toLocaleString()}
+                      ${(
+                        (revenueFilter !== 'products' ? day.ticket_revenue : 0) + 
+                        (revenueFilter !== 'tickets' ? day.product_revenue : 0)
+                      ).toLocaleString()}
                     </td>
                   </tr>
                 ))}
@@ -289,7 +472,6 @@ const ReportsPage = () => {
       </div>
     );
   };
-
   const renderEmployeeTab = () => {
     const departmentGroups = employeeData.reduce((acc, employee) => {
       if (!acc[employee.department]) {
@@ -298,12 +480,78 @@ const ReportsPage = () => {
       acc[employee.department].push(employee);
       return acc;
     }, {});
-
+  
+    const departments = ['All', ...Object.keys(departmentGroups)];
+  
+    const filteredDepartmentGroups = Object.entries(departmentGroups).reduce((acc, [department, employees]) => {
+      const filteredEmployees = employees.filter(employee =>
+        employee.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      
+      if (filteredEmployees.length > 0 && 
+         (selectedDepartment === 'All' || selectedDepartment === department)) {
+        acc[department] = filteredEmployees;
+      }
+      return acc;
+    }, {});
+  
+    const getTotalEmployees = () => {
+      return Object.values(filteredDepartmentGroups).reduce((total, employees) => 
+        total + employees.length, 0
+      );
+    };
+  
     return (
       <div className="space-y-8">
-        {Object.entries(departmentGroups).map(([department, employees]) => (
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <div className="flex-1">
+                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                  Search by Name
+                </label>
+                <input
+                  type="text"
+                  id="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search employees..."
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="flex-1">
+                <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+                  Filter by Department
+                </label>
+                <select
+                  id="department"
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {departments.map(dept => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex flex-col justify-end">
+              <p className="text-sm text-gray-500">Total Employees</p>
+              <p className="text-2xl font-bold text-gray-900">{getTotalEmployees()}</p>
+            </div>
+          </div>
+        </div>
+  
+        {Object.entries(filteredDepartmentGroups).map(([department, employees]) => (
           <div key={department} className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-semibold mb-4 text-gray-800">{department} Department</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-gray-800">{department} Department</h3>
+              <span className="text-sm text-gray-500">
+                {employees.length} {employees.length === 1 ? 'Employee' : 'Employees'}
+              </span>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -343,6 +591,24 @@ const ReportsPage = () => {
             </div>
           </div>
         ))}
+  
+        {Object.keys(filteredDepartmentGroups).length === 0 && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="text-center text-gray-500">
+              <p className="text-xl font-medium">No Results Found</p>
+              <p className="mt-2">No employees match your search criteria. Try adjusting your filters.</p>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedDepartment('All');
+                }}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -352,23 +618,6 @@ const ReportsPage = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">Reports Dashboard</h1>
-          <div className="flex items-center space-x-4">
-            <input
-              type="date"
-              value={dateRange.startDate}
-              max={new Date().toISOString().split('T')[0]}
-              onChange={(e) => handleDateChange(e, 'startDate')}
-              className="border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <span className="text-gray-600">to</span>
-            <input
-              type="date"
-              value={dateRange.endDate}
-              max={new Date().toISOString().split('T')[0]}
-              onChange={(e) => handleDateChange(e, 'endDate')}
-              className="border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
         </div>
 
         <div className="flex space-x-1 mb-6 bg-white rounded-lg shadow p-1">
