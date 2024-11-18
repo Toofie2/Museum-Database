@@ -35,26 +35,31 @@ import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
-import PurchaseHistoryPage from "./pages/PurchaseHistoryPage.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import SupportPage from "./pages/SupportPage.jsx";
+import ToursPage from "./pages/ToursPage.jsx";
+import AccessibilityPage from "./pages/AccessibilityPage.jsx";
+import ParkingPage from "./pages/ParkingPage.jsx";
+import Tasks from "./pages/employee/Tasks.jsx";
 
-const Layout = (props) =>{
+const Layout = (props) => {
   const formData = props.FD;
   const setFormData = props.setFD;
   return (
     <div>
       <TicketFormDataContext.Provider value={{ formData, setFormData }}>
-        <Outlet/>
+        <Outlet />
       </TicketFormDataContext.Provider>
     </div>
   );
-}
+};
 
 const App = () => {
   const [formData, setFormData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const getSelectedDate = (data) => {
     setSelectedDate(data);
-  }
+  };
 
   return (
     <AuthProvider>
@@ -64,7 +69,10 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/resetpassword" element={<ResetpasswordPage />} />
-        <Route path ="/passwordresetrequest" element={<PasswordresetrequestPage />} />
+        <Route
+          path="/passwordresetrequest"
+          element={<PasswordresetrequestPage />}
+        />
         <Route path="/collections" element={<CollectionsPage />} />
         <Route path="/collection/:id" element={<CollectionsViewPage />} />
         <Route path="/exhibitions" element={<ExhibitionsPage />} />
@@ -72,6 +80,11 @@ const App = () => {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/shop" element={<GiftShopPage />} />
         <Route path="/shop/:prodCatID" element={<GiftShopCategoryPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/tours" element={<ToursPage />} />
+        <Route path="/accessibility" element={<AccessibilityPage />} />
+        <Route path="/parking" element={<ParkingPage />} />
 
         {/* Employee Routes */}
         <Route
@@ -86,6 +99,7 @@ const App = () => {
         >
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="tasks" element={<Tasks />} />
           <Route path="settings" element={<Settings />}>
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
@@ -144,12 +158,12 @@ const App = () => {
           />
         </Route>
         {/* Protected Routes */}
-        <Route element={<Layout FD={formData} setFD={setFormData}/>}>
+        <Route element={<Layout FD={formData} setFD={setFormData} />}>
           <Route
             path="/tickets"
             element={
               <ProtectedRoute>
-                <TicketPage onNext={getSelectedDate}/>
+                <TicketPage onNext={getSelectedDate} />
               </ProtectedRoute>
             }
           />
@@ -157,7 +171,7 @@ const App = () => {
             path="/tickets/exhibitions"
             element={
               <ProtectedRoute>
-                <ExhibitionsPurchasePage selDate={selectedDate}/>
+                <ExhibitionsPurchasePage selDate={selectedDate} />
               </ProtectedRoute>
             }
           />

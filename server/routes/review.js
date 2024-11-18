@@ -69,6 +69,26 @@ router.get('/customer/:id', (req, res) => {
     });
 });
 
+// Route to fetch reviews by exhibit_id
+router.get('/exhibit/:id', (req, res) => {
+    const exhibitId = req.params.id;
+
+    const query = 'SELECT * FROM Review WHERE exhibit_id = ?';
+    
+    db.query(query, [exhibitId], (err, results) => {
+        if (err) {
+            console.error('Error fetching reviews:', err);
+            return res.status(500).json({ error: 'Failed to fetch reviews' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No reviews found for this exhibition' });
+        }
+
+        res.json(results);
+    });
+});
+
 // POST a new review
 router.post("/", (req, res) => {
   const { customer_id, title, feedback, rating, date_posted, exhibit_id } =
