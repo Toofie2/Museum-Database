@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 
 const ReportsPage = () => {
@@ -47,9 +47,10 @@ const ReportsPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [popularityRes, ticketRes, employeeRes] = await Promise.all([
+        const [popularityRes, ticketRevenueRes, productRevenueRes, employeeRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/popularity`, { params: dateRange }),
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/ticket-revenue`, { params: dateRange }),
+          axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/product-revenue`, { params: dateRange }),
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/employees`)
         ]);
 
@@ -70,7 +71,7 @@ const ReportsPage = () => {
           return acc;
         }, {});
 
-        const processedRevenueData = ticketRes.data.reduce((acc, item) => {
+        const processedTicketData = ticketRevenueRes.data.reduce((acc, item) => {
           const date = item.date_purchased.split('T')[0];
           if (!acc[date]) {
             acc[date] = {
@@ -86,10 +87,10 @@ const ReportsPage = () => {
           return acc;
         }, {});
 
-        ticketRes.data.forEach(item => {
+        const processedProductData = productRevenueRes.data.reduce((acc, item) => {
           const date = item.date_purchased.split('T')[0];
-          if (!processedRevenueData[date]) {
-            processedRevenueData[date] = {
+          if (!acc[date]) {
+            acc[date] = {
               date,
               ticket_sales: 0,
               product_sales: 0,
@@ -97,12 +98,18 @@ const ReportsPage = () => {
               product_revenue: 0
             };
           }
-          processedRevenueData[date].product_sales += item.quantity;
-          processedRevenueData[date].product_revenue += item.total_revenue;
-        });
+          acc[date].product_sales += item.quantity;
+          acc[date].product_revenue += item.total_revenue;
+          return acc;
+        }, {});
+
+        const combinedTicketData = Object.values(processedTicketData).map(item => ({
+          ...item,
+          ...processedProductData[item.date] || { product_sales: 0, product_revenue: 0 }
+        }));
 
         setPopularityData(Object.values(processedPopularityData));
-        setTicketData(Object.values(processedRevenueData));
+        setTicketData(combinedTicketData);
         setEmployeeData(employeeRes.data);
         setLoading(false);
       } catch (err) {
@@ -113,11 +120,10 @@ const ReportsPage = () => {
 
     fetchData();
   }, [dateRange]);
-  
+
   const renderPopularityTab = () => {
     const filteredData = filterDataByDateRange(popularityData, dateRange);
     
-    // Create a map of total visitors by exhibition
     const exhibitionTotals = filteredData.reduce((acc, day) => {
       day.exhibitions.forEach(exhibition => {
         if (!acc[exhibition.name]) {
@@ -269,36 +275,35 @@ const ReportsPage = () => {
   };
 
   const renderRevenueTab = () => {
-    const filteredData = filterDataByDateRange(ticketData, dateRange);
-    const tableSortedData = [...filteredData].sort((a, b) => 
+    const filteredData = ticketData.filter((day) => {
+      const totalRevenue = day.ticket_revenue + day.product_revenue;
+      return totalRevenue >= revenueRange.min && totalRevenue <= revenueRange.max;
+    });
+  
+    const tableSortedData = [...filteredData].sort((a, b) =>
       new Date(b.date) - new Date(a.date)
     );
   
-    // Get max revenue for range input
-    const maxRevenue = Math.max(...filteredData.map(day => 
-      day.ticket_revenue + day.product_revenue
-    ));
+    const maxRevenue = Math.max(
+      ...filteredData.map((day) => day.ticket_revenue + day.product_revenue)
+    );
   
-    // Filter data based on selected revenue type and range
     const getFilteredBarData = () => {
-      let data = filteredData.filter(day => {
-        const totalRevenue = day.ticket_revenue + day.product_revenue;
-        return totalRevenue >= revenueRange.min && totalRevenue <= revenueRange.max;
-      });
-  
       if (revenueFilter === 'tickets') {
-        return data.map(day => ({
+        return filteredData.map((day) => ({
           ...day,
-          product_revenue: 0
+          product_revenue: 0,
+          product_sales: 0,
         }));
       }
       if (revenueFilter === 'products') {
-        return data.map(day => ({
+        return filteredData.map((day) => ({
           ...day,
-          ticket_revenue: 0
+          ticket_revenue: 0,
+          ticket_sales: 0,
         }));
       }
-      return data;
+      return filteredData;
     };
   
     return (
@@ -306,7 +311,9 @@ const ReportsPage = () => {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <label className="whitespace-nowrap text-sm text-gray-600">Revenue Type</label>
+              <label className="whitespace-nowrap text-sm text-gray-600">
+                Revenue Type
+              </label>
               <select
                 value={revenueFilter}
                 onChange={(e) => setRevenueFilter(e.target.value)}
@@ -322,7 +329,12 @@ const ReportsPage = () => {
               <input
                 type="number"
                 value={revenueRange.min}
-                onChange={(e) => setRevenueRange(prev => ({ ...prev, min: Math.max(0, Number(e.target.value)) }))}
+                onChange={(e) =>
+                  setRevenueRange((prev) => ({
+                    ...prev,
+                    min: Math.max(0, Number(e.target.value)),
+                  }))
+                }
                 min="0"
                 max={revenueRange.max || maxRevenue}
                 className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -331,7 +343,12 @@ const ReportsPage = () => {
               <input
                 type="number"
                 value={revenueRange.max}
-                onChange={(e) => setRevenueRange(prev => ({ ...prev, max: Math.max(prev.min, Number(e.target.value)) }))}
+                onChange={(e) =>
+                  setRevenueRange((prev) => ({
+                    ...prev,
+                    max: Math.max(prev.min, Number(e.target.value)),
+                  }))
+                }
                 min={revenueRange.min || 0}
                 max={maxRevenue}
                 className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -367,25 +384,25 @@ const ReportsPage = () => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Total Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${getFilteredBarData().reduce((sum, day) => 
-                sum + day.ticket_revenue + day.product_revenue, 0
+              $
+              {filteredData.reduce(
+                (sum, day) => sum + day.ticket_revenue + day.product_revenue,
+                0
               ).toLocaleString()}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Ticket Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${getFilteredBarData().reduce((sum, day) => 
-                sum + day.ticket_revenue, 0
-              ).toLocaleString()}
+              $
+              {filteredData.reduce((sum, day) => sum + day.ticket_revenue, 0).toLocaleString()}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Product Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${getFilteredBarData().reduce((sum, day) => 
-                sum + day.product_revenue, 0
-              ).toLocaleString()}
+              $
+              {filteredData.reduce((sum, day) => sum + day.product_revenue, 0).toLocaleString()}
             </p>
           </div>
         </div>
@@ -396,70 +413,88 @@ const ReportsPage = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={getFilteredBarData()} margin={{ left: 20, right: 50, top: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
+                <XAxis
                   dataKey="date"
                   tickFormatter={(date) => new Date(date).toLocaleDateString()}
                 />
-                <YAxis 
+                <YAxis
                   tickFormatter={(value) => `$${value.toLocaleString()}`}
                   width={80}
                 />
-                <Tooltip 
+                <Tooltip
                   labelFormatter={(date) => new Date(date).toLocaleDateString()}
                   formatter={(value) => [`$${value.toLocaleString()}`, '']}
                 />
                 <Legend />
-                {(revenueFilter === 'all' || revenueFilter === 'tickets') && 
-                  <Bar dataKey="ticket_revenue" name="Ticket Revenue" fill="#2563eb" />
-                }
-                {(revenueFilter === 'all' || revenueFilter === 'products') && 
-                  <Bar dataKey="product_revenue" name="Product Revenue" fill="#10b981" />
-                }
+                {(revenueFilter === 'all' || revenueFilter === 'tickets') && (
+                  <Bar
+                    dataKey="ticket_revenue"
+                    name="Ticket Revenue"
+                    fill="#2563eb"
+                  />
+                )}
+                {(revenueFilter === 'all' || revenueFilter === 'products') && (
+                  <Bar
+                    dataKey="product_revenue"
+                    name="Product Revenue"
+                    fill="#10b981"
+                  />
+                )}
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
   
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue Details</h3>
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">
+            Daily Revenue Details
+          </h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets Sold</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket Revenue</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Products Sold</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Product Revenue</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tickets Sold
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ticket Revenue
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Products Sold
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Product Revenue
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {tableSortedData
-                  .filter(day => {
-                    const totalRevenue = day.ticket_revenue + day.product_revenue;
-                    return totalRevenue >= revenueRange.min && totalRevenue <= revenueRange.max;
-                  })
-                  .map((day, index) => (
+                {tableSortedData.map((day, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(day.date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {revenueFilter === 'products' ? '-' : day.ticket_sales}
+                      {revenueFilter === 'products' ? '-' : day.ticket_sales || 0}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                       {revenueFilter === 'products' ? '-' : `$${day.ticket_revenue.toLocaleString()}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {revenueFilter === 'tickets' ? '-' : day.product_sales}
+                      {revenueFilter === 'tickets' ? '-' : day.product_sales || 0}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                       {revenueFilter === 'tickets' ? '-' : `$${day.product_revenue.toLocaleString()}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                      ${(
-                        (revenueFilter !== 'products' ? day.ticket_revenue : 0) + 
+                      $
+                      {(
+                        (revenueFilter !== 'products' ? day.ticket_revenue : 0) +
                         (revenueFilter !== 'tickets' ? day.product_revenue : 0)
                       ).toLocaleString()}
                     </td>
@@ -472,6 +507,7 @@ const ReportsPage = () => {
       </div>
     );
   };
+  
   const renderEmployeeTab = () => {
     const departmentGroups = employeeData.reduce((acc, employee) => {
       if (!acc[employee.department]) {
