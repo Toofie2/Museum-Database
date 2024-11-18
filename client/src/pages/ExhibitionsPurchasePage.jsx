@@ -269,7 +269,7 @@ const handleSubtotal = (formData, exhibitionFormData) => {
                 </div>
               )
             })}
-            <div className="mt-10 text-default-gray text-lg flex justify-between absolute bottom-10">
+            <div className="mt-10 text-default-gray text-lg flex justify-between absolute bottom-1">
               <span className="font-medium">Subtotal:</span> &nbsp; ${subtotal}
             </div>
           </div>
