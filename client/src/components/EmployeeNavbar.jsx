@@ -13,6 +13,11 @@ const EmployeeNavbar = () => {
       symbol: "dashboard",
     },
     {
+      name: "Tasks",
+      link: "/tasks",
+      symbol: "task",
+    },
+    {
       name: "Settings",
       link: "/settings",
       symbol: "settings",

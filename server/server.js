@@ -30,6 +30,9 @@ app.use(express.urlencoded({ extended: true }));
 const employeeRouter = require("./routes/employee");
 app.use("/employee", employeeRouter);
 
+const employeeTaskRouter = require("./routes/employee_task");
+app.use("/employee_task", employeeTaskRouter);
+
 const customerRouter = require("./routes/customer");
 app.use("/customer", customerRouter);
 
@@ -48,8 +51,8 @@ app.use("/exhibition", exhibitionRouter);
 const exhibition_emailRouter = require("./routes/exhibition_email");
 app.use("/exhibition_email", exhibition_emailRouter);
 
-const membership_emailRouter = require('./routes/membership_email.js');
-app.use('/membership_email', membership_emailRouter);
+const membership_emailRouter = require("./routes/membership_email.js");
+app.use("/membership_email", membership_emailRouter);
 
 const ticketRouter = require("./routes/ticket");
 app.use("/ticket", ticketRouter);
