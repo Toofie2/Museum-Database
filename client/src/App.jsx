@@ -264,14 +264,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/purchasehistory"
-          element={
-            <ProtectedRoute>
-              <PurchaseHistoryPage />
-            </ProtectedRoute>
-          }
-        />
     </Routes>
     </AuthProvider>
   );
