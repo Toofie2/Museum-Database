@@ -30,6 +30,7 @@ const PurchaseHistoryLog = () => {
         }));
         setData(processedData);
         setLoading(false);
+        setError(null);
       } catch (err) {
         setError(err.message);
         setLoading(false);
