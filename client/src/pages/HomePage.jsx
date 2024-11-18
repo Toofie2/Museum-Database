@@ -18,7 +18,10 @@ const HomePage = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/exhibition`
         );
-        const fetchedExhibitions = response.data;
+        const fetchedExhibitions = response.data
+          .filter(exhibition => exhibition.is_active === 1)
+          .sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
+
         setExhibitions(fetchedExhibitions);
         const upcoming = fetchedExhibitions.find(
           (exhibition) => exhibition.banner === 1

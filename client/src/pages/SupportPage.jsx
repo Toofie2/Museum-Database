@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -8,8 +9,9 @@ const Support = () => {
   const [message, setMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!name || !email || !message) {
@@ -18,12 +20,31 @@ const Support = () => {
       return;
     }
 
-    setIsSubmitted(true);
-    setError(false);
+    try {
+      setIsLoading(true);
+      setError(false);
+      
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/support_email`, {
+        name,
+        email,
+        message
+      });
 
-    setName('');
-    setEmail('');
-    setMessage('');
+      if (response.data.success) {
+        setIsSubmitted(true);
+        setName('');
+        setEmail('');
+        setMessage('');
+      } else {
+        throw new Error(response.data.message || 'Failed to send message');
+      }
+    } catch (err) {
+      console.error('Error details:', err);
+      setError(true);
+      setIsSubmitted(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -39,7 +60,7 @@ const Support = () => {
         <section className="support-content px-6 py-16 max-w-7xl mx-auto bg-white bg-opacity-80 rounded-lg shadow-lg">
           <div className="support-section mb-12">
             <h2 className="text-3xl font-semibold text-blue-800">Contact Us</h2>
-            <p className="mt-4 text-lg text-gray-700">If you have any questions or need assistance, feel free to email us at <a href="mailto:houstonfineartsmuseum@gmail.com" className="text-blue-500">houstonfineartsmuseum@gmail.com</a>.</p>
+            <p className="mt-4 text-lg text-gray-700">If you have any questions or need assistance, feel free to email us at <a href="mailto:houstonmuseumoffinearts@gmail.com" className="text-blue-500">houstonmuseumoffinearts@gmail.com</a>.</p>
           </div>
 
           <div className="support-section mb-12">
@@ -56,6 +77,7 @@ const Support = () => {
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your name"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -69,6 +91,7 @@ const Support = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your email"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -82,15 +105,19 @@ const Support = () => {
                   rows="6"
                   className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Write your message here"
+                  disabled={isLoading}
                 ></textarea>
               </div>
 
               <div className="mb-4">
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  disabled={isLoading}
                 >
-                  Submit Feedback
+                  {isLoading ? 'Sending...' : 'Submit Feedback'}
                 </button>
               </div>
             </form>
