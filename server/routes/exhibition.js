@@ -49,9 +49,10 @@ router.post("/", (req, res) => {
     start_date,
     end_date,
     is_active,
+    admission_price
   } = req.body;
   const insertQuery =
-    "INSERT INTO Exhibition (exhibit_id, room_id, name, description, image_path, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    "INSERT INTO Exhibition (exhibit_id, room_id, name, description, image_path, start_date, end_date, is_active, admission_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
   db.query(
     insertQuery,
     [
@@ -63,6 +64,7 @@ router.post("/", (req, res) => {
       start_date,
       end_date,
       is_active,
+      admission_price
     ],
     (err, result) => {
       if (err) {
@@ -100,12 +102,13 @@ router.put("/:id", (req, res) => {
       start_date,
       end_date,
       is_active,
+      admission_price
     } = updatedExhibition;
 
     // Update the exhibition
     const updateQuery = `
             UPDATE Exhibition 
-            SET room_id = ?, name = ?, description = ?, image_path = ?, start_date = ?, end_date = ?, is_active = ? 
+            SET room_id = ?, name = ?, description = ?, image_path = ?, start_date = ?, end_date = ?, is_active = ?, admission_price = ? 
             WHERE exhibit_id = ?
         `;
     db.query(
@@ -118,6 +121,7 @@ router.put("/:id", (req, res) => {
         start_date,
         end_date,
         is_active,
+        admission_price,
         exhibitId,
       ],
       (updateErr, updateResult) => {
@@ -141,6 +145,7 @@ router.put("/:id", (req, res) => {
           start_date,
           end_date,
           is_active,
+          admission_price
         });
       }
     );

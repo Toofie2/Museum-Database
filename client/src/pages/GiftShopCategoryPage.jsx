@@ -1,4 +1,5 @@
 import NavbarBlack from "../components/NavbarBlack.jsx";
+import Footer from "../components/Footer.jsx";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -22,7 +23,7 @@ const GiftShopCategoryPage = () => {
         );
         setProducts(productResponse.data);
       } catch (error) {
-        console.error("Error fetching produc t category:", error);
+        console.error("Error fetching product category:", error);
       }
     };
     fetchGiftShopCategoryView();
@@ -32,9 +33,9 @@ const GiftShopCategoryPage = () => {
     return <div className="text-center mt-20">Loading...</div>;
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <NavbarBlack/>
-      <div className="container mx-auto pb-12 p-1">
+      <div className="container mx-auto pb-12 p-1 flex-grow">
 
         {/* Products Section */}
         <h1 className="text-2xl content- font-medium mt-24 mb-4 flex justify-center items-center">
@@ -65,6 +66,7 @@ const GiftShopCategoryPage = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

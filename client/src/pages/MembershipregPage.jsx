@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import axios from 'axios'
 import NavbarBlack from "../components/NavbarBlack";
+import Footer from "../components/Footer";
 import { useNavigate } from 'react-router-dom';
 import halfImage from "../assets/membership_background.png";
 import { useAuth } from "../components/authentication";
@@ -54,14 +55,14 @@ const MembershipregPage = () => {
     };
 
     return (
-        <div className="w-full h-screen">
+        <div className="min-h-screen flex flex-col">  {/* Modified for flex layout */}
             {/* Navbar */}
             <div className="w-full">
                 <NavbarBlack />
             </div>
 
             {/* Main Content Section with Flexbox Layout */}
-            <div className="flex h-[calc(100%-75px)]">
+            <div className="flex flex-grow">  {/* Added flex-grow */}
                 
                 {/* Left Side - Membership Information Box */}
                 <div className="w-1/2 flex justify-start items-center bg-gray-50 p-16">
@@ -80,7 +81,7 @@ const MembershipregPage = () => {
                             Join today and become part of our global community of supporters dedicated to helping The Fine Arts Museum educate and inspire millions each year through the power of art!
                         </p>
 
-                        <div className="bg-stone-500 text-white p-8 rounded-lg mt-6">
+                        <div className="bg-gray-brown text-white p-8 rounded-lg mt-6">
                             <p className="text-lg font-bold mb-6">$110 per year</p>
                             <ul className="list-disc list-inside mb-6 space-y-2">
                                 <li>Free admission adult ticket</li>
@@ -98,7 +99,7 @@ const MembershipregPage = () => {
                             )}
 
                             <button
-                                className="bg-stone-500 border border-white text-white px-6 py-3 rounded-md hover:bg-stone-400 transition duration-200"
+                                className="bg-gray-brown border border-white text-white px-6 py-3 rounded-md hover:bg-stone-400 transition duration-200"
                                 onClick={handleClick}
                             >
                                 Purchase Membership
@@ -109,12 +110,13 @@ const MembershipregPage = () => {
 
                 {/* Right Side - Full Background Image */}
                 <div
-                    className="w-1/2 h-full bg-cover bg-center"
+                    className="w-1/2 bg-cover bg-center"
                     style={{
                         backgroundImage: `url(${halfImage})`,
                     }}
                 ></div>
             </div>
+            <Footer />
         </div>
     );
 };

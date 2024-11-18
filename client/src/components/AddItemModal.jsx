@@ -120,6 +120,9 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
             end_date: formData.end_date,
             image_path: formData.image_url,
             is_active: true,
+            admission_price: parseFloat(formData.admission_price || 0).toFixed(
+              2
+            ),
           };
           break;
 
@@ -277,6 +280,26 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Admission Price
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-2">$</span>
+                <input
+                  type="number"
+                  name="admission_price"
+                  value={formData.admission_price || ""}
+                  onChange={handleChange}
+                  min="0"
+                  max="99.99"
+                  step="0.01"
+                  className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md"
+                  required
+                  placeholder="0.00"
                 />
               </div>
             </div>

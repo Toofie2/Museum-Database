@@ -164,6 +164,11 @@ const CategoryLog = () => {
       { key: "description", label: "Description" },
       { key: "room_name", label: "Room" },
       {
+        key: "admission_price",
+        label: "Admission",
+        format: formatPrice,
+      },
+      {
         key: "start_date",
         label: "Start Date",
         format: formatDate,
