@@ -30,7 +30,14 @@ router.get('/:id', (req, res) => {
 
 // GET customer ticket by customer_id
 router.get('/:id/history', (req, res) => {
-    db.query('SELECT * FROM Customer_Ticket WHERE customer_id = ? AND is_deleted = FALSE ORDER BY date_purchased DESC', [req.params.id], (err, results) => {
+    const query = `
+    SELECT Customer_Ticket.*, Ticket.type
+    FROM Customer_Ticket
+    JOIN Ticket ON Customer_Ticket.ticket_id = Ticket.ticket_id
+    WHERE Customer_Ticket.is_deleted = FALSE AND Customer_Ticket.customer_id = ?
+    ORDER BY date_purchased DESC
+  `;
+    db.query(query, [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;

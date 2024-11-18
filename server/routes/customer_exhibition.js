@@ -31,7 +31,14 @@ router.get('/:id', (req, res) => {
 
 // GET customer exhibition by customer_id
 router.get('/:id/history', (req, res) => {
-    db.query('SELECT * FROM Customer_Exhibition WHERE customer_id = ? AND is_deleted = FALSE ORDER BY date_purchased DESC', [req.params.id], (err, results) => {
+    const query = `
+    SELECT Customer_Exhibition.*, Exhibition.name
+    FROM Customer_Exhibition
+    JOIN Exhibition ON Customer_Exhibition.exhibition_id = Exhibition.exhibit_id
+    WHERE Customer_Exhibition.is_deleted = FALSE AND Customer_Exhibition.customer_id = ?
+    ORDER BY date_purchased DESC
+  `;
+    db.query(query, [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
