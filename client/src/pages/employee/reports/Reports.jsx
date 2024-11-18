@@ -14,8 +14,6 @@ const ReportsPage = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Helper function to filter and sort data by date range
   const filterDataByDateRange = (data, dateRange) => {
     return data
       .filter(item => {
@@ -25,7 +23,6 @@ const ReportsPage = () => {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
   };
 
-  // Date change handler with validation
   const handleDateChange = (e, type) => {
     const newDate = e.target.value;
     const today = new Date().toISOString().split('T')[0];
@@ -52,7 +49,6 @@ const ReportsPage = () => {
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/employees`)
         ]);
 
-        // Process popularity data
         const processedPopularityData = popularityRes.data.reduce((acc, item) => {
           const date = item.date_purchased.split('T')[0];
           if (!acc[date]) {
@@ -70,7 +66,6 @@ const ReportsPage = () => {
           return acc;
         }, {});
 
-        // Process initial revenue data from tickets
         const processedRevenueData = ticketRes.data.reduce((acc, item) => {
           const date = item.date_purchased.split('T')[0];
           if (!acc[date]) {
@@ -87,7 +82,6 @@ const ReportsPage = () => {
           return acc;
         }, {});
 
-        // Add product data to revenue data
         productRes.data.forEach(item => {
           const date = item.date_purchased.split('T')[0];
           if (!processedRevenueData[date]) {
@@ -117,6 +111,9 @@ const ReportsPage = () => {
   }, [dateRange]);
   const renderPopularityTab = () => {
     const filteredData = filterDataByDateRange(popularityData, dateRange);
+    const tableSortedData = [...filteredData].sort((a, b) => 
+      new Date(b.date) - new Date(a.date)
+    );
     
     return (
       <div className="space-y-6">
@@ -146,7 +143,7 @@ const ReportsPage = () => {
             </ResponsiveContainer>
           </div>
         </div>
-
+  
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Exhibition Visits by Date</h3>
           <div className="overflow-x-auto">
@@ -159,7 +156,7 @@ const ReportsPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((day, index) => (
+                {tableSortedData.map((day, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(day.date).toLocaleDateString()}
@@ -176,6 +173,112 @@ const ReportsPage = () => {
                           </div>
                         ))}
                       </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  const renderRevenueTab = () => {
+    const filteredData = filterDataByDateRange(ticketData, dateRange);
+    const tableSortedData = [...filteredData].sort((a, b) => 
+      new Date(b.date) - new Date(a.date)
+    );
+  
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h4 className="text-sm font-medium text-gray-500">Total Revenue</h4>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              ${filteredData.reduce((sum, day) => 
+                sum + day.ticket_revenue + day.product_revenue, 0
+              ).toLocaleString()}
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h4 className="text-sm font-medium text-gray-500">Ticket Revenue</h4>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              ${filteredData.reduce((sum, day) => 
+                sum + day.ticket_revenue, 0
+              ).toLocaleString()}
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h4 className="text-sm font-medium text-gray-500">Product Revenue</h4>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              ${filteredData.reduce((sum, day) => 
+                sum + day.product_revenue, 0
+              ).toLocaleString()}
+            </p>
+          </div>
+        </div>
+  
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue</h3>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={filteredData} margin={{ left: 20, right: 50, top: 20, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="date"
+                  tickFormatter={(date) => new Date(date).toLocaleDateString()}
+                />
+                <YAxis 
+                  tickFormatter={(value) => `$${value.toLocaleString()}`}
+                  width={80}
+                />
+                <Tooltip 
+                  labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                  formatter={(value) => [`$${value.toLocaleString()}`, '']}
+                />
+                <Legend />
+                <Bar dataKey="ticket_revenue" name="Ticket Revenue" fill="#2563eb" />
+                <Bar dataKey="product_revenue" name="Product Revenue" fill="#10b981" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+  
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue Details</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets Sold</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket Revenue</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Products Sold</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Product Revenue</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {tableSortedData.map((day, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(day.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      {day.ticket_sales}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      ${day.ticket_revenue.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      {day.product_sales}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      ${day.product_revenue.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                      ${(day.ticket_revenue + day.product_revenue).toLocaleString()}
                     </td>
                   </tr>
                 ))}
@@ -240,105 +343,6 @@ const ReportsPage = () => {
             </div>
           </div>
         ))}
-      </div>
-    );
-  };
-
-  const renderRevenueTab = () => {
-    const filteredData = filterDataByDateRange(ticketData, dateRange);
-
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h4 className="text-sm font-medium text-gray-500">Total Revenue</h4>
-            <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${filteredData.reduce((sum, day) => 
-                sum + day.ticket_revenue + day.product_revenue, 0
-              ).toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h4 className="text-sm font-medium text-gray-500">Ticket Revenue</h4>
-            <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${filteredData.reduce((sum, day) => 
-                sum + day.ticket_revenue, 0
-              ).toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h4 className="text-sm font-medium text-gray-500">Product Revenue</h4>
-            <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${filteredData.reduce((sum, day) => 
-                sum + day.product_revenue, 0
-              ).toLocaleString()}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue</h3>
-          <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date"
-                  tickFormatter={(date) => new Date(date).toLocaleDateString()}
-                />
-                <YAxis />
-                <Tooltip 
-                  labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                />
-                <Legend />
-                <Bar dataKey="ticket_revenue" name="Ticket Revenue" fill="#2563eb" />
-                <Bar dataKey="product_revenue" name="Product Revenue" fill="#10b981" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue Details</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets Sold</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket Revenue</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Products Sold</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Product Revenue</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((day, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(day.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {day.ticket_sales}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      ${day.ticket_revenue.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {day.product_sales}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      ${day.product_revenue.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                      ${(day.ticket_revenue + day.product_revenue).toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     );
   };
