@@ -18,7 +18,10 @@ const ExhibitionsPurchasePage = (props) => {
   const [maxTickets, setMaxTickets] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
+  const [subtractFromSubtotal, setSubtractFromSubtotal] = useState(0);
+  const [sumExhibitFormData, setSumExhibitFormData] = useState(0);
   let selectedDate = props.selDate;
+  let ticketTypePricePairs = {};
 
   const fetchExhibitions = async () => {
     try {
@@ -62,6 +65,14 @@ const ExhibitionsPurchasePage = (props) => {
       ans += formData[ticket.type];
     })
     return ans;
+  };
+
+  const getSumExhibitFormData = (exhibitionFormData) => {
+    let ans = 0;
+    exhibitions.map((exhibition) => {
+      ans += exhibitionFormData[exhibition.name];
+    })
+    setSumExhibitFormData(ans);
   };
 
   // Update form data whenever input changes. Don't allow values out of range 
@@ -124,23 +135,27 @@ const ExhibitionsPurchasePage = (props) => {
       let exhibitionTicketsArr = [];
       const convertedDate = selectedDate.toISOString().split("T")[0];
       tickets.map((ticket) => {
+        let counter = 0;
         for (let j = 0; j < formData[ticket.type]; j++) {
           permCollectTicketsArr.push({
             customer_id: userId,
             ticket_id: ticket.ticket_id,
-            amount_spent: ticket.price,
+            amount_spent: (customerInfo.is_member && (ticket.type == "Adult")) ? (counter < 1 ? 0 : ticket.price) : (ticket.price),
             valid_day: convertedDate,
           });
+          counter = 1;
         }
       })
       exhibitions.map((exhibition) => {
+        let counter = 0;
         for (let j = 0; j < exhibitionFormData[exhibition.name]; j++) {
           exhibitionTicketsArr.push({
             customer_id: userId,
             exhibition_id: exhibition.exhibit_id,
-            amount_spent: 1,
+            amount_spent: customerInfo.is_member ? (counter < 1 ? 0 : exhibition.admission_price) : (exhibition.admission_price),
             valid_day: convertedDate
           });
+          counter = 1;
         }
       })
       await axios.post(
@@ -168,7 +183,7 @@ const handleSubtotal = (formData, exhibitionFormData) => {
     ans += formData[ticket.type] * ticket.price;
   })
   exhibitions.map((exhibition) => {
-    ans += exhibitionFormData[exhibition.name] * 1;
+    ans += exhibitionFormData[exhibition.name] * exhibition.admission_price;
   })
   setSubtotal(ans.toFixed(2));
 };
@@ -187,7 +202,6 @@ const handleSubtotal = (formData, exhibitionFormData) => {
 
 
   useEffect(() => {
-    console.log(selectedDate);
     exhibitions.map((exhibition) => {
       setExhibitionFormData((prevState) => ({
         ...prevState,
@@ -202,7 +216,23 @@ const handleSubtotal = (formData, exhibitionFormData) => {
   
   useEffect(() => {
     handleSubtotal(formData, exhibitionFormData);
+    getSumExhibitFormData(exhibitionFormData);
   }, [exhibitionFormData]);
+
+  useEffect(() => {
+    let ans = 0;
+    if(formData["Adult"] > 0){
+      ans += ticketTypePricePairs["Adult"]
+    }
+    {exhibitions.map((exhibition) => {
+      if(exhibitionFormData[exhibition.name] > 0){
+        ans += exhibition.admission_price
+      }
+    })}
+
+    setSubtractFromSubtotal(ans);
+  }, [showPopup])
+  
   
 
 
@@ -215,6 +245,7 @@ const handleSubtotal = (formData, exhibitionFormData) => {
           <div className="relative text-lg font-medium leading-loose w-1/4">
             Your Tickets:<hr/>
             {tickets.map((ticket) => {
+              ticketTypePricePairs[ticket.type] = ticket.price;
               return(
                 formData[ticket.type] > 0 &&
                 <div 
@@ -234,7 +265,7 @@ const handleSubtotal = (formData, exhibitionFormData) => {
                   className="flex flex-row justify-between"
                 >
                   <p>{capitalize(exhibition.name)} Admission ({exhibitionFormData[exhibition.name]}x)</p>
-                  <p>$1.00</p>
+                  <p>${Number(exhibition.admission_price).toFixed(2)}</p>
                 </div>
               )
             })}
@@ -243,7 +274,7 @@ const handleSubtotal = (formData, exhibitionFormData) => {
             </div>
           </div>
           <div className="w-1/2">
-            <h1 className="text-2xl font-medium"> Select the special exhibitions you want to attend </h1>
+            <h1 className="text-2xl font-medium"> Select the special exhibitions you want to attend (optional) </h1>
             <form className="mt-6">
               <div className="grid grid-cols-1 divide-y-2">
                 <div></div>
@@ -259,7 +290,7 @@ const handleSubtotal = (formData, exhibitionFormData) => {
                       </label>
                       <div className="flex flex-row">
                         <div className="mr-3 p-1">
-                          $1.00
+                          ${Number(exhibition.admission_price).toFixed(2)}
                         </div>
 
                         {/* Remove a ticket */}
@@ -312,9 +343,9 @@ const handleSubtotal = (formData, exhibitionFormData) => {
       </div>
       {showPopup && (
           <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow-lg">
+            <div className="bg-white p-6 rounded shadow-lg w-1/2 h-5/6 overflow-y-scroll">
               <h3 className="text-2xl">You are about to purchase:</h3>
-              <div className="text-xl leading-loose mt-5">
+              <div className="text-lg leading-loose mt-5">
                 {tickets.map((ticket) => {
                   return(
                     formData[ticket.type] > 0 &&
@@ -335,11 +366,43 @@ const handleSubtotal = (formData, exhibitionFormData) => {
                       className="flex flex-row justify-between"
                     >
                       <p>{capitalize(exhibition.name)} Admission ({exhibitionFormData[exhibition.name]}x)</p>
-                      <p>$1.00</p>
+                      <p>${Number(exhibition.admission_price).toFixed(2)}</p>
                     </div>
                   )
                 })}
-                <span className="font-bold mt-30">Total: ${subtotal}</span>
+                <hr/>
+                <div className="flex flex-row justify-between text-default-gray">
+                  <p>Subtotal:</p>
+                  <p>${Number(subtotal).toFixed(2)}</p>
+                </div>
+                {(Boolean(customerInfo.is_member) && formData["Adult"] > 0) && (
+                  <div className="text-default-gray">
+                    <hr/>
+                    <div className="flex flex-row justify-between mt-1">
+                      <p>Discount (Member, Free Adult Admission): </p>
+                      <p className="text-red-600">-${(ticketTypePricePairs["Adult"]).toFixed(2)}</p>
+                    </div>
+                  </div>
+                )}
+                {(Boolean(customerInfo.is_member) && sumExhibitFormData > 0) && (
+                  <div className="mt-1 text-default-gray">
+                    <div>Discount (Member, Free Exhibit Admission): </div>
+                    {exhibitions.map((exhibition) => {
+                      return(
+                        exhibitionFormData[exhibition.name] > 0 &&
+                        <div 
+                          key={exhibition.exhibition_id}
+                          className="flex flex-row justify-between"
+                        >
+                          <p>{capitalize(exhibition.name)} Admission (1x)</p>
+                          <p className="text-red-600">-${Number(exhibition.admission_price).toFixed(2)}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+                <hr/>
+                <span className="font-bold mt-30">Total: ${customerInfo.is_member ? ((Number(subtotal) - Number(subtractFromSubtotal)).toFixed(2)) : (Number(subtotal).toFixed(2))}</span>
               </div>
               <div className="flex flex-row justify-between">
                 <button
