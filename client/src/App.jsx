@@ -1,5 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider } from "./components/authentication";
+import { useState } from "react";
+import TicketFormDataContext from "./contexts/TicketFormDataContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import EmployeeProtectedRoute from "./components/EmployeeProtectedRoute";
@@ -9,6 +11,7 @@ import ExhibitionViewPage from "./pages/ExhibitionViewPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CollectionsViewPage from "./pages/CollectionsViewPage";
 import TicketPage from "./pages/TicketPage.jsx";
+import ExhibitionsPurchasePage from "./pages/ExhibitionsPurchasePage.jsx";
 import GiftShopPage from "./pages/GiftShopPage";
 import GiftShopCategoryPage from "./pages/GiftShopCategoryPage";
 import GiftShopProductPage from "./pages/GiftShopProductPage";
@@ -34,7 +37,25 @@ import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
 import Tasks from "./pages/employee/Tasks.jsx";
 
+const Layout = (props) =>{
+  const formData = props.FD;
+  const setFormData = props.setFD;
+  return (
+    <div>
+      <TicketFormDataContext.Provider value={{ formData, setFormData }}>
+        <Outlet/>
+      </TicketFormDataContext.Provider>
+    </div>
+  );
+}
+
 const App = () => {
+  const [formData, setFormData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const getSelectedDate = (data) => {
+    setSelectedDate(data);
+  }
+
   return (
     <AuthProvider>
       <Routes>
@@ -127,14 +148,24 @@ const App = () => {
           />
         </Route>
         {/* Protected Routes */}
-        <Route
-          path="/tickets"
-          element={
-            <ProtectedRoute>
-              <TicketPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<Layout FD={formData} setFD={setFormData}/>}>
+          <Route
+            path="/tickets"
+            element={
+              <ProtectedRoute>
+                <TicketPage onNext={getSelectedDate}/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tickets/exhibitions"
+            element={
+              <ProtectedRoute>
+                <ExhibitionsPurchasePage selDate={selectedDate}/>
+              </ProtectedRoute>
+            }
+          />
+        </Route>
         <Route
           path="/tickets/purchased"
           element={
@@ -223,7 +254,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-      </Routes>
+    </Routes>
     </AuthProvider>
   );
 };
