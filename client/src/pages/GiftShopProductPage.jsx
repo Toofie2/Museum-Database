@@ -242,12 +242,16 @@ const GiftShopProductPage = () => {
                   </div>
                 )}
                 <hr />
-                <span className="font-bold mt-30">
-                  Total: $
-                  {customerInfo.is_member
-                    ? (subtotal - subtotal * discountPercent).toFixed(2)
-                    : Number(subtotal).toFixed(2)}
-                </span>
+                <div className="flex flex-row font-bold mt-30 justify-between">
+                  <p>
+                    Total:
+                  </p>
+                  <p>
+                    ${customerInfo.is_member
+                      ? (subtotal - subtotal * discountPercent).toFixed(2)
+                      : Number(subtotal).toFixed(2)}
+                  </p>
+                </div>
               </div>
               <div className="flex flex-row justify-between">
                 <button
