@@ -7,7 +7,7 @@ router.get("/product_category/:product_category_id", (req, res) => {
   const { product_category_id } = req.params;
 
   db.query(
-    "SELECT * FROM Product WHERE product_category_id = ?",
+    "SELECT * FROM Product WHERE product_category_id = ? AND is_deleted = FALSE",
     [product_category_id],
     (err, results) => {
       if (err) {

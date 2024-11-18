@@ -20,7 +20,7 @@ router.get("/exhibit/:exhibit_id", (req, res) => {
   const { exhibit_id } = req.params;
 
   db.query(
-    "SELECT * FROM Art WHERE exhibit_id = ?",
+    "SELECT * FROM Art WHERE exhibit_id = ? AND is_active = TRUE",
     [exhibit_id],
     (err, results) => {
       if (err) {
@@ -31,12 +31,12 @@ router.get("/exhibit/:exhibit_id", (req, res) => {
   );
 });
 
-// GET Art pieces by Exhibit ID
+// GET Art pieces by Collection ID
 router.get("/collection/:collection_id", (req, res) => {
   const { collection_id } = req.params;
 
   db.query(
-    "SELECT * FROM Art WHERE collection_id = ?",
+    "SELECT * FROM Art WHERE collection_id = ? AND is_active = TRUE",
     [collection_id],
     (err, results) => {
       if (err) {
@@ -83,6 +83,7 @@ router.get("/", (req, res) => {
     LEFT JOIN Artist ar ON a.artist_id = ar.artist_id
     LEFT JOIN Collection c ON a.collection_id = c.collection_id
     LEFT JOIN Exhibition e ON a.exhibit_id = e.exhibit_id
+    WHERE a.is_active = TRUE
   `;
 
   db.query(query, (err, results) => {
@@ -133,6 +134,7 @@ router.post("/", (req, res) => {
     art_id,
     artist_id,
     collection_id,
+    exhibit_id,
     art_title,
     art_desc,
     art_image_path,
@@ -150,8 +152,8 @@ router.post("/", (req, res) => {
   }
 
   const insertQuery = `
-        INSERT INTO Art (art_id, artist_id, collection_id, art_title, art_desc, art_image_path, art_medium, date_created, date_received)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO Art (art_id, artist_id, collection_id, exhibit_id, art_title, art_desc, art_image_path, art_medium, date_created, date_received)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
   db.query(
@@ -160,6 +162,7 @@ router.post("/", (req, res) => {
       art_id,
       artist_id,
       collection_id,
+      exhibit_id,
       art_title,
       art_desc,
       art_image_path,
@@ -180,65 +183,83 @@ router.post("/", (req, res) => {
 });
 
 // PUT (update) Art by ID
+// PUT (update) Art by ID
 router.put("/:id", (req, res) => {
   const artId = req.params.id;
-  const updates = req.body;
+  const {
+    artist_id,
+    collection_id,
+    exhibit_id,
+    art_title,
+    art_desc,
+    art_image_path,
+    art_medium,
+    date_created,
+    date_received,
+  } = req.body;
 
-  db.query("SELECT * FROM Art WHERE art_id = ?", [artId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ message: "Art not found" });
-    }
+  // Make sure date_created <= date_received (though we have a DB constraint)
+  if (
+    date_created &&
+    date_received &&
+    new Date(date_created) > new Date(date_received)
+  ) {
+    return res.status(400).json({
+      message:
+        "Invalid dates: date_created should be before or equal to date_received",
+    });
+  }
 
-    const currentArt = results[0];
-    const updatedArt = { ...currentArt, ...updates };
-    const {
+  const updateQuery = `
+    UPDATE Art 
+    SET 
+      artist_id = ?,
+      collection_id = ?,
+      exhibit_id = ?,
+      art_title = ?,
+      art_desc = ?,
+      art_image_path = ?,
+      art_medium = ?,
+      date_created = ?,
+      date_received = ?
+    WHERE art_id = ?
+  `;
+
+  db.query(
+    updateQuery,
+    [
       artist_id,
-      collection_id,
+      collection_id || null,
+      exhibit_id || null,
       art_title,
-      description,
-      image_path,
-      medium,
-      date_created,
-      date_received,
-    } = updatedArt;
-
-    // Ensure valid dates
-    if (new Date(date_created) > new Date(date_received)) {
-      return res.status(400).json({
-        message:
-          "Invalid dates: date_created should be before or equal to date_received",
-      });
-    }
-
-    const updateQuery = `
-            UPDATE Art 
-            SET artist_id = ?, collection_id = ?, art_title = ?, description = ?, image_path = ?, medium = ?, date_created = ?, date_received = ?
-            WHERE art_id = ?
-        `;
-    db.query(
-      updateQuery,
-      [
+      art_desc,
+      art_image_path,
+      art_medium,
+      date_created || null,
+      date_received || null,
+      artId,
+    ],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Art not found" });
+      }
+      res.json({
+        art_id: parseInt(artId),
         artist_id,
         collection_id,
+        exhibit_id,
         art_title,
-        description,
-        image_path,
-        medium,
+        art_desc,
+        art_image_path,
+        art_medium,
         date_created,
         date_received,
-        artIdrtId,
-      ],
-      (err) => {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-        res.json({ art_id: artId, ...updatedArt });
-      }
-    );
-  });
+      });
+    }
+  );
 });
 
 // DELETE (soft delete) Art by ID (set is_active = FALSE)
