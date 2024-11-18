@@ -1,6 +1,6 @@
 import NavbarBlack from "../components/NavbarBlack.jsx";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState, useHistory } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import SubtractIcon from '../components/SubtractIcon.jsx'
 import AddIcon from '../components/AddIcon.jsx'
@@ -9,10 +9,20 @@ import "../components/Modal.css"
 
 const GiftShopProductPage = () => {
   const { userId } = useAuth();
+  const navigate = useNavigate();
   const [customerInfo, setCustomerInfo] = useState({});
   const discountPercent = 0.15;
+  const [showPopup, setShowPopup] = useState(false);
+  const [showGoBackPopup, setShowGoBackPopup] =  useState(false);
 
-  
+  const handleCloseGoBackPopup = () => {
+    setShowGoBackPopup(false);
+    if ((window.history?.length && window.history.length > 1) || window.history.state?.idx) {
+      navigate(-1);
+    } else {
+      navigate('/', { replace: true });
+    }
+  };
 
   useEffect(() => {
     const fetchCustomerInfo = async (userId) => {
@@ -27,6 +37,10 @@ const GiftShopProductPage = () => {
     };
     fetchCustomerInfo(userId);
   }, [])
+
+  const handleClosePopup = () => {
+    setShowPopup(false); // Close the popup
+  };
   
 
   // Update form data whenever input changes. Don't allow values out of range 
@@ -73,12 +87,13 @@ const GiftShopProductPage = () => {
     try {
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/customer_product`,
-        [{customer_id: userId, product_id: prodID, amount_spent: subtotal - (subtotal * discountPercent), quantity: formData.quantity}]
+        [{customer_id: userId, product_id: prodID, amount_spent: customerInfo.is_member ? (subtotal - (subtotal * discountPercent)) : subtotal, quantity: formData.quantity}]
       );
     } catch (err) {
       console.log(err);
     }
-    toggleModal();
+    handleClosePopup();
+    setShowGoBackPopup(true);
   };
 
   const handleSubtotal = (formData) => {
@@ -183,41 +198,70 @@ const GiftShopProductPage = () => {
           </div>
           <button
             className="w-full mt-4 bg-black text-white py-2 px-52 border-black rounded"
-            onClick={toggleModal}
+            onClick={() => {setShowPopup(true)}}
           >
             Purchase
           </button>
         </div>
       </div>
-      {modal && (
-        <div className="modal">
-          <div className="overlay"></div>
-          <div className="modal-content">
-            <h2>You are about to purchase:</h2>
-            <div className="font-medium mt-10 mb-10">
-              {productInfo.name} ({formData.quantity}x)<br/>
-              ${(productInfo.price).toFixed(2)} <br/><br/>
-              {Boolean(customerInfo.is_member) &&
-                <p className="text-default-gray font-light">
-                  Subtotal: ${subtotal.toFixed(2)}<br/>
-                  Discount (Member, {discountPercent * 100}% off): <span className="text-red-600 font-bold">-${(subtotal * discountPercent).toFixed(2)}</span><br/><br/>
-                </p>
-              }
-              <span className="font-bold">Total: ${(subtotal - (subtotal * discountPercent)).toFixed(2)}</span>
+      {showPopup && (
+        <div>
+        <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-1/2 h-5/6 overflow-y-scroll">
+            <h3 className="text-2xl">You are about to purchase:</h3>
+            <div className="text-lg leading-loose mt-5">
+              <div className="flex flex-row justify-between">
+                <p>{productInfo.name} ({formData.quantity}x)</p>
+                <p>${(productInfo.price).toFixed(2)}</p>
+              </div>
+              <hr/>
+              <div className="flex flex-row justify-between text-default-gray">
+                <p>Subtotal:</p>
+                <p>${Number(subtotal).toFixed(2)}</p>
+              </div>
+              {Boolean(customerInfo.is_member) && (
+                <div className="text-default-gray">
+                  <hr/>
+                  <div className="flex flex-row justify-between mt-1">
+                    <p>Discount (Member, {discountPercent * 100}% off): </p>
+                    <p className="text-red-600">-${(subtotal * discountPercent).toFixed(2)}</p>
+                  </div>
+                </div>
+              )}
+              <hr/>
+              <span className="font-bold mt-30">Total: ${customerInfo.is_member ? ((subtotal - (subtotal * discountPercent)).toFixed(2)) : (Number(subtotal).toFixed(2))}</span>
             </div>
-
-
-            <div className="flex flex-row justify-center space-x-40">
-              <button onClick={toggleModal}>
+            <div className="flex flex-row justify-between">
+              <button
+                onClick={handleClosePopup} // Close popup and trigger redirect
+                className="mt-4 bg-red-600 text-white px-4 py-2 rounded"
+              >
                 Cancel
               </button>
-              <button onClick={handleSubmit}>
+              <button
+                onClick={handleSubmit} // Close popup and trigger redirect
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+              >
                 Confirm
               </button>
             </div>
           </div>
         </div>
+        </div>
       )}
+      {showGoBackPopup && (
+          <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow-lg">
+              <h3 className="text-xl">Thank you for your purchase!</h3>
+              <button
+                onClick={handleCloseGoBackPopup} // Close popup and trigger redirect
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
     </div>
   );
 };
