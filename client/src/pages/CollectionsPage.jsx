@@ -31,7 +31,7 @@ const CollectionsPage = () => {
           className="w-full h-full object-cover absolute top-0 left-0"
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center pl-4 space-y-2">
-          <h1 className="text-8xl font-regular text-white z-10 w-[600px] p-6">
+          <h1 className="text-8xl font-cavas text-white w-[600px] p-6">
             Collections
           </h1>
           <p className="text-3xl font-thin text-white z-10 w-[800px] p-6">
