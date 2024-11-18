@@ -84,6 +84,9 @@ app.use("/artist", artistRouter);
 const collectionRouter = require("./routes/collection");
 app.use("/collection", collectionRouter);
 
+const reportsRouter = require("./routes/reports");
+app.use("/reports", reportsRouter);
+
 const departmentRouter = require("./routes/department");
 app.use("/department", departmentRouter);
 
