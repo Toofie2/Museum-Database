@@ -81,7 +81,7 @@ const MembershipregPage = () => {
                             Join today and become part of our global community of supporters dedicated to helping The Fine Arts Museum educate and inspire millions each year through the power of art!
                         </p>
 
-                        <div className="bg-stone-500 text-white p-8 rounded-lg mt-6">
+                        <div className="bg-gray-brown text-white p-8 rounded-lg mt-6">
                             <p className="text-lg font-bold mb-6">$110 per year</p>
                             <ul className="list-disc list-inside mb-6 space-y-2">
                                 <li>Free admission adult ticket</li>
@@ -99,7 +99,7 @@ const MembershipregPage = () => {
                             )}
 
                             <button
-                                className="bg-stone-500 border border-white text-white px-6 py-3 rounded-md hover:bg-stone-400 transition duration-200"
+                                className="bg-gray-brown border border-white text-white px-6 py-3 rounded-md hover:bg-stone-400 transition duration-200"
                                 onClick={handleClick}
                             >
                                 Purchase Membership

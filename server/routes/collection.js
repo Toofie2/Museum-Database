@@ -15,13 +15,14 @@ router.get('/', (req, res) => {
 
 */
 
-// GET all collections
+// GET all collections that are active
 router.get("/", (req, res) => {
   const query = `
-      SELECT Collection.*, Room.room_name 
-      FROM Collection
-      JOIN Room ON Collection.room_id = Room.room_id
-    `;
+    SELECT Collection.*, Room.room_name 
+    FROM Collection
+    JOIN Room ON Collection.room_id = Room.room_id
+    WHERE Collection.is_active = TRUE
+  `;
   db.query(query, (err, results) => {
     if (err) {
       res.status(500).json({ error: err.message });

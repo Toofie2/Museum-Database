@@ -6,7 +6,18 @@ import AddItemModal from "../../components/AddItemModal";
 
 const Settings = () => {
   const { category } = useParams();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  const handleSuccess = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
   return (
     <div>
       <div className="flex justify-between">
@@ -21,12 +32,15 @@ const Settings = () => {
       </div>
       <CategoryNavbar section="settings" />
       <main className="p-8">
-        <Outlet />
+        <Outlet
+          context={{ refreshTrigger, setRefreshTrigger: handleRefresh }}
+        />
       </main>
       <AddItemModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         category={category}
+        onSuccess={handleSuccess}
       />
     </div>
   );
