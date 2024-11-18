@@ -5,7 +5,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 const RegisterEmployee = () => {
   const navigate = useNavigate();
   const [confirmationMessage, setConfirmationMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Error message for password mismatch
+  const [errorMessage, setErrorMessage] = useState("");
+  const [departments, setDepartments] = useState([]); // To store fetched departments
 
   const [employee, setEmployee] = useState({
     department_id: 0,
@@ -32,6 +33,26 @@ const RegisterEmployee = () => {
     confirmPassword: "",
   });
 
+  // Fetch departments from API when component mounts
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/department`);
+        console.log("Fetched departments:", response.data);  // Check the structure here
+        setDepartments(response.data);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+        setErrorMessage("Failed to load departments");
+      }
+    };
+  
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    console.log("Departments have changed:", departments);
+  }, [departments]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -49,15 +70,14 @@ const RegisterEmployee = () => {
   const formatDate = (date) => {
     const d = new Date(date);
     const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   };
 
   const handleClick = async (e) => {
     e.preventDefault();
-  
-    // Trim values to avoid spaces causing issues
+
     const trimmedEmployee = {
       ...employee,
       first_name: employee.first_name.trim(),
@@ -65,8 +85,7 @@ const RegisterEmployee = () => {
       ssn: employee.ssn.trim(),
       address: employee.address.trim(),
     };
-    
-    // Validation for required fields
+
     if (
       !trimmedEmployee.first_name ||
       !trimmedEmployee.last_name ||
@@ -74,45 +93,40 @@ const RegisterEmployee = () => {
       !credentials.email.trim() ||
       !credentials.password.trim() ||
       !checkpassword.confirmPassword.trim() ||
-      !trimmedEmployee.department_id || 
-      trimmedEmployee.department_id === "0" // Checking if department_id is selected
+      !trimmedEmployee.department_id ||
+      trimmedEmployee.department_id === "0"
     ) {
       alert("Please fill in all required fields.");
       return;
     }
-  
-    // Validation for password mismatch
+
     if (credentials.password !== checkpassword.confirmPassword) {
       setErrorMessage("Passwords do not match");
       return;
     } else {
       setErrorMessage("");
     }
-  
+
     try {
-      // Convert hire_date and start_date to yyyy-mm-dd format
       const formattedHireDate = formatDate(employee.hire_date);
       const formattedStartDate = formatDate(employee.start_date);
-  
-      // Update employee state with the formatted dates
+
       const updatedEmployee = {
         ...employee,
         hire_date: formattedHireDate,
         start_date: formattedStartDate,
       };
-  
-      // Send employee details to backend
+
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/employee`, updatedEmployee);
       if (response.status === 201) {
         setConfirmationMessage("Registration successful!");
         const lastEmployee = response.data;
-        
-        // Send authentication details (email and password)
+
         await axios.post(`${import.meta.env.VITE_BACKEND_URL}/authentication`, {
           ...credentials,
-          employee_id: lastEmployee.id, // Use the returned employee ID
+          employee_id: lastEmployee.id,
         });
-        
+
         setTimeout(() => {
           navigate("/employee");
         }, 1500);
@@ -127,7 +141,7 @@ const RegisterEmployee = () => {
     }
   };
   
-
+console.log("these are the departments:", departments)
   return (
     <div className="flex h-screen">
       <div className="flex flex-col justify-center items-center w-full bg-white shadow-md p-8">
@@ -189,23 +203,24 @@ const RegisterEmployee = () => {
 
           {/* Department ID, Salary, and SSN Row */}
     <div className="flex space-x-4">
-    {/* Department ID Dropdown */}
-    <div className="flex-1">
-        <label className="block text-gray-700 text-sm mb-2" htmlFor="department_id">Department</label>
-        <select
-        name="department_id"
-        onChange={handleChange}
-        value={employee.department_id}
-        required
-        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        >
-        <option value="">Select Department</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        </select>
-    </div>
+  {/* Department Dropdown */}
+  <div className="flex-1">
+              <label className="block text-gray-700 text-sm mb-2" htmlFor="department_id">Department</label>
+              <select
+  name="department_id"
+  onChange={handleChange}
+  value={employee.department_id}
+  required
+  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+>
+  <option value="">Select Department</option>
+  {departments.map((dept) => (
+    <option key={dept.department_id} value={dept.department_id}>
+      {dept.name} {/* Use dept.name instead of dept.department_name */}
+    </option>
+  ))}
+</select>
+            </div>
 
     {/* Salary */}
     <div className="flex-1">

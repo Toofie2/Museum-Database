@@ -78,6 +78,9 @@ app.use("/artist", artistRouter);
 const collectionRouter = require("./routes/collection");
 app.use("/collection", collectionRouter);
 
+const departmentRouter = require("./routes/department");
+app.use("/department", departmentRouter);
+
 app.get("/", (req, res) => {
   res.json("Hello, this is the backend!");
 });
