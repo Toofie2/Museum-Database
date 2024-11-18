@@ -15,6 +15,16 @@ const ReportsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper function to filter and sort data by date range
+  const filterDataByDateRange = (data, dateRange) => {
+    return data
+      .filter(item => {
+        const itemDate = item.date;
+        return itemDate >= dateRange.startDate && itemDate <= dateRange.endDate;
+      })
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  };
+
   // Date change handler with validation
   const handleDateChange = (e, type) => {
     const newDate = e.target.value;
@@ -42,6 +52,7 @@ const ReportsPage = () => {
           axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/employees`)
         ]);
 
+        // Process popularity data
         const processedPopularityData = popularityRes.data.reduce((acc, item) => {
           const date = item.date_purchased.split('T')[0];
           if (!acc[date]) {
@@ -59,9 +70,41 @@ const ReportsPage = () => {
           return acc;
         }, {});
 
+        // Process initial revenue data from tickets
+        const processedRevenueData = ticketRes.data.reduce((acc, item) => {
+          const date = item.date_purchased.split('T')[0];
+          if (!acc[date]) {
+            acc[date] = {
+              date,
+              ticket_sales: 0,
+              product_sales: 0,
+              ticket_revenue: 0,
+              product_revenue: 0
+            };
+          }
+          acc[date].ticket_sales += item.tickets_sold;
+          acc[date].ticket_revenue += item.total_revenue;
+          return acc;
+        }, {});
+
+        // Add product data to revenue data
+        productRes.data.forEach(item => {
+          const date = item.date_purchased.split('T')[0];
+          if (!processedRevenueData[date]) {
+            processedRevenueData[date] = {
+              date,
+              ticket_sales: 0,
+              product_sales: 0,
+              ticket_revenue: 0,
+              product_revenue: 0
+            };
+          }
+          processedRevenueData[date].product_sales += item.quantity;
+          processedRevenueData[date].product_revenue += item.total_revenue;
+        });
+
         setPopularityData(Object.values(processedPopularityData));
-        setTicketData(ticketRes.data);
-        setProductData(productRes.data);
+        setTicketData(Object.values(processedRevenueData));
         setEmployeeData(employeeRes.data);
         setLoading(false);
       } catch (err) {
@@ -72,164 +115,137 @@ const ReportsPage = () => {
 
     fetchData();
   }, [dateRange]);
-
-  const renderPopularityTab = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Visitors</h3>
-        <div className="h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={popularityData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis 
-                dataKey="date" 
-                tickFormatter={(date) => new Date(date).toLocaleDateString()}
-              />
-              <YAxis />
-              <Tooltip 
-                labelFormatter={(date) => new Date(date).toLocaleDateString()}
-              />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="total_visitors" 
-                stroke="#2563eb" 
-                name="Total Visitors"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+  const renderPopularityTab = () => {
+    const filteredData = filterDataByDateRange(popularityData, dateRange);
+    
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Visitors</h3>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={filteredData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(date) => new Date(date).toLocaleDateString()}
+                />
+                <YAxis />
+                <Tooltip 
+                  labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="total_visitors" 
+                  stroke="#2563eb" 
+                  name="Total Visitors"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Exhibition Visits by Date</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibitions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {popularityData.map((day, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(day.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {day.total_visitors}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="space-y-1">
-                      {day.exhibitions.map((exhibition, idx) => (
-                        <div key={idx} className="flex justify-between text-sm">
-                          <span className="text-gray-900">{exhibition.name}</span>
-                          <span className="text-gray-500">{exhibition.visitors} visitors</span>
-                        </div>
-                      ))}
-                    </div>
-                  </td>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Exhibition Visits by Date</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibitions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredData.map((day, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(day.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {day.total_visitors}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        {day.exhibitions.map((exhibition, idx) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-gray-900">{exhibition.name}</span>
+                            <span className="text-gray-500">{exhibition.visitors} visitors</span>
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-    const renderEmployeeTab = () => {
-      const departmentGroups = employeeData.reduce((acc, employee) => {
-        if (!acc[employee.department]) {
-          acc[employee.department] = [];
-        }
-        acc[employee.department].push(employee);
-        return acc;
-      }, {});
-  
-      return (
-        <div className="space-y-8">
-          {Object.entries(departmentGroups).map(([department, employees]) => (
-            <div key={department} className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">{department} Department</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Tasks</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {employees.map((employee, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {employee.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(employee.hire_date).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {employee.tasks.length > 0 ? (
-                            <ul className="list-none space-y-2">
-                              {employee.tasks.map((task, taskIndex) => (
-                                <li key={taskIndex} className="flex flex-col">
-                                  <span className="font-medium text-gray-900">{task.name}</span>
-                                  <span className="text-gray-500 text-xs">{task.description}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <span className="text-gray-400 italic">No tasks assigned</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    };
-
-  const renderRevenueTab = () => {
-    const dailyRevenue = ticketData.reduce((acc, item) => {
-      const date = item.date_purchased.split('T')[0];
-      if (!acc[date]) {
-        acc[date] = {
-          date,
-          ticket_sales: 0,
-          product_sales: 0,
-          ticket_revenue: 0,
-          product_revenue: 0
-        };
+  const renderEmployeeTab = () => {
+    const departmentGroups = employeeData.reduce((acc, employee) => {
+      if (!acc[employee.department]) {
+        acc[employee.department] = [];
       }
-      acc[date].ticket_sales += item.tickets_sold;
-      acc[date].ticket_revenue += item.total_revenue;
+      acc[employee.department].push(employee);
       return acc;
     }, {});
 
-    productData.forEach(item => {
-      const date = item.date_purchased.split('T')[0];
-      if (!dailyRevenue[date]) {
-        dailyRevenue[date] = {
-          date,
-          ticket_sales: 0,
-          product_sales: 0,
-          ticket_revenue: 0,
-          product_revenue: 0
-        };
-      }
-      dailyRevenue[date].product_sales += item.quantity;
-      dailyRevenue[date].product_revenue += item.total_revenue;
-    });
+    return (
+      <div className="space-y-8">
+        {Object.entries(departmentGroups).map(([department, employees]) => (
+          <div key={department} className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">{department} Department</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Tasks</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {employees.map((employee, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {employee.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(employee.hire_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {employee.tasks.length > 0 ? (
+                          <ul className="list-none space-y-2">
+                            {employee.tasks.map((task, taskIndex) => (
+                              <li key={taskIndex} className="flex flex-col">
+                                <span className="font-medium text-gray-900">{task.name}</span>
+                                <span className="text-gray-500 text-xs">{task.description}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <span className="text-gray-400 italic">No tasks assigned</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
-    const dailyRevenueData = Object.values(dailyRevenue);
+  const renderRevenueTab = () => {
+    const filteredData = filterDataByDateRange(ticketData, dateRange);
 
     return (
       <div className="space-y-6">
@@ -237,7 +253,7 @@ const ReportsPage = () => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Total Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${dailyRevenueData.reduce((sum, day) => 
+              ${filteredData.reduce((sum, day) => 
                 sum + day.ticket_revenue + day.product_revenue, 0
               ).toLocaleString()}
             </p>
@@ -245,7 +261,7 @@ const ReportsPage = () => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Ticket Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${dailyRevenueData.reduce((sum, day) => 
+              ${filteredData.reduce((sum, day) => 
                 sum + day.ticket_revenue, 0
               ).toLocaleString()}
             </p>
@@ -253,19 +269,18 @@ const ReportsPage = () => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Product Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
-              ${dailyRevenueData.reduce((sum, day) => 
+              ${filteredData.reduce((sum, day) => 
                 sum + day.product_revenue, 0
               ).toLocaleString()}
             </p>
           </div>
         </div>
 
-        {/* Revenue Chart */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue</h3>
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailyRevenueData}>
+              <BarChart data={filteredData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis 
                   dataKey="date"
@@ -283,7 +298,6 @@ const ReportsPage = () => {
           </div>
         </div>
 
-        {/* Revenue Table */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Daily Revenue Details</h3>
           <div className="overflow-x-auto">
@@ -299,7 +313,7 @@ const ReportsPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {dailyRevenueData.map((day, index) => (
+                {filteredData.map((day, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(day.date).toLocaleDateString()}
@@ -353,7 +367,6 @@ const ReportsPage = () => {
           </div>
         </div>
 
-        {/* Tab Navigation */}
         <div className="flex space-x-1 mb-6 bg-white rounded-lg shadow p-1">
           <button
             onClick={() => setActiveTab('popularity')}
@@ -386,6 +399,7 @@ const ReportsPage = () => {
             Employee Report
           </button>
         </div>
+
         {loading && (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
