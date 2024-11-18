@@ -1,11 +1,10 @@
-import { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import DatePickerComponent from "../components/DatePickerComponent";
-import { useNavigate, Link } from "react-router-dom";
-import SubtractIcon from "../components/SubtractIcon.jsx";
-import AddIcon from "../components/AddIcon.jsx";
-import { useAuth } from "../components/authentication";
-import "../components/Modal.css";
+import {useEffect, useState, useContext} from 'react'
+import axios from 'axios'
+import DatePickerComponent from "../components/DatePickerComponent"
+import { useNavigate, Link } from 'react-router-dom'
+import SubtractIcon from '../components/SubtractIcon.jsx'
+import AddIcon from '../components/AddIcon.jsx'
+import { useAuth } from "../components/authentication"
 import NavbarBlack from "../components/NavbarBlack.jsx";
 import TicketFormDataContext from "../contexts/TicketFormDataContext.jsx";
 import Footer from "../components/Footer.jsx";

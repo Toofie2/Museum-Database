@@ -28,9 +28,17 @@ router.get('/:id', (req, res) => {
     });
 });
 
+
 // GET customer product by customer_id
 router.get('/:id/history', (req, res) => {
-    db.query('SELECT * FROM Customer_Product WHERE customer_id = ? AND is_deleted = FALSE ORDER BY date_purchased DESC', [req.params.id], (err, results) => {
+    const query = `
+    SELECT Customer_Product.*, Product.name
+    FROM Customer_Product
+    JOIN Product ON Customer_Product.product_id = Product.product_id
+    WHERE Customer_Product.is_deleted = FALSE AND Customer_Product.customer_id = ?
+    ORDER BY date_purchased DESC
+  `;
+    db.query(query, [req.params.id], (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;

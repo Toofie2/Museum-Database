@@ -35,6 +35,9 @@ import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
+import PurchaseHistoryLayout from "./pages/PurchaseHistoryLayout.jsx";
+import PurchaseHistoryLog from "./components/PurchaseHistoryLog.jsx";
+import PurchaseHistoryPage from "./pages/PurchaseHistoryPage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import SupportPage from "./pages/SupportPage.jsx";
 import ToursPage from "./pages/ToursPage.jsx";
@@ -264,6 +267,29 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        {/*<Route
+          path="/purchasehistory"
+          element={
+            <ProtectedRoute>
+              <PurchaseHistoryPage />
+            </ProtectedRoute>
+          }
+        />*/}
+        <Route
+          path="/purchasehistory"
+          element={
+            <ProtectedRoute>
+              {" "}
+              {/* Protect employee routes */}
+              <PurchaseHistoryLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route element={<PurchaseHistoryPage />}>
+            <Route index element={<Navigate to="ticket" replace />} />
+            <Route path=":category" element={<PurchaseHistoryLog />} />
+          </Route>
+        </Route>
     </Routes>
     </AuthProvider>
   );
