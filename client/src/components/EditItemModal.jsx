@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
 
-const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
+const EditItemModal = ({ isOpen, onClose, category, item, onSuccess }) => {
   const [formData, setFormData] = useState({});
+  const timeoutRef = useRef(null); // Add this line
   const [imagePreview, setImagePreview] = useState("");
   const [rooms, setRooms] = useState([]);
   const [artists, setArtists] = useState([]);
@@ -15,19 +16,69 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  // Initialize form data with the item's current values
+  useEffect(() => {
+    if (item) {
+      let initialData = { ...item };
+
+      // Handle special cases for different categories
+      switch (category) {
+        case "art":
+          initialData = {
+            ...initialData,
+            image_url: item.art_image_path,
+            location_type: item.collection_id ? "collection" : "exhibition",
+            date_created: item.date_created
+              ? formatDate(item.date_created)
+              : "",
+            date_received: item.date_received
+              ? formatDate(item.date_received)
+              : "",
+          };
+          break;
+        case "exhibition":
+          initialData = {
+            ...initialData,
+            image_url: item.image_path,
+            start_date: item.start_date
+              ? new Date(item.start_date).toISOString().split("T")[0]
+              : "",
+            end_date: item.end_date
+              ? new Date(item.end_date).toISOString().split("T")[0]
+              : "",
+          };
+          break;
+        case "collection":
+        case "product":
+          initialData = {
+            ...initialData,
+            image_url: item.image_path,
+            category_name: item.category_name,
+          };
+          break;
+        default:
+          break;
+      }
+
+      setFormData(initialData);
+      if (initialData.image_url) {
+        setImagePreview(initialData.image_url);
+      }
+    }
+  }, [item, category]);
+
+  // Fetch options (same as AddItemModal)
   useEffect(() => {
     const fetchOptions = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch rooms
         const roomsResponse = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/room`
         );
         setRooms(roomsResponse.data);
 
-        // Fetch category-specific data
         if (category === "art") {
           const [
             artistsResponse,
@@ -44,12 +95,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
           setArtists(artistsResponse.data);
           setCollections(collectionsResponse.data);
           setExhibitions(exhibitionsResponse.data);
-
-          // Filter out empty string and set mediums directly
-          const filteredMediums = mediumsResponse.data.filter(
-            (medium) => medium !== ""
-          );
-          setMediums(filteredMediums);
+          setMediums(mediumsResponse.data.filter((medium) => medium !== ""));
         }
 
         if (category === "product") {
@@ -73,18 +119,59 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
   }, [isOpen, category]);
 
   useEffect(() => {
-    if (!isOpen) {
-      setImagePreview(""); // Reset image preview
-      setFormData({}); // Reset form data
-      setError(null); // Reset any errors
-      setSuccess(false); // Reset success state
+    return () => {
+      // Clear timeout on unmount
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleClose = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-  }, [isOpen]);
+    onClose();
+  };
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return ""; // Return an empty string for invalid dates
+    }
+    return date.toISOString().split("T")[0];
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      let endpoint = `${import.meta.env.VITE_BACKEND_URL}/${category}`;
+      let itemId;
+      switch (category) {
+        case "exhibition":
+          itemId = item.exhibit_id;
+          break;
+        case "collection":
+          itemId = item.collection_id;
+          break;
+        case "art":
+          itemId = item.art_id;
+          break;
+        case "artist":
+          itemId = item.artist_id;
+          break;
+        case "product":
+          itemId = item.product_id;
+          break;
+        case "ticket":
+          itemId = item.ticket_id;
+          break;
+        default:
+          itemId = item.id;
+      }
+
+      let endpoint = `${
+        import.meta.env.VITE_BACKEND_URL
+      }/${category}/${itemId}`;
       let processedData = { ...formData };
 
       // Process data based on category
@@ -105,8 +192,12 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
             art_desc: formData.art_desc,
             art_image_path: formData.image_url,
             art_medium: formData.art_medium,
-            date_created: formData.date_created,
-            date_received: formData.date_received,
+            date_created: formData.date_created
+              ? new Date(formData.date_created).toISOString().split("T")[0]
+              : null,
+            date_received: formData.date_received
+              ? new Date(formData.date_received).toISOString().split("T")[0]
+              : null,
           };
           break;
 
@@ -116,10 +207,14 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
             description: formData.description,
             room_id: rooms.find((room) => room.room_name === formData.room_name)
               ?.room_id,
-            start_date: formData.start_date,
-            end_date: formData.end_date,
+            start_date: formData.start_date
+              ? new Date(formData.start_date).toISOString().split("T")[0]
+              : null,
+            end_date: formData.end_date
+              ? new Date(formData.end_date).toISOString().split("T")[0]
+              : null,
             image_path: formData.image_url,
-            is_active: true,
+            is_active: formData.is_active,
           };
           break;
 
@@ -130,7 +225,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
             room_id: rooms.find((room) => room.room_name === formData.room_name)
               ?.room_id,
             image_path: formData.image_url,
-            is_active: true,
+            is_active: formData.is_active,
           };
           break;
 
@@ -157,26 +252,29 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
           break;
       }
 
-      // Log the data being sent
-      console.log("Sending to endpoint:", endpoint);
-      console.log("Processed data:", processedData);
+      const response = await axios.put(endpoint, processedData);
 
-      const response = await axios.post(endpoint, processedData);
-      console.log("Response:", response);
-
-      if (response.status === 201) {
+      if (response.status === 200) {
         setSuccess(true);
-        onSuccess?.(); // Call the onSuccess callback
-        setTimeout(() => {
+        onSuccess?.();
+
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        // Set new timeout and store the reference
+        timeoutRef.current = setTimeout(() => {
           setSuccess(false);
           onClose();
+          timeoutRef.current = null;
         }, 2000);
       }
     } catch (error) {
       console.error("Error details:", error.response?.data || error.message);
       setError(
         error.response?.data?.message ||
-          "Failed to save data. Please try again."
+          "Failed to update data. Please try again."
       );
     }
   };
@@ -192,7 +290,6 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
       setImagePreview(value);
     }
   };
-
   const renderImagePreview = () => {
     return (
       imagePreview && (
@@ -207,7 +304,6 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
       )
     );
   };
-
   const renderFields = () => {
     switch (category) {
       case "exhibition":
@@ -220,6 +316,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="text"
                 name="name"
+                value={formData.name || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -231,6 +328,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <textarea
                 name="description"
+                value={formData.description || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -242,6 +340,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <select
                 name="room_name"
+                value={formData.room_name || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -262,6 +361,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="date"
                   name="start_date"
+                  value={formData.start_date || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -274,6 +374,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="date"
                   name="end_date"
+                  value={formData.end_date || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -287,6 +388,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="url"
                 name="image_url"
+                value={formData.image_url || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -306,6 +408,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="text"
                 name="title"
+                value={formData.title || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -317,6 +420,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <textarea
                 name="description"
+                value={formData.description || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -328,6 +432,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <select
                 name="room_name"
+                value={formData.room_name || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -347,6 +452,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="url"
                 name="image_url"
+                value={formData.image_url || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -366,6 +472,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="text"
                 name="art_title"
+                value={formData.art_title || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -377,6 +484,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <textarea
                 name="art_desc"
+                value={formData.art_desc || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -388,6 +496,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <select
                 name="artist_id"
+                value={formData.artist_id || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -410,6 +519,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <select
                 name="art_medium"
+                value={formData.art_medium || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -428,6 +538,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <select
                 name="location_type"
+                value={formData.location_type || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -445,6 +556,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 </label>
                 <select
                   name="collection_id"
+                  value={formData.collection_id || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -469,6 +581,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 </label>
                 <select
                   name="exhibit_id"
+                  value={formData.exhibit_id || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -493,6 +606,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="date"
                   name="date_created"
+                  value={formData.date_created || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -505,6 +619,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="date"
                   name="date_received"
+                  value={formData.date_received || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -518,6 +633,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="url"
                 name="image_url"
+                value={formData.image_url || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -538,6 +654,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="text"
                   name="first_name"
+                  value={formData.first_name || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
@@ -550,6 +667,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="text"
                   name="middle_initial"
+                  value={formData.middle_initial || ""}
                   maxLength="1"
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -563,6 +681,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="text"
                 name="last_name"
+                value={formData.last_name || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -570,6 +689,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
             </div>
           </>
         );
+
       case "product":
         return (
           <>
@@ -580,6 +700,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="text"
                 name="name"
+                value={formData.name || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -591,6 +712,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <textarea
                 name="description"
+                value={formData.description || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -604,6 +726,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="number"
                   name="price"
+                  value={formData.price || ""}
                   min="0"
                   step="0.01"
                   onChange={handleChange}
@@ -618,6 +741,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
                 <input
                   type="number"
                   name="quantity"
+                  value={formData.quantity || ""}
                   min="1"
                   max="999"
                   onChange={handleChange}
@@ -632,6 +756,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               </label>
               <select
                 name="category_name"
+                value={formData.category_name || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -651,6 +776,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="url"
                 name="image_url"
+                value={formData.image_url || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -670,6 +796,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="text"
                 name="type"
+                value={formData.type || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -682,6 +809,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="number"
                 name="price"
+                value={formData.price || ""}
                 min="0"
                 step="0.01"
                 onChange={handleChange}
@@ -696,6 +824,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               <input
                 type="text"
                 name="requirement"
+                value={formData.requirement || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
@@ -726,10 +855,10 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">
-            Add New {category.charAt(0).toUpperCase() + category.slice(1)}
+            Edit {category.charAt(0).toUpperCase() + category.slice(1)}
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-500 hover:text-gray-700"
           >
             <span className="material-symbols-outlined">close</span>
@@ -744,7 +873,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
 
         {success && (
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
-            Successfully added new {category}!
+            Successfully updated {category}!
           </div>
         )}
 
@@ -754,7 +883,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
           <div className="flex justify-end gap-2 mt-6">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
             >
               Cancel
@@ -763,7 +892,7 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              Add {category}
+              Save Changes
             </button>
           </div>
         </form>
@@ -771,11 +900,13 @@ const AddItemModal = ({ isOpen, onClose, category, onSuccess }) => {
     </div>
   );
 };
-AddItemModal.propTypes = {
+
+EditItemModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   category: PropTypes.string.isRequired,
-  onSuccess: PropTypes.func, // Add this prop type
+  item: PropTypes.object.isRequired,
+  onSuccess: PropTypes.func,
 };
 
-export default AddItemModal;
+export default EditItemModal;

@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-// GET all exhibitions with room name
+// GET all exhibitions with room name that are active
 router.get("/", (req, res) => {
   const query = `
-      SELECT Exhibition.*, Room.room_name 
-      FROM Exhibition 
-      JOIN Room ON Exhibition.room_id = Room.room_id
-    `;
+    SELECT Exhibition.*, Room.room_name 
+    FROM Exhibition 
+    JOIN Room ON Exhibition.room_id = Room.room_id
+    WHERE Exhibition.is_active = TRUE
+  `;
   db.query(query, (err, results) => {
     if (err) {
       res.status(500).json({ error: err.message });
