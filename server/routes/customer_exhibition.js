@@ -6,7 +6,6 @@ const db = require('../db');
 // GET all customer tickets
 router.get('/', (req, res) => {
     db.query('SELECT * FROM Customer_Exhibition WHERE is_deleted = FALSE', (err, results) => {
-    db.query('SELECT * FROM Customer_Exhibition WHERE is_deleted = FALSE', (err, results) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -36,8 +35,6 @@ router.get('/:id/history', (req, res) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
-            res.status(500).json({ error: err.message });
-            return;
         }
         if (results.length == 0) {
             res.status(404).json({ message: 'Customer Exhibition not found' });
@@ -63,22 +60,6 @@ router.post('/', (req, res) => {
     res.status(201).json({...req.body});
 });
 
-// PUT (update) a customer ticket
-// POST new customer_ticket(s)
-router.post('/', (req, res) => {
-    let reqBodyArr = {...req.body};
-    const insertQuery = "INSERT INTO Customer_Exhibition (customer_id, exhibition_id, amount_spent, valid_day) VALUES (?, ?, ?, ?)";
-
-    for(let i in reqBodyArr){
-        const { customer_id, exhibition_id, amount_spent, valid_day} = {...reqBodyArr[i]};
-        db.query(insertQuery, [customer_id, exhibition_id, amount_spent, valid_day], (err) => {
-            if (err) {
-                return res.status(500).json({ error: err.message });
-            }
-        });
-    }
-    res.status(201).json({...req.body});
-});
 
 // PUT (update) a customer ticket
 router.put('/:id', (req, res) => {
@@ -137,6 +118,7 @@ router.patch('/:id/reactivate', (req, res) => {
             return;
         }
         res.json({ message: 'Customer Exhibition successfully reactivated' });
+    })
     const customerExhibitionId = req.params.id;
     const updates = req.body;
     // Fetch customer ticket data
