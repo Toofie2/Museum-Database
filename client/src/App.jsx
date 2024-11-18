@@ -35,6 +35,7 @@ import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
+import Tasks from "./pages/employee/Tasks.jsx";
 
 const Layout = (props) =>{
   const formData = props.FD;
@@ -63,7 +64,10 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/resetpassword" element={<ResetpasswordPage />} />
-        <Route path ="/passwordresetrequest" element={<PasswordresetrequestPage />} />
+        <Route
+          path="/passwordresetrequest"
+          element={<PasswordresetrequestPage />}
+        />
         <Route path="/collections" element={<CollectionsPage />} />
         <Route path="/collection/:id" element={<CollectionsViewPage />} />
         <Route path="/exhibitions" element={<ExhibitionsPage />} />
@@ -85,6 +89,7 @@ const App = () => {
         >
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="tasks" element={<Tasks />} />
           <Route path="settings" element={<Settings />}>
             <Route index element={<Navigate to="exhibition" replace />} />
             <Route path=":category" element={<CategoryLog />} />
