@@ -28,6 +28,21 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// GET customer exhibition by customer_id
+router.get('/:id/history', (req, res) => {
+    db.query('SELECT * FROM Customer_Exhibition WHERE customer_id = ? AND is_deleted = FALSE ORDER BY date_purchased DESC', [req.params.id], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (results.length == 0) {
+            res.status(404).json({ message: 'Customer Exhibition not found' });
+            return;
+        }
+        res.json(results);
+    });
+});
+
 // POST new customer_ticket(s)
 router.post('/', (req, res) => {
     let reqBodyArr = {...req.body};

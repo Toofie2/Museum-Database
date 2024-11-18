@@ -35,6 +35,7 @@ import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
+import PurchaseHistoryPage from "./pages/PurchaseHistoryPage.jsx";
 
 const Layout = (props) =>{
   const formData = props.FD;
@@ -246,6 +247,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <EditreviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchasehistory"
+          element={
+            <ProtectedRoute>
+              <PurchaseHistoryPage />
             </ProtectedRoute>
           }
         />
