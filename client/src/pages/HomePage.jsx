@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 import { Link } from "react-router-dom";
 import backgroundImage from "../assets/HomePageBackground.jpg";
 import floor1Image from "../assets/Floor 1.png";
@@ -17,7 +18,10 @@ const HomePage = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/exhibition`
         );
-        const fetchedExhibitions = response.data;
+        const fetchedExhibitions = response.data
+          .filter(exhibition => exhibition.is_active === 1)
+          .sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
+
         setExhibitions(fetchedExhibitions);
         const upcoming = fetchedExhibitions.find(
           (exhibition) => exhibition.banner === 1
@@ -32,6 +36,7 @@ const HomePage = () => {
     };
     fetchExhibitions();
   }, []);
+  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { month: "long", day: "numeric", year: "numeric" };
@@ -156,6 +161,7 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };
