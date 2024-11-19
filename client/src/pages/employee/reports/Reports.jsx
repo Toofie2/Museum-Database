@@ -346,7 +346,7 @@ const ReportsPage = () => {
   };
 
   const renderRevenueTab = () => {
-      const maxRevenue = 1000000;
+      const maxRevenue = 100000000;
     const filteredData = ticketData.filter((day) => {
       const totalRevenue = day.ticket_revenue + day.product_revenue;
       const isInRange =
