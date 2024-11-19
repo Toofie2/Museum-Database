@@ -54,6 +54,9 @@ app.use("/exhibition_email", exhibition_emailRouter);
 const membership_emailRouter = require("./routes/membership_email.js");
 app.use("/membership_email", membership_emailRouter);
 
+const support_emailRouter = require("./routes/support_email");
+app.use("/support_email", support_emailRouter);
+
 const ticketRouter = require("./routes/ticket");
 app.use("/ticket", ticketRouter);
 
@@ -81,8 +84,8 @@ app.use("/artist", artistRouter);
 const collectionRouter = require("./routes/collection");
 app.use("/collection", collectionRouter);
 
-const reportsRoutes = require("./routes/reports");
-app.use("/reports", reportsRoutes);
+const reportsRouter = require("./routes/reports");
+app.use("/reports", reportsRouter);
 
 const departmentRouter = require("./routes/department");
 app.use("/department", departmentRouter);

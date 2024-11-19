@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import axios from 'axios'
 import NavbarBlack from "../components/NavbarBlack";
+import Footer from "../components/Footer";
 import { useNavigate } from 'react-router-dom';
 import halfImage from "../assets/membership_background.png";
 import { useAuth } from "../components/authentication";
@@ -54,14 +55,14 @@ const MembershipregPage = () => {
     };
 
     return (
-        <div className="w-full h-screen">
+        <div className="min-h-screen flex flex-col">  {/* Modified for flex layout */}
             {/* Navbar */}
             <div className="w-full">
                 <NavbarBlack />
             </div>
 
             {/* Main Content Section with Flexbox Layout */}
-            <div className="flex h-[calc(100%-75px)]">
+            <div className="flex flex-grow">  {/* Added flex-grow */}
                 
                 {/* Left Side - Membership Information Box */}
                 <div className="w-1/2 flex justify-start items-center bg-gray-50 p-16">
@@ -109,12 +110,13 @@ const MembershipregPage = () => {
 
                 {/* Right Side - Full Background Image */}
                 <div
-                    className="w-1/2 h-full bg-cover bg-center"
+                    className="w-1/2 bg-cover bg-center"
                     style={{
                         backgroundImage: `url(${halfImage})`,
                     }}
                 ></div>
             </div>
+            <Footer />
         </div>
     );
 };

@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -21,7 +22,7 @@ const CollectionsPage = () => {
   }, []);
 
   return (
-    <div className="mx-auto p-0">
+    <div className="min-h-screen flex flex-col">  {/* Added flex container */}
       <Navbar />
       {/* Banner Section */}
       <div className="relative flex items-center h-[800px] w-full">
@@ -42,7 +43,7 @@ const CollectionsPage = () => {
       </div>
 
       {/* Collections List */}
-      <div className="container mx-auto p-7 pb-20">
+      <div className="container mx-auto p-7 pb-20 flex-grow">  {/* Added flex-grow */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
           {Collections.map((collection) => (
             <div
@@ -66,6 +67,7 @@ const CollectionsPage = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
