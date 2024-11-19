@@ -42,7 +42,7 @@ const CollectionsViewPage = () => {
           className="w-full h-full object-cover absolute top-0 left-0"
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center px-8 space-y-4">
-          <h1 className="text-8xl font-regular text-white z-10">
+          <h1 className="text-8xl font-cavas text-white w-[900px] p-6">
             {collection.title}
           </h1>
           <p className="text-3xl font-thin text-white z-10 max-w-4xl">
@@ -64,12 +64,12 @@ const CollectionsViewPage = () => {
             >
               <img
                 src={`${art.art_image_path}`}
-                alt={art.title}
+                alt={art.art_title}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black to-transparent opacity-50"></div>
               <h3 className="text-2xl font-thin text-white absolute bottom-0 left-0 ml-4 mb-4 z-10">
-                {art.title}
+                {art.art_title}
               </h3>
             </div>
           ))}
