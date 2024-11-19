@@ -30,6 +30,9 @@ app.use(express.urlencoded({ extended: true }));
 const employeeRouter = require("./routes/employee");
 app.use("/employee", employeeRouter);
 
+const employeeTaskRouter = require("./routes/employee_task");
+app.use("/employee_task", employeeTaskRouter);
+
 const customerRouter = require("./routes/customer");
 app.use("/customer", customerRouter);
 
@@ -48,8 +51,8 @@ app.use("/exhibition", exhibitionRouter);
 const exhibition_emailRouter = require("./routes/exhibition_email");
 app.use("/exhibition_email", exhibition_emailRouter);
 
-const membership_emailRouter = require('./routes/membership_email.js');
-app.use('/membership_email', membership_emailRouter);
+const membership_emailRouter = require("./routes/membership_email.js");
+app.use("/membership_email", membership_emailRouter);
 
 const support_emailRouter = require("./routes/support_email");
 app.use("/support_email", support_emailRouter);
@@ -81,8 +84,11 @@ app.use("/artist", artistRouter);
 const collectionRouter = require("./routes/collection");
 app.use("/collection", collectionRouter);
 
-const reportsRouter = require('./routes/reports');
-app.use('/reports', reportsRouter);
+const reportsRouter = require("./routes/reports");
+app.use("/reports", reportsRouter);
+
+const departmentRouter = require("./routes/department");
+app.use("/department", departmentRouter);
 
 app.get("/", (req, res) => {
   res.json("Hello, this is the backend!");
