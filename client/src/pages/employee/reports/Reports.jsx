@@ -26,7 +26,7 @@ const ReportsPage = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [revenueFilter, setRevenueFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");
-  const [revenueRange, setRevenueRange] = useState({ min: 0, max: 0 });
+  const [revenueRange, setRevenueRange] = useState({ min: 0, max: 100000000 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -346,21 +346,21 @@ const ReportsPage = () => {
   };
 
   const renderRevenueTab = () => {
+      const maxRevenue = 1000000;
     const filteredData = ticketData.filter((day) => {
       const totalRevenue = day.ticket_revenue + day.product_revenue;
-      return (
-        totalRevenue >= revenueRange.min && totalRevenue <= revenueRange.max
-      );
+      const isInRange =
+        totalRevenue >= revenueRange.min && totalRevenue <= revenueRange.max;
+      const isInDateRange =
+        (!dateRange.startDate ||
+          new Date(day.date) >= new Date(dateRange.startDate)) &&
+        (!dateRange.endDate || new Date(day.date) <= new Date(dateRange.endDate));
+      return isInRange && isInDateRange;
     });
-
+  
     const tableSortedData = [...filteredData].sort(
       (a, b) => new Date(b.date) - new Date(a.date)
     );
-
-    const maxRevenue = Math.max(
-      ...filteredData.map((day) => day.ticket_revenue + day.product_revenue)
-    );
-
     const getFilteredBarData = () => {
       if (revenueFilter === "tickets") {
         return filteredData.map((day) => ({
@@ -378,7 +378,7 @@ const ReportsPage = () => {
       }
       return filteredData;
     };
-
+  
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
@@ -431,7 +431,9 @@ const ReportsPage = () => {
                 className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <button
-                onClick={() => setRevenueRange({ min: 0, max: maxRevenue })}
+                onClick={() =>
+                  setRevenueRange({ min: 0, max: maxRevenue })
+                }
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md transition-colors"
               >
                 Reset Range
@@ -456,7 +458,7 @@ const ReportsPage = () => {
             />
           </div>
         </div>
-
+  
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h4 className="text-sm font-medium text-gray-500">Total Revenue</h4>
@@ -471,9 +473,7 @@ const ReportsPage = () => {
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h4 className="text-sm font-medium text-gray-500">
-              Ticket Revenue
-            </h4>
+            <h4 className="text-sm font-medium text-gray-500">Ticket Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
               $
               {filteredData
@@ -482,9 +482,7 @@ const ReportsPage = () => {
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h4 className="text-sm font-medium text-gray-500">
-              Product Revenue
-            </h4>
+            <h4 className="text-sm font-medium text-gray-500">Product Revenue</h4>
             <p className="mt-2 text-3xl font-bold text-gray-900">
               $
               {filteredData
@@ -493,7 +491,7 @@ const ReportsPage = () => {
             </p>
           </div>
         </div>
-
+  
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">
             Daily Revenue
@@ -514,7 +512,9 @@ const ReportsPage = () => {
                   width={80}
                 />
                 <Tooltip
-                  labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                  labelFormatter={(date) =>
+                    new Date(date).toLocaleDateString()
+                  }
                   formatter={(value) => [`$${value.toLocaleString()}`, ""]}
                 />
                 <Legend />
@@ -536,7 +536,7 @@ const ReportsPage = () => {
             </ResponsiveContainer>
           </div>
         </div>
-
+  
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">
             Daily Revenue Details
@@ -565,39 +565,31 @@ const ReportsPage = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200">
                 {tableSortedData.map((day, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr
+                    key={index}
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  >
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(day.date).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {revenueFilter === "products"
-                        ? "-"
-                        : day.ticket_sales || 0}
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
+                      {day.ticket_sales}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {revenueFilter === "products"
-                        ? "-"
-                        : `$${day.ticket_revenue.toLocaleString()}`}
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
+                      ${day.ticket_revenue.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {revenueFilter === "tickets"
-                        ? "-"
-                        : day.product_sales || 0}
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
+                      {day.product_sales}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {revenueFilter === "tickets"
-                        ? "-"
-                        : `$${day.product_revenue.toLocaleString()}`}
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
+                      ${day.product_revenue.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
                       $
                       {(
-                        (revenueFilter !== "products"
-                          ? day.ticket_revenue
-                          : 0) +
-                        (revenueFilter !== "tickets" ? day.product_revenue : 0)
+                        day.ticket_revenue + day.product_revenue
                       ).toLocaleString()}
                     </td>
                   </tr>
@@ -608,7 +600,7 @@ const ReportsPage = () => {
         </div>
       </div>
     );
-  };
+  };  
 
   const renderEmployeeTab = () => {
     const departmentGroups = employeeData.reduce((acc, employee) => {
