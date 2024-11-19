@@ -35,6 +35,11 @@ import ResetpasswordPage from "./pages/ResetpasswordPage.jsx";
 import PasswordresetrequestPage from "./pages/PasswordresetrequestPage.jsx";
 import ViewprofilePage from "./pages/ViewprofilePage.jsx";
 import EditreviewPage from "./pages/EditreviewPage.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import SupportPage from "./pages/SupportPage.jsx";
+import ToursPage from "./pages/ToursPage.jsx";
+import AccessibilityPage from "./pages/AccessibilityPage.jsx";
+import ParkingPage from "./pages/ParkingPage.jsx";
 import Tasks from "./pages/employee/Tasks.jsx";
 
 const Layout = (props) => {
@@ -75,6 +80,11 @@ const App = () => {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/shop" element={<GiftShopPage />} />
         <Route path="/shop/:prodCatID" element={<GiftShopCategoryPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/tours" element={<ToursPage />} />
+        <Route path="/accessibility" element={<AccessibilityPage />} />
+        <Route path="/parking" element={<ParkingPage />} />
 
         {/* Employee Routes */}
         <Route
