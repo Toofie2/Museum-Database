@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../db');
+const db = require("../db");
 
 const validateDates = (startDate, endDate) => {
   const today = new Date();
@@ -9,27 +9,27 @@ const validateDates = (startDate, endDate) => {
   monthAgo.setMonth(monthAgo.getMonth() - 1);
   if (!startDate || !endDate) {
     return {
-      startDate: monthAgo.toISOString().split('T')[0],
-      endDate: today.toISOString().split('T')[0]
+      startDate: monthAgo.toISOString().split("T")[0],
+      endDate: today.toISOString().split("T")[0],
     };
   }
   const start = new Date(startDate);
   const end = new Date(endDate);
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     return {
-      startDate: monthAgo.toISOString().split('T')[0],
-      endDate: today.toISOString().split('T')[0]
+      startDate: monthAgo.toISOString().split("T")[0],
+      endDate: today.toISOString().split("T")[0],
     };
   }
   const validEnd = end > today ? today : end;
   const validStart = start > today ? today : start;
   return {
-    startDate: validStart.toISOString().split('T')[0],
-    endDate: validEnd.toISOString().split('T')[0]
+    startDate: validStart.toISOString().split("T")[0],
+    endDate: validEnd.toISOString().split("T")[0],
   };
 };
 
-router.get('/popularity', async (req, res) => {
+router.get("/popularity", async (req, res) => {
   const query = `
     SELECT 
       e.name AS exhibition_name,
@@ -55,14 +55,16 @@ router.get('/popularity', async (req, res) => {
   db.query(query, (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ error: 'Failed to retrieve popularity report' });
+      return res
+        .status(500)
+        .json({ error: "Failed to retrieve popularity report" });
     }
     res.json(results);
   });
 });
 
 // Employee Report
-router.get('/employees', async (req, res) => {
+router.get("/employees", async (req, res) => {
   const query = `
       SELECT 
         e.employee_id,
@@ -94,25 +96,27 @@ router.get('/employees', async (req, res) => {
   try {
     db.query(query, (error, results) => {
       if (error) {
-        console.error('Error in employee report:', error);
-        res.status(500).json({ error: 'Failed to retrieve employee report.' });
+        console.error("Error in employee report:", error);
+        res.status(500).json({ error: "Failed to retrieve employee report." });
       } else {
         const employeeMap = new Map();
-        results.forEach(row => {
+        results.forEach((row) => {
           const employeeId = row.employee_id;
           if (!employeeMap.has(employeeId)) {
             employeeMap.set(employeeId, {
-              name: `${row.first_name} ${row.middle_initial ? row.middle_initial + '. ' : ''}${row.last_name}`,
+              name: `${row.first_name} ${
+                row.middle_initial ? row.middle_initial + ". " : ""
+              }${row.last_name}`,
               department: row.department_name,
               hire_date: row.hire_date,
-              tasks: []
+              tasks: [],
             });
           }
-          
+
           if (row.task_name && row.task_description) {
             employeeMap.get(employeeId).tasks.push({
               name: row.task_name,
-              description: row.task_description
+              description: row.task_description,
             });
           }
         });
@@ -121,13 +125,13 @@ router.get('/employees', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Error in employee report:', err);
-    res.status(500).json({ error: 'Failed to retrieve employee report.' });
+    console.error("Error in employee report:", err);
+    res.status(500).json({ error: "Failed to retrieve employee report." });
   }
 });
 
 // Ticket Revenue Report
-router.get('/ticket-revenue', async (req, res) => {
+router.get("/ticket-revenue", async (req, res) => {
   let { startDate, endDate } = req.query;
   const validDates = validateDates(startDate, endDate);
   const query = `
@@ -152,22 +156,30 @@ router.get('/ticket-revenue', async (req, res) => {
   `;
 
   try {
-    db.query(query, [validDates.startDate, validDates.endDate], (error, results) => {
-      if (error) {
-        console.error('Error in ticket revenue report:', error);
-        res.status(500).json({ error: 'Failed to retrieve ticket revenue report.' });
-      } else {
-        res.status(200).json(results);
+    db.query(
+      query,
+      [validDates.startDate, validDates.endDate],
+      (error, results) => {
+        if (error) {
+          console.error("Error in ticket revenue report:", error);
+          res
+            .status(500)
+            .json({ error: "Failed to retrieve ticket revenue report." });
+        } else {
+          res.status(200).json(results);
+        }
       }
-    });
+    );
   } catch (err) {
-    console.error('Error in ticket revenue report:', err);
-    res.status(500).json({ error: 'Failed to retrieve ticket revenue report.' });
+    console.error("Error in ticket revenue report:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve ticket revenue report." });
   }
 });
 
 // Product Revenue Report
-router.get('/product-revenue', async (req, res) => {
+router.get("/product-revenue", async (req, res) => {
   let { startDate, endDate } = req.query;
   const validDates = validateDates(startDate, endDate);
   const query = `
@@ -195,17 +207,25 @@ router.get('/product-revenue', async (req, res) => {
   `;
 
   try {
-    db.query(query, [validDates.startDate, validDates.endDate], (error, results) => {
-      if (error) {
-        console.error('Error in product revenue report:', error);
-        res.status(500).json({ error: 'Failed to retrieve product revenue report.' });
-      } else {
-        res.status(200).json(results);
+    db.query(
+      query,
+      [validDates.startDate, validDates.endDate],
+      (error, results) => {
+        if (error) {
+          console.error("Error in product revenue report:", error);
+          res
+            .status(500)
+            .json({ error: "Failed to retrieve product revenue report." });
+        } else {
+          res.status(200).json(results);
+        }
       }
-    });
+    );
   } catch (err) {
-    console.error('Error in product revenue report:', err);
-    res.status(500).json({ error: 'Failed to retrieve product revenue report.' });
+    console.error("Error in product revenue report:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve product revenue report." });
   }
 });
 
