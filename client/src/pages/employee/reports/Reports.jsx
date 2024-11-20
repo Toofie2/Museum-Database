@@ -97,6 +97,7 @@ const ReportsPage = () => {
             acc[date].exhibitions.push({
               name: item.exhibition_name,
               visitors: item.total_visitors,
+              average_rating: item.average_rating,
               start_date: new Date(item.start_date).toISOString().split('T')[0],
               end_date: new Date(item.end_date).toISOString().split('T')[0],
             });

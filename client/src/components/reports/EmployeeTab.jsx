@@ -84,7 +84,7 @@ export const EmployeeTab = ({
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50">
+                <tr className="bg-gray-100">
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Employee Name
                   </th>
@@ -98,7 +98,7 @@ export const EmployeeTab = ({
               </thead>
               <tbody>
                 {employees.map((employee, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {employee.name}
                     </td>

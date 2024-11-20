@@ -7,6 +7,7 @@ export const PopularityTab = ({
   handleDateChange,
 }) => {
   const [sortBy, setSortBy] = useState('date');
+  const [selectedGraph, setSelectedGraph] = useState('total'); // 'total' or exhibition name
 
   const filteredData = useMemo(() => {
     return popularityData.filter((item) => {
@@ -48,11 +49,10 @@ export const PopularityTab = ({
     return filteredData.map((day) => ({
       date: new Date(day.date).toLocaleDateString(),
       totalVisitors: day.total_visitors,
-      averageRating: day.exhibitions.reduce((sum, ex) => sum + (ex.average_rating || 0), 0) / day.exhibitions.length,
       exhibitions: day.exhibitions.map((exhibition) => ({
         name: exhibition.name,
         visitors: exhibition.visitors || 0,
-        rating: exhibition.average_rating || 0,
+        rating: exhibition.average_rating ? Number(exhibition.average_rating.toFixed(1)) : null,
       })),
     })).sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [filteredData]);
@@ -62,16 +62,39 @@ export const PopularityTab = ({
       .sort((a, b) => b.totalVisitors - a.totalVisitors)
       .map((exhibition) => ({
         ...exhibition,
-        averageRating: exhibition.averageRating !== null ? exhibition.averageRating.toFixed(1) : 'N/A',
+        averageRating: exhibition.averageRating !== null 
+          ? Number(exhibition.averageRating.toFixed(1)) 
+          : 'N/A',
       }));
   }, [exhibitionTotals]);
 
   const chartData = useMemo(() => {
-    return sortedDailyData.map(day => ({
-      date: day.date,
-      visitors: day.totalVisitors,
-      rating: day.averageRating
-    })).reverse();
+    if (selectedGraph === 'total') {
+      return sortedDailyData.map(day => ({
+        date: day.date,
+        visitors: day.totalVisitors
+      })).reverse();
+    } else {
+      // Get data for specific exhibition
+      return sortedDailyData.map(day => {
+        const exhibition = day.exhibitions.find(ex => ex.name === selectedGraph);
+        return {
+          date: day.date,
+          visitors: exhibition ? exhibition.visitors : 0
+        };
+      }).reverse();
+    }
+  }, [sortedDailyData, selectedGraph]);
+
+  // Get unique exhibition names for the dropdown
+  const exhibitionNames = useMemo(() => {
+    const names = new Set();
+    sortedDailyData.forEach(day => {
+      day.exhibitions.forEach(exhibition => {
+        names.add(exhibition.name);
+      });
+    });
+    return Array.from(names);
   }, [sortedDailyData]);
 
   return (
@@ -120,18 +143,36 @@ export const PopularityTab = ({
       </div>
 
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Popularity Trend</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Popularity Trend</h3>
+          <div className="w-64">
+            <select
+              value={selectedGraph}
+              onChange={(e) => setSelectedGraph(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="total">Total Visitors</option>
+              {exhibitionNames.map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
         <div className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
               <Tooltip />
               <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="visitors" stroke="#8884d8" name="Visitors" />
-              <Line yAxisId="right" type="monotone" dataKey="rating" stroke="#82ca9d" name="Avg Rating" />
+              <Line 
+                yAxisId="left" 
+                type="monotone" 
+                dataKey="visitors" 
+                stroke="#8884d8" 
+                name={selectedGraph === 'total' ? 'Total Visitors' : selectedGraph} 
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -143,27 +184,40 @@ export const PopularityTab = ({
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibitions</th>
+                <tr className="bg-gray-100">
+                  <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
+                  <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibition</th>
+                  <th className="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Visitors</th>
+                  <th className="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
                 </tr>
               </thead>
-              <tbody>
-                {sortedDailyData.map((day, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{day.date}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{day.totalVisitors.toLocaleString()}</td>
-                    <td className="px-6 py-4">
-                      {day.exhibitions.map((exhibition, idx) => (
-                        <div key={idx} className="flex justify-between text-sm">
-                          <span>{exhibition.name}</span>
-                          <span>{exhibition.visitors.toLocaleString()} visitors</span>
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-gray-200">
+                {sortedDailyData.flatMap((day, index) => 
+                  day.exhibitions.map((exhibition, exhibitionIndex) => (
+                    <tr key={`${index}-${exhibitionIndex}`} className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                      {exhibitionIndex === 0 && (
+                        <>
+                          <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900" rowSpan={day.exhibitions.length}>
+                            {day.date}
+                          </td>
+                          <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900" rowSpan={day.exhibitions.length}>
+                            {day.totalVisitors.toLocaleString()}
+                          </td>
+                        </>
+                      )}
+                      <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                        {exhibition.name}
+                      </td>
+                      <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {exhibition.visitors.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900 text-right">
+                        {exhibition.rating ? `${exhibition.rating} ` : 'No rating'}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -174,22 +228,22 @@ export const PopularityTab = ({
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibition Name</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Average Rating</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
+                <tr className="bg-gray-100">
+                  <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exhibition Name</th>
+                  <th className="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Visitors</th>
+                  <th className="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Average Rating</th>
+                  <th className="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                  <th className="px-6 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {sortedExhibitionTotals.map((exhibition, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{exhibition.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{exhibition.totalVisitors.toLocaleString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{exhibition.averageRating}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{new Date(exhibition.startDate).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{new Date(exhibition.endDate).toLocaleDateString()}</td>
+                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{exhibition.name}</td>
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900 text-right">{exhibition.totalVisitors.toLocaleString()}</td>
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900 text-right">{exhibition.averageRating}</td>
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900 text-right">{new Date(exhibition.startDate).toLocaleDateString()}</td>
+                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900 text-right">{new Date(exhibition.endDate).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>

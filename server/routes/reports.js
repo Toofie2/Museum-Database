@@ -37,27 +37,27 @@ router.get("/popularity", async (req, res) => {
     console.log("Fetching popularity data for dates:", validDates);
 
     const query = `
-      SELECT 
-        e.name AS exhibition_name,
-        e.start_date,
-        e.end_date,
-        DATE(ce.valid_day) AS date_purchased,
-        COUNT(DISTINCT ce.customer_exhibition_id) AS total_visitors,
-        COALESCE(AVG(r.rating), NULL) AS average_rating,
-        COUNT(r.rating) AS review_count
-      FROM Exhibition e
-      INNER JOIN Customer_Exhibition ce ON e.exhibit_id = ce.exhibition_id
-      LEFT JOIN Review r ON e.exhibit_id = r.exhibit_id
-        AND DATE(r.date_posted) BETWEEN ? AND ?
-      WHERE ce.valid_day BETWEEN ? AND ?
-      GROUP BY
-        e.name,
-        e.start_date,
-        e.end_date,
-        DATE(ce.valid_day)
-      ORDER BY
-        date_purchased DESC,
-        total_visitors DESC;
+ SELECT 
+  e.name AS exhibition_name,
+  e.start_date,
+  e.end_date,
+  DATE(ce.valid_day) AS date_purchased,
+  COUNT(DISTINCT ce.customer_exhibition_id) AS total_visitors,
+  ROUND(AVG(r.rating), 1) AS average_rating,
+  COUNT(r.rating) AS review_count
+FROM Exhibition e
+INNER JOIN Customer_Exhibition ce ON e.exhibit_id = ce.exhibition_id
+LEFT JOIN Review r ON e.exhibit_id = r.exhibit_id 
+  AND r.rating IS NOT NULL
+WHERE ce.valid_day BETWEEN ? AND ?
+GROUP BY
+  e.name,
+  e.start_date,
+  e.end_date,
+  DATE(ce.valid_day)
+ORDER BY
+  date_purchased DESC,
+  total_visitors DESC;
     `;
 
     db.query(query, [validDates.startDate, validDates.endDate, validDates.startDate, validDates.endDate], (err, results) => {
@@ -65,11 +65,11 @@ router.get("/popularity", async (req, res) => {
         console.error("Database error in popularity:", err);
         return res.status(500).json({ error: "Failed to retrieve popularity report" });
       }
-      
-      const processedResults = results.map(row => ({
-        ...row,
-        average_rating: row.average_rating !== null ? Math.round(row.average_rating) : null
-      }));
+
+    const processedResults = results.map(row => ({
+      ...row,
+      average_rating: row.average_rating !== null ? parseFloat(row.average_rating.toFixed(1)) : null
+    }));
 
       console.log("Popularity results:", processedResults);
       res.json(processedResults);

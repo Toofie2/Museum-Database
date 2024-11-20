@@ -238,7 +238,7 @@ export const RevenueTab = ({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50">
+              <tr className="bg-gray-100">
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
                 </th>
@@ -263,7 +263,7 @@ export const RevenueTab = ({
               {tableSortedData.map((day, index) => (
                 <tr
                   key={index}
-                  className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
                 >
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(day.date).toLocaleDateString()}
