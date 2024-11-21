@@ -28,6 +28,29 @@ router.get('/:id', (req, res) => {
     });
 });
 
+
+// GET customer product by customer_id
+router.get('/:id/history', (req, res) => {
+    const query = `
+    SELECT Customer_Product.*, Product.name
+    FROM Customer_Product
+    JOIN Product ON Customer_Product.product_id = Product.product_id
+    WHERE Customer_Product.is_deleted = FALSE AND Customer_Product.customer_id = ?
+    ORDER BY date_purchased DESC
+  `;
+    db.query(query, [req.params.id], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (results.length == 0) {
+            res.status(404).json({ message: 'Customer Product not found' });
+            return;
+        }
+        res.json(results);
+    });
+});
+
 // POST new customer_product(s)
 router.post('/', (req, res) => {
     let reqBodyArr = {...req.body};
