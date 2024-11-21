@@ -5,7 +5,6 @@ import axios from "axios";
 import SubtractIcon from "../components/SubtractIcon.jsx";
 import AddIcon from "../components/AddIcon.jsx";
 import { useAuth } from "../components/authentication";
-import "../components/Modal.css";
 import Footer from "../components/Footer.jsx";
 
 const GiftShopProductPage = () => {
@@ -243,12 +242,16 @@ const GiftShopProductPage = () => {
                   </div>
                 )}
                 <hr />
-                <span className="font-bold mt-30">
-                  Total: $
-                  {customerInfo.is_member
-                    ? (subtotal - subtotal * discountPercent).toFixed(2)
-                    : Number(subtotal).toFixed(2)}
-                </span>
+                <div className="flex flex-row font-bold mt-30 justify-between">
+                  <p>
+                    Total:
+                  </p>
+                  <p>
+                    ${customerInfo.is_member
+                      ? (subtotal - subtotal * discountPercent).toFixed(2)
+                      : Number(subtotal).toFixed(2)}
+                  </p>
+                </div>
               </div>
               <div className="flex flex-row justify-between">
                 <button
@@ -269,19 +272,18 @@ const GiftShopProductPage = () => {
         </div>
       )}
       {showGoBackPopup && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <h3 className="text-xl">Thank you for your purchase!</h3>
-            <button
-              onClick={handleCloseGoBackPopup} // Close popup and trigger redirect
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              Close
-            </button>
+          <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded shadow-lg">
+              <h3 className="text-xl">Thank you for your purchase! <br/> (You can view your purchase history on your profile)</h3>
+              <button
+                onClick={handleCloseGoBackPopup} // Close popup and trigger redirect
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                Close
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-      <Footer />
+        )}
     </div>
   );
 };

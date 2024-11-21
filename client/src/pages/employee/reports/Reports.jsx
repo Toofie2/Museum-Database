@@ -25,7 +25,6 @@ const ReportsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // =============== HANDLERS ===============
   const handleDateChange = (e, type) => {
     const newDate = e.target.value;
     const today = new Date().toISOString().split("T")[0];
@@ -41,48 +40,29 @@ const ReportsPage = () => {
     }
   };
 
-  // =============== DATA FETCHING ===============
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // Log the requests we're making
-        console.log('Making requests to:', {
-          popularity: `${import.meta.env.VITE_BACKEND_URL}/reports/popularity`,
-          ticketRevenue: `${import.meta.env.VITE_BACKEND_URL}/reports/ticket-revenue`,
-          productRevenue: `${import.meta.env.VITE_BACKEND_URL}/reports/product-revenue`,
-          employees: `${import.meta.env.VITE_BACKEND_URL}/reports/employees`
-        });
-
-        // Make requests individually to better track errors
         const popularityRes = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/reports/popularity`,
           { params: dateRange }
         );
-        console.log('Popularity raw data:', popularityRes.data);
-
         const ticketRevenueRes = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/reports/ticket-revenue`,
           { params: dateRange }
         );
-        console.log('Ticket revenue raw data:', ticketRevenueRes.data);
-
         const productRevenueRes = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/reports/product-revenue`,
           { params: dateRange }
         );
-        console.log('Product revenue raw data:', productRevenueRes.data);
-
         const employeeRes = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/reports/employees`
         );
-        console.log('Employee raw data:', employeeRes.data);
-
-        // Process popularity data
         const processedPopularityData = popularityRes.data.reduce((acc, item) => {
-          if (!item.date_purchased) return acc; // Skip invalid data
+          if (!item.date_purchased) return acc;
           
           const date = new Date(item.date_purchased).toISOString().split('T')[0];
           if (!acc[date]) {
@@ -107,9 +87,6 @@ const ReportsPage = () => {
           return acc;
         }, {});
 
-        console.log('Processed popularity data:', Object.values(processedPopularityData));
-
-        // Process revenue data
         const revenueData = ticketRevenueRes.data.map((ticketDay) => {
           const productDay = productRevenueRes.data.find(
             (p) => new Date(p.date).toISOString().split('T')[0] === new Date(ticketDay.date).toISOString().split('T')[0]
@@ -124,17 +101,11 @@ const ReportsPage = () => {
           };
         });
 
-        console.log('Processed revenue data:', revenueData);
-
-        // Process employee data
         const processedEmployeeData = employeeRes.data.map(emp => ({
           ...emp,
           tasks: emp.tasks || []
         }));
 
-        console.log('Processed employee data:', processedEmployeeData);
-
-        // Calculate max revenue
         const maxRevenue = Math.max(
           ...revenueData.map(
             (day) => (day.ticket_revenue || 0) + (day.product_revenue || 0)
@@ -142,19 +113,10 @@ const ReportsPage = () => {
           0
         );
 
-        // Update state
         setPopularityData(Object.values(processedPopularityData));
         setTicketData(revenueData);
         setEmployeeData(processedEmployeeData);
         setRevenueRange((prev) => ({ min: 0, max: maxRevenue }));
-        
-        // Log final state updates
-        console.log('Final state updates:', {
-          popularityData: Object.values(processedPopularityData),
-          ticketData: revenueData,
-          employeeData: processedEmployeeData,
-          maxRevenue
-        });
 
         setLoading(false);
       } catch (err) {
@@ -175,7 +137,6 @@ const ReportsPage = () => {
     fetchData();
   }, [dateRange]);
 
-  // Log whenever active tab changes
   useEffect(() => {
     console.log('Active tab:', activeTab);
     console.log('Current data for tab:', {
@@ -188,13 +149,11 @@ const ReportsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">
             Reports Dashboard
           </h1>
         </div>
-
         {/* Tab Navigation */}
         <div className="flex space-x-1 mb-6 bg-white rounded-lg shadow p-1">
           {[
@@ -215,14 +174,11 @@ const ReportsPage = () => {
             </button>
           ))}
         </div>
-
-        {/* Error Display */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
-
         {/* Loading Display */}
         {loading ? (
           <div className="flex justify-center items-center h-64">

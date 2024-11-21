@@ -85,6 +85,10 @@ const EditProfilePage = () => {
     navigate('/editreview');
   };
 
+  const handlePurchaseHistoryClick = () => {
+    navigate('/purchasehistory');
+  };
+
   // Handle the account deletion
   const handleDeleteAccount = async () => {
     try {
@@ -145,6 +149,13 @@ const EditProfilePage = () => {
                 className="bg-gray-900 text-white px-6 py-3 rounded-md w-full md:w-1/2 lg:w-1/3 hover:bg-black transition duration-200"
               >
                 Edit Reviews
+              </button>
+
+              <button
+                onClick={handlePurchaseHistoryClick}
+                className="bg-gray-900 text-white px-6 py-3 rounded-md w-full md:w-1/2 lg:w-1/3 hover:bg-black transition duration-200"
+              >
+                Purchase History
               </button>
 
               <button

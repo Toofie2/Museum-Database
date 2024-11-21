@@ -446,12 +446,16 @@ const ExhibitionsPurchasePage = (props) => {
                 </div>
               )}
               <hr />
-              <span className="font-bold mt-30">
-                Total: $
-                {customerInfo.is_member
+              <div className="flex flex-row font-bold mt-30 justify-between">
+                <p>
+                  Total:
+                </p>
+                <p>
+                  ${customerInfo.is_member
                   ? (Number(subtotal) - Number(subtractFromSubtotal)).toFixed(2)
                   : Number(subtotal).toFixed(2)}
-              </span>
+                </p>
+              </div>
             </div>
             <div className="flex flex-row justify-between">
               <button

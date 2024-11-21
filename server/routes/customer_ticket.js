@@ -28,6 +28,28 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// GET customer ticket by customer_id
+router.get('/:id/history', (req, res) => {
+    const query = `
+    SELECT Customer_Ticket.*, Ticket.type
+    FROM Customer_Ticket
+    JOIN Ticket ON Customer_Ticket.ticket_id = Ticket.ticket_id
+    WHERE Customer_Ticket.is_deleted = FALSE AND Customer_Ticket.customer_id = ?
+    ORDER BY date_purchased DESC
+  `;
+    db.query(query, [req.params.id], (err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (results.length == 0) {
+            res.status(404).json({ message: 'Customer Ticket not found' });
+            return;
+        }
+        res.json(results);
+    });
+});
+
 // POST new customer_ticket(s)
 router.post('/', (req, res) => {
     let reqBodyArr = {...req.body};
