@@ -7,7 +7,7 @@ export const PopularityTab = ({
   handleDateChange,
 }) => {
   const [sortBy, setSortBy] = useState('date');
-  const [selectedGraph, setSelectedGraph] = useState('total'); // 'total' or exhibition name
+  const [selectedGraph, setSelectedGraph] = useState('total');
 
   const filteredData = useMemo(() => {
     return popularityData.filter((item) => {
@@ -75,7 +75,6 @@ export const PopularityTab = ({
         visitors: day.totalVisitors
       })).reverse();
     } else {
-      // Get data for specific exhibition
       return sortedDailyData.map(day => {
         const exhibition = day.exhibitions.find(ex => ex.name === selectedGraph);
         return {
@@ -86,7 +85,6 @@ export const PopularityTab = ({
     }
   }, [sortedDailyData, selectedGraph]);
 
-  // Get unique exhibition names for the dropdown
   const exhibitionNames = useMemo(() => {
     const names = new Set();
     sortedDailyData.forEach(day => {
@@ -141,7 +139,6 @@ export const PopularityTab = ({
           </div>
         </div>
       </div>
-
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Popularity Trend</h3>

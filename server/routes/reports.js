@@ -1,4 +1,3 @@
-// server/routes/reports.js
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
@@ -37,27 +36,27 @@ router.get("/popularity", async (req, res) => {
     console.log("Fetching popularity data for dates:", validDates);
 
     const query = `
- SELECT 
-  e.name AS exhibition_name,
-  e.start_date,
-  e.end_date,
-  DATE(ce.valid_day) AS date_purchased,
-  COUNT(DISTINCT ce.customer_exhibition_id) AS total_visitors,
-  ROUND(AVG(r.rating), 1) AS average_rating,
-  COUNT(r.rating) AS review_count
-FROM Exhibition e
-INNER JOIN Customer_Exhibition ce ON e.exhibit_id = ce.exhibition_id
-LEFT JOIN Review r ON e.exhibit_id = r.exhibit_id 
-  AND r.rating IS NOT NULL
-WHERE ce.valid_day BETWEEN ? AND ?
-GROUP BY
-  e.name,
-  e.start_date,
-  e.end_date,
-  DATE(ce.valid_day)
-ORDER BY
-  date_purchased DESC,
-  total_visitors DESC;
+        SELECT 
+          e.name AS exhibition_name,
+          e.start_date,
+          e.end_date,
+          DATE(ce.valid_day) AS date_purchased,
+          COUNT(DISTINCT ce.customer_exhibition_id) AS total_visitors,
+          ROUND(AVG(r.rating), 1) AS average_rating,
+          COUNT(r.rating) AS review_count
+        FROM Exhibition e
+        INNER JOIN Customer_Exhibition ce ON e.exhibit_id = ce.exhibition_id
+        LEFT JOIN Review r ON e.exhibit_id = r.exhibit_id 
+          AND r.rating IS NOT NULL
+        WHERE ce.valid_day BETWEEN ? AND ?
+        GROUP BY
+          e.name,
+          e.start_date,
+          e.end_date,
+          DATE(ce.valid_day)
+        ORDER BY
+          date_purchased DESC,
+          total_visitors DESC;
     `;
 
     db.query(query, [validDates.startDate, validDates.endDate, validDates.startDate, validDates.endDate], (err, results) => {
@@ -96,7 +95,7 @@ router.get("/ticket-revenue", async (req, res) => {
       AND DATE(ct.date_purchased) BETWEEN ? AND ?
       GROUP BY DATE(ct.date_purchased)
       ORDER BY date DESC;
-    `;
+      `;
 
     db.query(query, [validDates.startDate, validDates.endDate], (err, results) => {
       if (err) {

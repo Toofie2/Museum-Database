@@ -1,4 +1,3 @@
-// src/components/Reports/RevenueTab.jsx
 import React from 'react';
 import {
   BarChart,
@@ -20,7 +19,6 @@ export const RevenueTab = ({
   revenueFilter,
   setRevenueFilter
 }) => {
-  // Filter data based on date range and revenue range
   const filteredData = ticketData.filter((day) => {
     const totalRevenue = day.ticket_revenue + day.product_revenue;
     const isInRange =
@@ -32,12 +30,9 @@ export const RevenueTab = ({
     return isInRange && isInDateRange;
   });
 
-  // Sort data for table (newest to oldest)
   const tableSortedData = [...filteredData].sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
-
-  // Get data for bar chart (oldest to newest)
   const getFilteredBarData = () => {
     let data = [...filteredData].sort(
       (a, b) => new Date(a.date) - new Date(b.date)
@@ -60,7 +55,7 @@ export const RevenueTab = ({
     return data;
   };
 
-  // Calculate total revenues for summary cards
+  // Calculate total revenue for summary cards
   const getTotalRevenue = () => {
     return filteredData
       .reduce(
@@ -84,7 +79,6 @@ export const RevenueTab = ({
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="flex items-center gap-2">
@@ -163,8 +157,6 @@ export const RevenueTab = ({
           />
         </div>
       </div>
-
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h4 className="text-sm font-medium text-gray-500">Total Revenue</h4>
@@ -185,8 +177,6 @@ export const RevenueTab = ({
           </p>
         </div>
       </div>
-
-      {/* Chart */}
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h3 className="text-xl font-semibold mb-4 text-gray-800">
           Daily Revenue

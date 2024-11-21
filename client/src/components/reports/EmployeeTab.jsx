@@ -70,7 +70,6 @@ export const EmployeeTab = ({
           </div>
         </div>
       </div>
-
       {Object.entries(filteredDepartmentGroups).map(([department, employees]) => (
         <div key={department} className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-center mb-4">
