@@ -48,6 +48,7 @@ router.get("/popularity", async (req, res) => {
         LEFT JOIN Review r ON e.exhibit_id = r.exhibit_id 
           AND r.rating IS NOT NULL
         WHERE ce.valid_day BETWEEN ? AND ?
+          AND e.is_active = 1
         GROUP BY
           e.name,
           e.start_date,
@@ -58,18 +59,32 @@ router.get("/popularity", async (req, res) => {
           total_visitors DESC;
     `;
 
-    db.query(query, [validDates.startDate, validDates.endDate, validDates.startDate, validDates.endDate], (err, results) => {
-      if (err) {
-        console.error("Database error in popularity:", err);
-        return res.status(500).json({ error: "Failed to retrieve popularity report" });
-      }
+    db.query(
+      query,
+      [
+        validDates.startDate,
+        validDates.endDate,
+        validDates.startDate,
+        validDates.endDate,
+      ],
+      (err, results) => {
+        if (err) {
+          console.error("Database error in popularity:", err);
+          return res
+            .status(500)
+            .json({ error: "Failed to retrieve popularity report" });
+        }
 
-    const processedResults = results.map(row => ({
-      ...row,
-      average_rating: row.average_rating !== null ? parseFloat(row.average_rating.toFixed(1)) : null
-    }));
-      res.json(processedResults);
-    });
+        const processedResults = results.map((row) => ({
+          ...row,
+          average_rating:
+            row.average_rating !== null
+              ? parseFloat(row.average_rating.toFixed(1))
+              : null,
+        }));
+        res.json(processedResults);
+      }
+    );
   } catch (err) {
     console.error("Error in popularity route:", err);
     res.status(500).json({ error: "Failed to retrieve popularity report" });
@@ -93,13 +108,19 @@ router.get("/ticket-revenue", async (req, res) => {
       ORDER BY date DESC;
       `;
 
-    db.query(query, [validDates.startDate, validDates.endDate], (err, results) => {
-      if (err) {
-        console.error("Database error in ticket revenue:", err);
-        return res.status(500).json({ error: "Failed to retrieve ticket revenue" });
+    db.query(
+      query,
+      [validDates.startDate, validDates.endDate],
+      (err, results) => {
+        if (err) {
+          console.error("Database error in ticket revenue:", err);
+          return res
+            .status(500)
+            .json({ error: "Failed to retrieve ticket revenue" });
+        }
+        res.json(results);
       }
-      res.json(results);
-    });
+    );
   } catch (err) {
     console.error("Error in ticket revenue route:", err);
     res.status(500).json({ error: "Failed to retrieve ticket revenue" });
@@ -122,13 +143,19 @@ router.get("/product-revenue", async (req, res) => {
       ORDER BY date DESC;
     `;
 
-    db.query(query, [validDates.startDate, validDates.endDate], (err, results) => {
-      if (err) {
-        console.error("Database error in product revenue:", err);
-        return res.status(500).json({ error: "Failed to retrieve product revenue" });
+    db.query(
+      query,
+      [validDates.startDate, validDates.endDate],
+      (err, results) => {
+        if (err) {
+          console.error("Database error in product revenue:", err);
+          return res
+            .status(500)
+            .json({ error: "Failed to retrieve product revenue" });
+        }
+        res.json(results);
       }
-      res.json(results);
-    });
+    );
   } catch (err) {
     console.error("Error in product revenue route:", err);
     res.status(500).json({ error: "Failed to retrieve product revenue" });
@@ -169,7 +196,9 @@ router.get("/employees", async (req, res) => {
     db.query(query, (err, results) => {
       if (err) {
         console.error("Database error in employees:", err);
-        return res.status(500).json({ error: "Failed to retrieve employee data" });
+        return res
+          .status(500)
+          .json({ error: "Failed to retrieve employee data" });
       }
 
       const employeeMap = new Map();
@@ -177,7 +206,9 @@ router.get("/employees", async (req, res) => {
         const employeeId = row.employee_id;
         if (!employeeMap.has(employeeId)) {
           employeeMap.set(employeeId, {
-            name: `${row.first_name} ${row.middle_initial ? row.middle_initial + ". " : ""}${row.last_name}`,
+            name: `${row.first_name} ${
+              row.middle_initial ? row.middle_initial + ". " : ""
+            }${row.last_name}`,
             department: row.department_name,
             hire_date: row.hire_date,
             tasks: [],
