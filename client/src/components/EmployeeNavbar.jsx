@@ -30,7 +30,7 @@ const EmployeeNavbar = () => {
     {
       name: "Employees",
       link: "/employees",
-      symbol: "people",
+      symbol: "work",
     },
     {
       name: "Customers",

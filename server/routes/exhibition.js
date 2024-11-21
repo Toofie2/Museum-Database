@@ -9,6 +9,10 @@ router.get("/", (req, res) => {
     FROM Exhibition 
     JOIN Room ON Exhibition.room_id = Room.room_id
     WHERE Exhibition.is_active = TRUE
+    ORDER BY GREATEST(
+      IFNULL(Exhibition.start_date, '1970-01-01'), 
+      IFNULL(Exhibition.end_date, '1970-01-01')
+    ) DESC
   `;
   db.query(query, (err, results) => {
     if (err) {
@@ -49,7 +53,7 @@ router.post("/", (req, res) => {
     start_date,
     end_date,
     is_active,
-    admission_price
+    admission_price,
   } = req.body;
   const insertQuery =
     "INSERT INTO Exhibition (exhibit_id, room_id, name, description, image_path, start_date, end_date, is_active, admission_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -64,7 +68,7 @@ router.post("/", (req, res) => {
       start_date,
       end_date,
       is_active,
-      admission_price
+      admission_price,
     ],
     (err, result) => {
       if (err) {
@@ -102,7 +106,7 @@ router.put("/:id", (req, res) => {
       start_date,
       end_date,
       is_active,
-      admission_price
+      admission_price,
     } = updatedExhibition;
 
     // Update the exhibition
@@ -145,7 +149,7 @@ router.put("/:id", (req, res) => {
           start_date,
           end_date,
           is_active,
-          admission_price
+          admission_price,
         });
       }
     );
