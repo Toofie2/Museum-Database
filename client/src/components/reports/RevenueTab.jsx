@@ -219,7 +219,6 @@ export const RevenueTab = ({
           </ResponsiveContainer>
         </div>
       </div>
-
       {/* Table */}
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h3 className="text-xl font-semibold mb-4 text-gray-800">

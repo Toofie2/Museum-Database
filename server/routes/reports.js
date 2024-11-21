@@ -33,7 +33,6 @@ router.get("/popularity", async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     const validDates = validateDates(startDate, endDate);
-    console.log("Fetching popularity data for dates:", validDates);
 
     const query = `
         SELECT 
@@ -69,8 +68,6 @@ router.get("/popularity", async (req, res) => {
       ...row,
       average_rating: row.average_rating !== null ? parseFloat(row.average_rating.toFixed(1)) : null
     }));
-
-      console.log("Popularity results:", processedResults);
       res.json(processedResults);
     });
   } catch (err) {
@@ -83,7 +80,6 @@ router.get("/ticket-revenue", async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     const validDates = validateDates(startDate, endDate);
-    console.log("Fetching ticket revenue for dates:", validDates);
 
     const query = `
       SELECT 
@@ -102,7 +98,6 @@ router.get("/ticket-revenue", async (req, res) => {
         console.error("Database error in ticket revenue:", err);
         return res.status(500).json({ error: "Failed to retrieve ticket revenue" });
       }
-      console.log("Ticket revenue results:", results);
       res.json(results);
     });
   } catch (err) {
@@ -115,8 +110,6 @@ router.get("/product-revenue", async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     const validDates = validateDates(startDate, endDate);
-    console.log("Fetching product revenue for dates:", validDates);
-
     const query = `
       SELECT 
         DATE(cp.date_purchased) AS date,
@@ -134,7 +127,6 @@ router.get("/product-revenue", async (req, res) => {
         console.error("Database error in product revenue:", err);
         return res.status(500).json({ error: "Failed to retrieve product revenue" });
       }
-      console.log("Product revenue results:", results);
       res.json(results);
     });
   } catch (err) {
@@ -145,8 +137,6 @@ router.get("/product-revenue", async (req, res) => {
 
 router.get("/employees", async (req, res) => {
   try {
-    console.log("Fetching employee data");
-
     const query = `
       SELECT 
         e.employee_id,
@@ -203,7 +193,6 @@ router.get("/employees", async (req, res) => {
       });
 
       const formattedData = Array.from(employeeMap.values());
-      console.log("Employee results:", formattedData);
       res.json(formattedData);
     });
   } catch (err) {
